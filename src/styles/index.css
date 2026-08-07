@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+/* ======================================================
+   GLOBAL
+====================================================== */
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #faf8f2;
+  font-family: "Nunito", sans-serif;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+}
+
+img {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ======================================================
+   TIMELINE ANIMATIONS
+====================================================== */
+
+@keyframes timelineFloat {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.timeline-float {
+  animation: timelineFloat 5s ease-in-out infinite;
+}
+
+/* Smooth animations */
+
+.timeline-transition {
+  transition: all 0.35s ease;
+}
+
+/* Books */
+
+.timeline-book {
+  transition: transform 0.3s ease, filter 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.timeline-book:hover {
+  transform: translateY(-10px) scale(1.03);
+}
+
+.timeline-book.selected {
+  transform: translateY(-18px) scale(1.05);
+}
