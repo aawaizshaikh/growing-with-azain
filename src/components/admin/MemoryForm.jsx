@@ -12,9 +12,16 @@ export default function MemoryForm({
     slug: "",
     date: "",
     age: "",
-    category: "Milestone",
+
+    // Book Chapter
+    category: "newborn",
+
+    // Memory Type
+    memory_type: "memory",
+
     description: "",
     story: "",
+
     favorite: false,
     published: true,
   });
@@ -23,9 +30,11 @@ export default function MemoryForm({
   const [galleryImages, setGalleryImages] = useState([]);
   const [highlights, setHighlights] = useState([]);
 
-  // NEW
-  const [existingCover, setExistingCover] = useState([]);
-  const [existingGallery, setExistingGallery] = useState([]);
+  const [existingCover, setExistingCover] =
+    useState([]);
+
+  const [existingGallery, setExistingGallery] =
+    useState([]);
 
   useEffect(() => {
     if (!initialData) return;
@@ -33,16 +42,32 @@ export default function MemoryForm({
     setForm({
       title: initialData.title || "",
       slug: initialData.slug || "",
+
       date: initialData.date || "",
       age: initialData.age || "",
-      category: initialData.category || "Milestone",
-      description: initialData.description || "",
-      story: initialData.story || "",
-      favorite: initialData.favorite || false,
-      published: initialData.published ?? true,
+
+      category:
+        initialData.category || "newborn",
+
+      memory_type:
+        initialData.memory_type || "memory",
+
+      description:
+        initialData.description || "",
+
+      story:
+        initialData.story || "",
+
+      favorite:
+        initialData.favorite || false,
+
+      published:
+        initialData.published ?? true,
     });
 
-    setHighlights(initialData.highlights || []);
+    setHighlights(
+      initialData.highlights || []
+    );
 
     setExistingCover(
       initialData.cover_image
@@ -53,11 +78,15 @@ export default function MemoryForm({
     setExistingGallery(
       initialData.gallery_images || []
     );
-
   }, [initialData]);
 
   function handleChange(e) {
-    const { name, value, checked, type } = e.target;
+    const {
+      name,
+      value,
+      checked,
+      type,
+    } = e.target;
 
     setForm((prev) => ({
       ...prev,
@@ -71,7 +100,10 @@ export default function MemoryForm({
         ? {
             slug: value
               .toLowerCase()
-              .replace(/[^a-z0-9]+/g, "-")
+              .replace(
+                /[^a-z0-9]+/g,
+                "-"
+              )
               .replace(/^-|-$/g, ""),
           }
         : {}),
@@ -99,7 +131,7 @@ export default function MemoryForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white rounded-[30px] shadow-xl p-10"
+      className="bg-white rounded-3xl shadow-xl p-10"
     >
       <h2
         className="text-3xl mb-8"
@@ -111,6 +143,8 @@ export default function MemoryForm({
       </h2>
 
       <div className="grid md:grid-cols-2 gap-6">
+
+        {/* Title */}
 
         <div>
 
@@ -127,6 +161,8 @@ export default function MemoryForm({
 
         </div>
 
+        {/* Slug */}
+
         <div>
 
           <label className="block mb-2 font-semibold">
@@ -140,6 +176,8 @@ export default function MemoryForm({
           />
 
         </div>
+
+        {/* Date */}
 
         <div>
 
@@ -157,6 +195,8 @@ export default function MemoryForm({
 
         </div>
 
+        {/* Age */}
+
         <div>
 
           <label className="block mb-2 font-semibold">
@@ -173,11 +213,14 @@ export default function MemoryForm({
         </div>
 
       </div>
+            {/* ======================================
+          CHAPTER
+      ====================================== */}
 
       <div className="mt-6">
 
         <label className="block mb-2 font-semibold">
-          Category
+          Chapter
         </label>
 
         <select
@@ -186,17 +229,43 @@ export default function MemoryForm({
           onChange={handleChange}
           className="w-full border rounded-xl px-4 py-3"
         >
-          <option>Birth</option>
-          <option>Milestone</option>
-          <option>Family</option>
-          <option>Travel</option>
-          <option>Festival</option>
-          <option>Celebration</option>
-          <option>Photo</option>
-          <option>Other</option>
+          <option value="newborn">Newborn</option>
+          <option value="infant">Infant</option>
+          <option value="toddler">Toddler</option>
+          <option value="preschool">Preschool</option>
+          <option value="school">School Years</option>
+          <option value="teen">Teen Years</option>
         </select>
 
       </div>
+
+      {/* ======================================
+          MEMORY TYPE
+      ====================================== */}
+
+      <div className="mt-6">
+
+        <label className="block mb-2 font-semibold">
+          Memory Type
+        </label>
+
+        <select
+          name="memory_type"
+          value={form.memory_type}
+          onChange={handleChange}
+          className="w-full border rounded-xl px-4 py-3"
+        >
+          <option value="memory">Memory</option>
+          <option value="milestone">Milestone</option>
+          <option value="letter">Letter</option>
+          <option value="video">Video</option>
+        </select>
+
+      </div>
+
+      {/* ======================================
+          DESCRIPTION
+      ====================================== */}
 
       <div className="mt-6">
 
@@ -214,6 +283,10 @@ export default function MemoryForm({
 
       </div>
 
+      {/* ======================================
+          STORY
+      ====================================== */}
+
       <div className="mt-6">
 
         <label className="block mb-2 font-semibold">
@@ -230,6 +303,10 @@ export default function MemoryForm({
 
       </div>
 
+      {/* ======================================
+          IMAGES
+      ====================================== */}
+
       <FileUploader
         label="Cover Image"
         multiple={false}
@@ -244,10 +321,18 @@ export default function MemoryForm({
         onChange={setGalleryImages}
       />
 
+      {/* ======================================
+          HIGHLIGHTS
+      ====================================== */}
+
       <HighlightsInput
         initialHighlights={highlights}
         onChange={setHighlights}
       />
+
+      {/* ======================================
+          SETTINGS
+      ====================================== */}
 
       <div className="flex gap-10 mt-8">
 
@@ -279,9 +364,24 @@ export default function MemoryForm({
 
       </div>
 
+      {/* ======================================
+          SUBMIT
+      ====================================== */}
+
       <button
         type="submit"
-        className="mt-10 w-full bg-[#8FAE7A] hover:bg-[#789961] text-white py-4 rounded-xl text-lg font-semibold"
+        className="
+          mt-10
+          w-full
+          bg-[#8FAE7A]
+          hover:bg-[#789961]
+          text-white
+          py-4
+          rounded-xl
+          text-lg
+          font-semibold
+          transition
+        "
       >
         {submitText}
       </button>

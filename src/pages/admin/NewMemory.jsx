@@ -29,7 +29,6 @@ export default function NewMemory() {
           .replace(/^-|-$/g, "");
 
       let coverImageUrl = "";
-
       let galleryUrls = [];
 
       /*
@@ -77,7 +76,11 @@ export default function NewMemory() {
         date: formData.date,
         age: formData.age,
 
+        // Chapter (Newborn / Infant / Toddler...)
         category: formData.category,
+
+        // Memory Type (Memory / Milestone / Letter / Video)
+        memory_type: formData.memory_type,
 
         cover_image: coverImageUrl,
 
@@ -95,7 +98,6 @@ export default function NewMemory() {
       alert("Memory created successfully!");
 
       navigate("/admin/timeline");
-
     } catch (err) {
       console.error(err);
       alert(err.message);
@@ -106,8 +108,7 @@ export default function NewMemory() {
 
   return (
     <AdminLayout>
-      <div className="max-w-5xl mx-auto">
-
+      <div className="max-w-5xl mx-auto py-10">
         <button
           onClick={() => navigate("/admin/timeline")}
           className="mb-8 text-[#8FAE7A] font-semibold hover:underline"
@@ -139,7 +140,6 @@ export default function NewMemory() {
           onSubmit={handleSave}
           submitText="Create Memory"
         />
-
       </div>
     </AdminLayout>
   );

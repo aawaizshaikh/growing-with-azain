@@ -1,4 +1,10 @@
-import { FaEdit, FaTrash, FaStar, FaRegStar, FaCalendarAlt } from "react-icons/fa";
+import {
+  FaEdit,
+  FaTrash,
+  FaStar,
+  FaRegStar,
+  FaCalendarAlt,
+} from "react-icons/fa";
 
 export default function MemoryCard({
   memory,
@@ -6,9 +12,11 @@ export default function MemoryCard({
   onDelete,
 }) {
   return (
-    <div className="bg-white rounded-[30px] overflow-hidden shadow-xl hover:shadow-2xl transition duration-300">
+    <div className="bg-white rounded-[32px] overflow-hidden shadow-xl">
 
-      {/* Cover Image */}
+      {/* ==========================
+          COVER
+      ========================== */}
 
       <div className="relative">
 
@@ -21,13 +29,17 @@ export default function MemoryCard({
           className="w-full h-72 object-cover"
         />
 
+        {/* Chapter */}
+
         <div className="absolute top-5 left-5">
 
-          <span className="bg-white/90 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold text-[#7B9A67]">
+          <span className="bg-white/90 backdrop-blur px-4 py-2 rounded-full text-sm font-semibold text-[#7B9A67] capitalize">
             {memory.category}
           </span>
 
         </div>
+
+        {/* Favourite */}
 
         <div className="absolute top-5 right-5">
 
@@ -45,7 +57,9 @@ export default function MemoryCard({
 
       </div>
 
-      {/* Content */}
+      {/* ==========================
+          CONTENT
+      ========================== */}
 
       <div className="p-7">
 
@@ -58,25 +72,67 @@ export default function MemoryCard({
           {memory.title}
         </h2>
 
+        {/* Date */}
+
         <div className="flex items-center gap-2 mt-4 text-gray-500">
 
           <FaCalendarAlt />
 
-          <span>
-            {memory.date}
+          <span>{memory.date}</span>
+
+        </div>
+
+        {/* Age */}
+
+        {memory.age && (
+
+          <div className="mt-3 inline-block bg-[#EEF7E8] text-[#6E8D5C] px-4 py-2 rounded-full text-sm font-semibold">
+
+            🍼 {memory.age}
+
+          </div>
+
+        )}
+
+        {/* Memory Type */}
+
+        <div className="mt-3">
+
+          <span className="inline-block bg-[#FFF5E8] text-[#B58A5A] px-4 py-2 rounded-full text-sm font-semibold capitalize">
+
+            {memory.memory_type}
+
           </span>
 
         </div>
 
-        {memory.age && (
-          <div className="mt-3 inline-block bg-[#EEF7E8] text-[#6E8D5C] px-4 py-2 rounded-full text-sm font-semibold">
-            🍼 {memory.age}
-          </div>
-        )}
+        {/* Published */}
+
+        <div className="mt-3">
+
+          <span
+            className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${
+              memory.published
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-600"
+            }`}
+          >
+            {memory.published
+              ? "Published"
+              : "Draft"}
+          </span>
+
+        </div>
+
+        {/* Description */}
 
         <p className="mt-5 text-gray-600 leading-7 line-clamp-3">
+
           {memory.description}
+
         </p>
+
+        {/* Buttons */}
 
         <div className="flex gap-4 mt-8">
 

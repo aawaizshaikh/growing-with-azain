@@ -2,38 +2,38 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import AdminLayout from "../../components/admin/AdminLayout";
-import FavoriteSongForm from "../../components/admin/FavoriteSongForm";
+import MemoryForm from "../../components/admin/MemoryForm";
 
 import {
-  getFavoriteSong,
-  updateFavoriteSong,
-} from "../../services/favoriteSongService";
+  getTimelineMemory,
+  updateTimelineMemory,
+} from "../../services/timelineService";
 
 import {
   uploadFile,
   uploadMultiple,
 } from "../../services/storageService";
 
-export default function EditFavoriteSong() {
+export default function EditMemory() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const [song, setSong] = useState(null);
+  const [memory, setMemory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    loadSong();
+    loadMemory();
   }, []);
 
-  async function loadSong() {
+  async function loadMemory() {
     try {
-      const data = await getFavoriteSong(id);
-      setSong(data);
+      const data = await getTimelineMemory(id);
+      setMemory(data);
     } catch (err) {
       console.error(err);
-      alert("Failed to load favourite song.");
-      navigate("/admin/songs");
+      alert("Failed to load memory.");
+      navigate("/admin/timeline");
     } finally {
       setLoading(false);
     }
@@ -46,19 +46,21 @@ export default function EditFavoriteSong() {
       setSaving(true);
 
       const folderName =
-        song.folder_name ||
+        memory.folder_name ||
         formData.slug ||
         formData.title
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/^-|-$/g, "");
 
-      let coverImage = song.cover_image;
-      let galleryImages = song.gallery_images || [];
+      let coverImage = memory.cover_image;
+      let galleryImages = memory.gallery_images || [];
 
-      /* ===========================
-         Upload Cover
-      ============================ */
+      /*
+      ==============================
+      Upload Cover
+      ==============================
+      */
 
       if (formData.coverImage) {
         coverImage = await uploadFile(
@@ -67,18 +69,21 @@ export default function EditFavoriteSong() {
         );
       }
 
-      /* ===========================
-         Upload Gallery
-      ============================ */
+      /*
+      ==============================
+      Upload Gallery
+      ==============================
+      */
 
       if (
         formData.galleryImages &&
         formData.galleryImages.length > 0
       ) {
-        const uploaded = await uploadMultiple(
-          formData.galleryImages,
-          folderName
-        );
+        const uploaded =
+          await uploadMultiple(
+            formData.galleryImages,
+            folderName
+          );
 
         galleryImages = [
           ...galleryImages,
@@ -86,19 +91,28 @@ export default function EditFavoriteSong() {
         ];
       }
 
-      /* ===========================
-         Update Song
-      ============================ */
+      /*
+      ==============================
+      Update Database
+      ==============================
+      */
 
-      await updateFavoriteSong(id, {
+      await updateTimelineMemory(id, {
         title: formData.title,
-        artist: formData.artist,
-        month: formData.month,
-        age: formData.age,
 
         slug: formData.slug,
 
-        category: "Favourite Song",
+        date: formData.date,
+
+        age: formData.age,
+
+        // Chapter
+        category: formData.category,
+
+        // Memory Type
+        memory_type: formData.memory_type,
+
+        description: formData.description,
 
         story: formData.story,
 
@@ -106,13 +120,7 @@ export default function EditFavoriteSong() {
 
         gallery_images: galleryImages,
 
-        video_url: formData.videoUrl,
-
         highlights: formData.highlights,
-
-        display_order: Number(
-          formData.displayOrder || 0
-        ),
 
         favorite: formData.favorite,
 
@@ -121,10 +129,9 @@ export default function EditFavoriteSong() {
         folder_name: folderName,
       });
 
-      alert("Favourite Song updated successfully!");
+      alert("Memory updated successfully!");
 
-      navigate("/admin/songs");
-
+      navigate("/admin/timeline");
     } catch (err) {
       console.error(err);
       alert(err.message);
@@ -136,8 +143,8 @@ export default function EditFavoriteSong() {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="text-center py-20 text-3xl">
-          Loading Favourite Song...
+        <div className="p-10">
+          Loading Memory...
         </div>
       </AdminLayout>
     );
@@ -147,12 +154,11 @@ export default function EditFavoriteSong() {
     <AdminLayout>
 
       <div className="max-w-5xl mx-auto">
-
-        <button
-          onClick={() => navigate("/admin/songs")}
+                <button
+          onClick={() => navigate("/admin/timeline")}
           className="mb-8 text-[#8FAE7A] font-semibold hover:underline"
         >
-          ← Back to Favourite Songs
+          ← Back to Timeline
         </button>
 
         <h1
@@ -162,21 +168,21 @@ export default function EditFavoriteSong() {
             color: "#5A5148",
           }}
         >
-          Edit Favourite Song
+          Edit Memory
         </h1>
 
         <p className="text-gray-500 mb-10">
-          Update your favourite song.
+          Update your timeline memory.
         </p>
 
         {saving && (
-          <div className="mb-6 rounded-xl bg-[#EEF7E8] p-4">
+          <div className="mb-6 rounded-xl bg-[#EEF7E8] p-4 text-[#5A5148] font-semibold">
             Saving changes...
           </div>
         )}
 
-        <FavoriteSongForm
-          initialData={song}
+        <MemoryForm
+          initialData={memory}
           onSubmit={handleUpdate}
           submitText="Save Changes"
         />

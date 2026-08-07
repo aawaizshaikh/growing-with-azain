@@ -67,3 +67,30 @@ img {
 .timeline-book.selected {
   transform: translateY(-18px) scale(1.05);
 }
+/* ======================================================
+SCRAPBOOK SOFT FLOAT ANIMATION
+====================================================== */
+
+@keyframes floatSoft {
+
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+
+}
+
+
+.float-soft {
+
+  animation:
+    floatSoft 5s ease-in-out infinite;
+
+}

@@ -3,8 +3,6 @@ import React from "react";
 import shelfImg from "../../assets/illustrations/timeline-shelf.png";
 import plantLeft from "../../assets/illustrations/timeline-plant-left.png";
 import vineRight from "../../assets/illustrations/timeline-vine-right.png";
-import balloon from "../../assets/illustrations/balloon.png";
-import cloud from "../../assets/illustrations/cloud.png";
 import teddy from "../../assets/illustrations/teddy.png";
 
 export default function TimelineBookshelf({
@@ -98,51 +96,15 @@ const BOOKS = {
           TITLE
       ===================================================== */}
       {/* ===========================
-    LEFT CLOUD
-=========================== */}
+   
 
-<img
-  src={cloud}
-  alt=""
-  draggable={false}
-  style={{
-    position: "absolute",
-    left: 150,
-    top: -150,
-    width: 400,
-    zIndex: 20,
-    pointerEvents: "none",
-    userSelect: "none",
-  }}
-/>
-
-{/* ===========================
-    RIGHT CLOUD
-=========================== */}
-
-<img
-  src={cloud}
-  alt=""
-  draggable={false}
-  style={{
-    position: "absolute",
-    right: 150,
-    top: -150,
-    width:400,
-    transform: "scaleX(-1)",
-    zIndex: 1,
-    pointerEvents: "none",
-    userSelect: "none",
-  }}
-/>
-
-      <div className="text-center mb-10">
+      <div className="text-center -mt-10">
 
         <p
           className="
             uppercase
             tracking-[0.35em]
-            text-[#A69070]
+            text-[#D8B982]
             text-xs
             font-semibold
           "
@@ -152,10 +114,10 @@ const BOOKS = {
 
         <h2
           className="
-            mt-2
+            mt-0
             text-5xl
             font-bold
-            text-[#5A4332]
+            text-[#F3E6C8]
           "
           style={{
             fontFamily: "Cormorant Garamond, serif",
@@ -164,7 +126,7 @@ const BOOKS = {
           Pick a Chapter
         </h2>
 
-        <p className="mt-3 text-[#7B6F63]">
+        <p className="mt-1 text-[#E8D3A8]>
           Every memory belongs to a beautiful chapter.
         </p>
 
@@ -173,29 +135,13 @@ const BOOKS = {
       {/* =====================================================
           BOOK AREA
       ===================================================== */}
-      {/* Floating Balloon */}
-<img
-  src={balloon}
-  alt=""
-  draggable={false}
-  style={{
-    position: "absolute",
-    left: "60%",
-    transform: "translateX(-50%)",
-    top: -10,
-    width: 750,
-    zIndex: 5,
-    pointerEvents: "none",
-    userSelect: "none",
-  }}
-  className="timeline-float"
-/>
+     
 
       <div
         className="relative mx-auto"
         style={{
           width: 1080,
-          height: 760,
+          height: 650,
           maxWidth: "100%",
         }}
       >

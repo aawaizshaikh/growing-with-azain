@@ -1,41 +1,63 @@
 import React from "react";
 
-import balloon from "../../assets/illustrations/balloon.png";
-import teddy from "../../assets/illustrations/teddy.png";
-import leafSpray from "../../assets/illustrations/timeline-leaf-spray.png";
-import leftPlant from "../../assets/illustrations/timeline-plant-left.png";
-import rightVine from "../../assets/illustrations/timeline-vine-right.png";
 import decoration from "../../assets/illustrations/timeline-header-decoration.png";
 
 export default function JourneyHeader() {
   return (
-    <section className="relative overflow-hidden pt-24 pb-10">
+    <div
+      className="
+        relative
+        z-10
+        text-center
+        max-w-6xl
+        mx-auto
+        -mt-1
+        mb-15
+      "
+    >
 
-    
-      
-      <div className="relative z-10 text-center max-w-6xl mx-auto">
+      {/* HEADER DECORATION */}
+      <img
+        src={decoration}
+        alt=""
+        className="
+          mx-auto
+          w-36
+          mb-1
+          pointer-events-none
+          select-none
+        "
+      />
 
-        <img
-          src={decoration}
-          alt=""
-          className="mx-auto w-48 mb-4"
-        />
 
-        <h1
-          className="text-[#556B2F] text-6xl md:text-7xl font-bold"
-          style={{
-            fontFamily: "Cormorant Garamond, serif",
-          }}
-        >
-          Journey
-        </h1>
+      {/* MAIN TITLE */}
+      <h1
+        className="
+          text-[#F3E6C8]
+          text-6xl
+          md:text-7xl
+          font-bold
+          leading-none
+        "
+        style={{
+          fontFamily: "Cormorant Garamond, serif",
+        }}
+      >
+        Journey
+      </h1>
 
-        <p className="mt-4 text-[#6d6258] text-lg">
-          Every stage, every smile, every memory.
-        </p>
 
-      </div>
+      {/* SUB TITLE */}
+      <p
+        className="
+          mt-1
+          text-[#E8D3A8]
+          text-base
+        "
+      >
+        Every stage, every smile, every memory.
+      </p>
 
-    </section>
+    </div>
   );
 }

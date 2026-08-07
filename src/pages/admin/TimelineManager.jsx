@@ -50,7 +50,6 @@ export default function TimelineManager() {
       );
 
       alert("Memory Deleted");
-
     } catch (err) {
       console.error(err);
       alert(err.message);
@@ -67,76 +66,81 @@ export default function TimelineManager() {
     return (
       memory.title?.toLowerCase().includes(q) ||
       memory.category?.toLowerCase().includes(q) ||
+      memory.memory_type?.toLowerCase().includes(q) ||
       memory.description?.toLowerCase().includes(q)
     );
   });
 
   return (
     <AdminLayout>
+      <div className="max-w-7xl mx-auto">
 
-      <div className="flex justify-between items-center mb-10">
+        <div className="flex justify-between items-center mb-10">
 
-        <div>
+          <div>
 
-          <h1
-            className="text-6xl"
-            style={{
-              fontFamily: "Baloo 2",
-              color: "#5A5148",
-            }}
+            <h1
+              className="text-6xl"
+              style={{
+                fontFamily: "Baloo 2",
+                color: "#5A5148",
+              }}
+            >
+              Timeline
+            </h1>
+
+            <p className="text-gray-500 mt-2">
+              {filtered.length} Memories
+            </p>
+
+          </div>
+
+          <button
+            onClick={() =>
+              navigate("/admin/timeline/new")
+            }
+            className="bg-[#8FAE7A] text-white rounded-full px-8 py-4 font-semibold hover:bg-[#789961] transition"
           >
-            Timeline
-          </h1>
-
-          <p className="text-gray-500 mt-2">
-            {filtered.length} Memories
-          </p>
+            + Add Memory
+          </button>
 
         </div>
 
-        <button
-          onClick={() => navigate("/admin/timeline/new")}
-          className="bg-[#8FAE7A] text-white rounded-full px-8 py-4 font-semibold"
-        >
-          + Add Memory
-        </button>
+        <input
+          value={search}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
+          placeholder="Search by title, chapter, memory type..."
+          className="w-full rounded-2xl border px-5 py-4 mb-10"
+        />
+
+        {loading ? (
+
+          <div className="text-center py-24">
+            Loading...
+          </div>
+
+        ) : (
+
+          <div className="grid lg:grid-cols-2 gap-8">
+
+            {filtered.map((memory) => (
+
+              <MemoryCard
+                key={memory.id}
+                memory={memory}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+
+            ))}
+
+          </div>
+
+        )}
 
       </div>
-
-      <input
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search..."
-        className="w-full rounded-2xl border px-5 py-4 mb-10"
-      />
-
-      {loading ? (
-
-        <div className="text-center py-24">
-
-          Loading...
-
-        </div>
-
-      ) : (
-
-        <div className="grid lg:grid-cols-2 gap-8">
-
-          {filtered.map((memory) => (
-
-            <MemoryCard
-              key={memory.id}
-              memory={memory}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-
-          ))}
-
-        </div>
-
-      )}
-
     </AdminLayout>
   );
 }

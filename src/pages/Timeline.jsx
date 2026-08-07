@@ -10,9 +10,12 @@ import JourneyHeader from "../components/timeline/JourneyHeader";
 import TimelineBookshelf from "../components/timeline/TimelineBookshelf";
 import ChapterSection from "../components/timeline/ChapterSection";
 
+import brickWall from "../assets/illustrations/timeline-vintage-brick-wall.png";
+
 import { getTimelineMemories } from "../services/timelineService";
 
 export default function Timeline() {
+
   const navigate = useNavigate();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -25,144 +28,214 @@ export default function Timeline() {
     books[0]
   );
 
+
   /*
-  ============================================================
-  LOAD MEMORIES
-  ============================================================
+    LOAD MEMORIES
   */
 
   useEffect(() => {
+
     async function loadMemories() {
+
       try {
+
         const data = await getTimelineMemories();
 
         setMemories(data || []);
+
       } catch (err) {
+
         console.error(err);
+
       } finally {
+
         setLoading(false);
+
       }
+
     }
 
     loadMemories();
+
   }, []);
 
+
+
   /*
-  ============================================================
-  GROUP MEMORIES
-  ============================================================
+    GROUP MEMORIES
   */
 
   const memoriesByChapter = useMemo(() => {
+
     const grouped = {};
 
     books.forEach((book) => {
+
       grouped[book.slug] = [];
+
     });
 
+
     memories.forEach((memory) => {
+
       const chapter =
         memory.category?.toLowerCase() ||
         memory.age?.toLowerCase();
 
+
       if (grouped[chapter]) {
+
         grouped[chapter].push(memory);
+
       }
+
     });
 
+
     return grouped;
+
   }, [memories]);
 
+
+
   /*
-  ============================================================
-  CURRENT CHAPTER
-  ============================================================
+    CURRENT CHAPTER
   */
 
   const selectedMemories =
     memoriesByChapter[selectedBook.slug] || [];
 
+
+
   return (
-    <main className="min-h-screen bg-[#FAF8F2] overflow-x-hidden">
 
-      {/* Drawer */}
+    <main
+      className="
+        relative
+        min-h-screen
+        overflow-hidden
+      "
+    >
 
-      <TimelineDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-      />
+      {/* ============================
+          BACKGROUND WALL
+      ============================== */}
 
-      {/* Back */}
-
-      <button
-        onClick={() => navigate(-1)}
+      <img
+        src={brickWall}
+        alt=""
         className="
-          fixed
-          top-6
-          left-6
-          z-50
-          w-12
-          h-12
-          rounded-full
-          bg-white
-          shadow-lg
-          flex
-          items-center
-          justify-center
-          hover:scale-105
-          transition
+          absolute
+          inset-0
+          w-full
+          h-full
+          object-cover
+          z-0
+          pointer-events-none
+          select-none
         "
-      >
-        ←
-      </button>
-
-      {/* Menu */}
-
-      <button
-        onClick={() => setDrawerOpen(true)}
-        className="
-          fixed
-          top-6
-          right-6
-          z-50
-          w-12
-          h-12
-          rounded-full
-          bg-white
-          shadow-lg
-          flex
-          items-center
-          justify-center
-          hover:scale-105
-          transition
-        "
-      >
-        ☰
-      </button>
-
-      {/* Header */}
-
-      <JourneyHeader />
-
-      {/* Books */}
-
-      <TimelineBookshelf
-        books={books}
-        memoriesByChapter={memoriesByChapter}
-        selectedBook={selectedBook}
-        onSelectBook={setSelectedBook}
       />
 
-      {/* Memories */}
 
-      <ChapterSection
-        loading={loading}
-        book={selectedBook}
-        memories={selectedMemories}
-      />
+      <div className="relative z-10">
 
-      <Footer />
+
+        {/* Drawer */}
+
+        <TimelineDrawer
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+        />
+
+
+
+        {/* Back */}
+
+        <button
+          onClick={() => navigate(-1)}
+          className="
+            fixed
+            top-6
+            left-6
+            z-50
+            w-12
+            h-12
+            rounded-full
+            bg-white
+            shadow-lg
+            flex
+            items-center
+            justify-center
+            hover:scale-105
+            transition
+          "
+        >
+          ←
+        </button>
+
+
+
+        {/* Menu */}
+
+        <button
+          onClick={() => setDrawerOpen(true)}
+          className="
+            fixed
+            top-6
+            right-6
+            z-50
+            w-12
+            h-12
+            rounded-full
+            bg-white
+            shadow-lg
+            flex
+            items-center
+            justify-center
+            hover:scale-105
+            transition
+          "
+        >
+          ☰
+        </button>
+
+
+
+        {/* Header */}
+
+        <JourneyHeader />
+
+
+
+        {/* Books */}
+
+        <TimelineBookshelf
+          books={books}
+          memoriesByChapter={memoriesByChapter}
+          selectedBook={selectedBook}
+          onSelectBook={setSelectedBook}
+        />
+
+
+
+        {/* Memories */}
+
+        <ChapterSection
+          loading={loading}
+          book={selectedBook}
+          memories={selectedMemories}
+        />
+
+
+
+        <Footer />
+
+
+      </div>
+
 
     </main>
+
   );
+
 }

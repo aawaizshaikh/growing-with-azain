@@ -99,32 +99,36 @@ export default function ChapterSection({
       ========================================== */}
 
       <div
-        className="rounded-[34px] bg-[#FDFBF6] border border-[#EEE5D7] shadow-sm"
-        style={{
-          padding: "55px 60px",
-        }}
-      >
+  className="
+    -mt-40
+    rounded-[34px]
+    bg-[#FDFBF6]
+    border
+    border-[#EEE5D7]
+    shadow-sm
+  "
+  style={{
+    padding: "55px 60px",
+  }}
+>
 
         {/* Heading */}
+<div className="text-center -mt-6">
 
-        <div className="text-center">
-
-          <p
-            className="uppercase tracking-[0.35em] text-xs font-semibold text-[#B19169]"
-          >
-            Chapter
-          </p>
-
-          <h2
-            className="mt-3 text-[54px] font-bold text-[#5A4332]"
-            style={{
-              fontFamily:
-                "Cormorant Garamond, serif",
-            }}
-          >
-            {book.title}
-          </h2>
-
+  <h2
+    className="
+      text-[54px]
+      font-bold
+      text-[#5A4332]
+      leading-none
+    "
+    style={{
+      fontFamily:
+        "Cormorant Garamond, serif",
+    }}
+  >
+    {book.title}
+  </h2>
           <p className="mt-3 text-[#8B7B69]">
             {filteredMemories.length} Memories
           </p>
