@@ -5,30 +5,25 @@ export default function MemoryGrid({
   loading,
   memories,
 }) {
-  /*
-  =====================================
-  LOADING
-  =====================================
-  */
+  /* ==========================================
+     LOADING
+  ========================================== */
 
   if (loading) {
     return (
-      <div className="py-20 text-center text-[#8A7A68]">
+      <div className="text-center text-[#7B6F63] py-16">
         Loading memories...
       </div>
     );
   }
 
-  /*
-  =====================================
-  EMPTY
-  =====================================
-  */
+  /* ==========================================
+     EMPTY
+  ========================================== */
 
   if (!memories.length) {
     return (
       <div className="flex justify-center">
-
         <div
           className="
             bg-[#FFFDF9]
@@ -41,7 +36,6 @@ export default function MemoryGrid({
             text-center
           "
         >
-
           <div className="text-6xl mb-6">
             📖
           </div>
@@ -61,42 +55,30 @@ export default function MemoryGrid({
             Panel will automatically appear
             here.
           </p>
-
         </div>
-
       </div>
     );
   }
 
-  /*
-  =====================================
-  GRID
-  =====================================
-  */
+  /* ==========================================
+     GRID
+  ========================================== */
 
   return (
-
     <div
       className="
         grid
-        grid-cols-1
-        md:grid-cols-2
-        lg:grid-cols-3
+        grid-cols-3
         gap-8
         pt-30
       "
     >
-
       {memories.map((memory) => (
-
         <MemoryCard
           key={memory.id}
           memory={memory}
         />
-
       ))}
-
     </div>
-
   );
 }

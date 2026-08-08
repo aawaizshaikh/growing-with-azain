@@ -10,17 +10,35 @@ import background from "../assets/illustrations/animals/background.png";
 import milestoneSignpost from "../assets/illustrations/animals/milestone-signpost.png";
 
 import parrot from "../assets/illustrations/animals/parrot.png";
+import bluebird from "../assets/illustrations/animals/bluebird.png";
 import deer1 from "../assets/illustrations/animals/deer-1.png";
 import monkey from "../assets/illustrations/animals/moneky.png";
 import hedgehog from "../assets/illustrations/animals/hedgehog.png";
 import turtle from "../assets/illustrations/animals/turtle.png";
 import butterfly from "../assets/illustrations/animals/butterfly.png";
-import lion from "../assets/illustrations/animals/lion.png";
+
+import lion1 from "../assets/illustrations/animals/lion/1.png";
+import lion2 from "../assets/illustrations/animals/lion/2.png";
+import lion3 from "../assets/illustrations/animals/lion/3.png";
+import lion4 from "../assets/illustrations/animals/lion/4.png";
+import lion5 from "../assets/illustrations/animals/lion/5.png";
+import lion6 from "../assets/illustrations/animals/lion/6.png";
+import lion7 from "../assets/illustrations/animals/lion/7.png";
+import lion8 from "../assets/illustrations/animals/lion/8.png";
+
 import squirrel from "../assets/illustrations/animals/squirrel.png";
 import deer2 from "../assets/illustrations/animals/deer-2.png";
 import owl from "../assets/illustrations/animals/owl.png";
-import bluebird from "../assets/illustrations/animals/bluebird.png";
-import elephant from "../assets/illustrations/animals/elephant.png";
+
+import elephant1 from "../assets/illustrations/animals/elephant/1.png";
+import elephant2 from "../assets/illustrations/animals/elephant/2.png";
+import elephant3 from "../assets/illustrations/animals/elephant/3.png";
+import elephant4 from "../assets/illustrations/animals/elephant/4.png";
+import elephant5 from "../assets/illustrations/animals/elephant/5.png";
+import elephant6 from "../assets/illustrations/animals/elephant/6.png";
+import elephant7 from "../assets/illustrations/animals/elephant/7.png";
+import elephant8 from "../assets/illustrations/animals/elephant/8.png";
+
 import giraffe from "../assets/illustrations/animals/giraffe.png";
 import vine from "../assets/illustrations/animals/vine.png";
 
@@ -30,6 +48,73 @@ const DESIGN_HEIGHT = 900;
 /*
   All coordinates belong to the same 1440 × 900 design space.
 */
+
+/*
+  LION ANIMATION
+  1 = calm
+  2 = preparation
+  3 = mouth opening
+  4 = active roar
+  5 = peak roar
+  6 = roar ending
+  7 = returning to idle
+  8 = calm
+*/
+const LION_FRAMES = [
+  lion1,
+  lion2,
+  lion3,
+  lion4,
+  lion5,
+  lion6,
+  lion7,
+  lion8,
+];
+
+const LION_FRAME_DURATIONS = [
+  2500,
+  250,
+  250,
+  250,
+  400,
+  250,
+  250,
+  2500,
+];
+
+/*
+  ELEPHANT ANIMATION
+  1 = normal idle
+  2 = beginning to look down
+  3 = looking down
+  4 = beginning to raise head + trunk
+  5 = head up + trunk raised
+  6 = holding raised trunk
+  7 = returning downward
+  8 = normal idle
+*/
+const ELEPHANT_FRAMES = [
+  elephant1,
+  elephant2,
+  elephant3,
+  elephant4,
+  elephant5,
+  elephant6,
+  elephant7,
+  elephant8,
+];
+
+const ELEPHANT_FRAME_DURATIONS = [
+  2500,
+  350,
+  550,
+  350,
+  650,
+  500,
+  400,
+  2500,
+];
+
 const ANIMALS = [
   {
     id: "parrot",
@@ -116,7 +201,7 @@ const ANIMALS = [
   },
   {
     id: "lion",
-    src: lion,
+    src: lion1,
     left: 590,
     top: 490,
     width: 200,
@@ -126,7 +211,7 @@ const ANIMALS = [
   },
   {
     id: "elephant",
-    src: elephant,
+    src: elephant1,
     left: 895,
     top: 400,
     width: 175,
@@ -192,10 +277,24 @@ const SIGNPOST_ANCHORS = [
   { left: 1005, top: 320, rotation: 2, scale: 0.58 },
 ];
 
-function AnimalLayer({ animal }) {
+function AnimalLayer({
+  animal,
+  lionFrame,
+  elephantFrame,
+}) {
+  let src = animal.src;
+
+  if (animal.id === "lion") {
+    src = LION_FRAMES[lionFrame];
+  }
+
+  if (animal.id === "elephant") {
+    src = ELEPHANT_FRAMES[elephantFrame];
+  }
+
   return (
     <img
-      src={animal.src}
+      src={src}
       alt=""
       aria-hidden="true"
       draggable={false}
@@ -359,95 +458,6 @@ function MilestoneSignpost({ milestone, anchor, index }) {
   );
 }
 
-function SceneHeader() {
-  return (
-    <>
-      {/* =====================================================
-          BRAND PILL
-      ===================================================== */}
-
-      <div
-        className="
-          absolute
-          left-[75px]
-          top-[75px]
-          z-[60]
-          rounded-full
-          border
-          border-[#F7E8C6]/80
-          bg-[#FFF8E8]/75
-          px-5
-          py-2
-          shadow-[0_4px_14px_rgba(76,55,32,0.14)]
-          backdrop-blur-[2px]
-        "
-      >
-        <span
-          className="
-            text-[11px]
-            font-bold
-            uppercase
-            tracking-[0.24em]
-            text-[#76583B]
-          "
-          style={{
-            fontFamily: "Nunito, sans-serif",
-          }}
-        >
-          Growing With Azain
-        </span>
-      </div>
-
-      {/* =====================================================
-          PAGE TITLE
-      ===================================================== */}
-
-      <div
-        className="
-          absolute
-          left-1/2
-          top-[70px]
-          z-[60]
-          -translate-x-1/2
-          text-center
-          pointer-events-none
-        "
-      >
-        <p
-          className="
-            text-[11px]
-            font-bold
-            uppercase
-            tracking-[0.32em]
-            text-[#6D684B]
-          "
-          style={{
-            fontFamily: "Nunito, sans-serif",
-          }}
-        >
-          A little journey
-        </p>
-
-        <h1
-          className="
-            mt-[-2px]
-            text-[48px]
-            leading-none
-            font-bold
-            text-[#5D4734]
-            drop-shadow-[0_2px_0_rgba(255,248,226,0.65)]
-          "
-          style={{
-            fontFamily: "Cormorant Garamond, serif",
-          }}
-        >
-          Our Milestones
-        </h1>
-      </div>
-    </>
-  );
-}
-
 export default function Milestones() {
   const navigate = useNavigate();
 
@@ -456,6 +466,25 @@ export default function Milestones() {
   const [loading, setLoading] = useState(true);
   const [sceneScale, setSceneScale] = useState(1);
 
+  /*
+    Browser zoom compensation for fixed UI controls.
+
+    The illustrated scene intentionally uses sceneScale.
+    The Back/Menu controls are outside that scene, so they need
+    their own compensation based on Chrome's devicePixelRatio.
+
+    We capture the DPR when the page first loads as the baseline.
+    If Chrome zoom changes from that baseline, the controls are
+    scaled and positioned by the inverse zoom factor.
+  */
+  const [browserZoom, setBrowserZoom] = useState(1);
+
+  const [lionFrame, setLionFrame] = useState(0);
+  const [elephantFrame, setElephantFrame] = useState(0);
+
+  /*
+    Load milestones from the existing Admin/data system.
+  */
   useEffect(() => {
     let mounted = true;
 
@@ -491,6 +520,74 @@ export default function Milestones() {
   }, []);
 
   /*
+    LION ANIMATION
+
+    The lion animation remains exactly as previously implemented.
+  */
+  useEffect(() => {
+    let timeoutId;
+
+    const scheduleNextFrame = (currentFrame) => {
+      timeoutId = window.setTimeout(() => {
+        const nextFrame =
+          (currentFrame + 1) % LION_FRAMES.length;
+
+        setLionFrame(nextFrame);
+        scheduleNextFrame(nextFrame);
+      }, LION_FRAME_DURATIONS[currentFrame]);
+    };
+
+    setLionFrame(0);
+    scheduleNextFrame(0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
+
+  /*
+    ELEPHANT ANIMATION
+
+    Normal idle
+      ↓
+    look down
+      ↓
+    look down
+      ↓
+    raise head + trunk
+      ↓
+    trunk fully raised
+      ↓
+    brief hold
+      ↓
+    return
+      ↓
+    normal idle
+      ↓
+    repeat
+  */
+  useEffect(() => {
+    let timeoutId;
+
+    const scheduleNextFrame = (currentFrame) => {
+      timeoutId = window.setTimeout(() => {
+        const nextFrame =
+          (currentFrame + 1) % ELEPHANT_FRAMES.length;
+
+        setElephantFrame(nextFrame);
+        scheduleNextFrame(nextFrame);
+      }, ELEPHANT_FRAME_DURATIONS[currentFrame]);
+    };
+
+    setElephantFrame(0);
+    scheduleNextFrame(0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
+
+  /*
     Fill the viewport with the complete illustrated stage.
 
     The 1440 × 900 design space remains the single coordinate system.
@@ -514,6 +611,51 @@ export default function Milestones() {
 
     return () => {
       window.removeEventListener("resize", updateScale);
+    };
+  }, []);
+
+  /*
+    Detect Chrome page-zoom changes.
+
+    We compare the current devicePixelRatio with the value that
+    existed when this page loaded. This means 150% -> 250% becomes
+    approximately 1.6667, and the controls use its inverse.
+  */
+  useEffect(() => {
+    const initialDpr = window.devicePixelRatio || 1;
+
+    const updateBrowserZoom = () => {
+      const currentDpr = window.devicePixelRatio || initialDpr;
+      const nextZoom = currentDpr / initialDpr;
+
+      setBrowserZoom(nextZoom);
+    };
+
+    updateBrowserZoom();
+
+    window.addEventListener("resize", updateBrowserZoom);
+
+    const mediaQuery = window.matchMedia(
+      `(resolution: ${window.devicePixelRatio}dppx)`
+    );
+
+    const handleResolutionChange = () => {
+      updateBrowserZoom();
+
+      mediaQuery.removeEventListener("change", handleResolutionChange);
+
+      const nextMediaQuery = window.matchMedia(
+        `(resolution: ${window.devicePixelRatio}dppx)`
+      );
+
+      nextMediaQuery.addEventListener("change", handleResolutionChange);
+    };
+
+    mediaQuery.addEventListener("change", handleResolutionChange);
+
+    return () => {
+      window.removeEventListener("resize", updateBrowserZoom);
+      mediaQuery.removeEventListener("change", handleResolutionChange);
     };
   }, []);
 
@@ -584,6 +726,9 @@ export default function Milestones() {
             object-fill
             pointer-events-none
           "
+          style={{
+            zIndex: 0,
+          }}
         />
 
         {/* Gentle watercolor integration veil */}
@@ -598,18 +743,21 @@ export default function Milestones() {
             via-transparent
             to-[#6F5A38]/10
           "
+          style={{
+            zIndex: 1,
+          }}
         />
-
-        <SceneHeader />
 
         {/* =====================================================
             INDEPENDENT ANIMAL LAYERS
         ===================================================== */}
 
-        {ANIMALS.map((animal) => (
+        {ANIMALS.map((animal, index) => (
           <AnimalLayer
-            key={animal.id}
+            key={`${animal.id}-${index}`}
             animal={animal}
+            lionFrame={lionFrame}
+            elephantFrame={elephantFrame}
           />
         ))}
 
@@ -769,6 +917,101 @@ export default function Milestones() {
       </div>
 
       {/* =====================================================
+          FIXED PAGE HEADER
+
+          Kept outside the transformed 1440 × 900 scene so the
+          title is always visible and follows the same browser-zoom
+          compensation as the Back/Menu controls.
+      ===================================================== */}
+
+      <div
+        className="fixed pointer-events-none"
+        style={{
+          top: 70 / browserZoom,
+          left: "50%",
+          width: 600 / browserZoom,
+          zIndex: 1000,
+          transform: `translateX(-50%) scale(${1 / browserZoom})`,
+          transformOrigin: "top center",
+          textAlign: "center",
+        }}
+      >
+        <p
+          className="
+            text-[11px]
+            font-bold
+            uppercase
+            tracking-[0.32em]
+            text-[#6D684B]
+          "
+          style={{
+            fontFamily: "Nunito, sans-serif",
+          }}
+        >
+          A little journey
+        </p>
+
+        <h1
+          className="
+            mt-[-2px]
+            text-[48px]
+            leading-none
+            font-bold
+            text-[#5D4734]
+            drop-shadow-[0_2px_0_rgba(255,248,226,0.65)]
+          "
+          style={{
+            fontFamily: "Cormorant Garamond, serif",
+          }}
+        >
+          Our Milestones
+        </h1>
+      </div>
+
+      {/* =====================================================
+          FIXED BRAND PILL
+      ===================================================== */}
+
+      <div
+        className="fixed pointer-events-none"
+        style={{
+          top: 75 / browserZoom,
+          left: 75 / browserZoom,
+          zIndex: 1000,
+          transform: `scale(${1 / browserZoom})`,
+          transformOrigin: "top left",
+        }}
+      >
+        <div
+          className="
+            rounded-full
+            border
+            border-[#F7E8C6]/80
+            bg-[#FFF8E8]/75
+            px-5
+            py-2
+            shadow-[0_4px_14px_rgba(76,55,32,0.14)]
+            backdrop-blur-[2px]
+          "
+        >
+          <span
+            className="
+              text-[11px]
+              font-bold
+              uppercase
+              tracking-[0.24em]
+              text-[#76583B]
+            "
+            style={{
+              fontFamily: "Nunito, sans-serif",
+            }}
+          >
+            Growing With Azain
+          </span>
+        </div>
+      </div>
+
+      {/* =====================================================
           EXISTING NAVIGATION DRAWER
       ===================================================== */}
 
@@ -781,71 +1024,85 @@ export default function Milestones() {
           BACK BUTTON
       ===================================================== */}
 
-      <button
-        onClick={() => navigate(-1)}
-        aria-label="Go back"
-        className="
-          fixed
-          top-6
-          left-6
-          z-[200]
-          flex
-          h-12
-          w-12
-          items-center
-          justify-center
-          rounded-full
-          border-[2px]
-          border-[#765034]
-          bg-[#EED19D]
-          text-[23px]
-          font-semibold
-          text-[#5D4734]
-          shadow-[0_5px_12px_rgba(82,55,30,0.28)]
-          transition-all
-          duration-200
-          hover:scale-105
-          hover:bg-[#F3DDAF]
-          active:scale-95
-        "
+      <div
+        className="fixed"
+        style={{
+          top: 24 / browserZoom,
+          left: 24 / browserZoom,
+          zIndex: 1000,
+          transform: `scale(${1 / browserZoom})`,
+          transformOrigin: "top left",
+        }}
       >
-        ←
-      </button>
+        <button
+          onClick={() => navigate(-1)}
+          aria-label="Go back"
+          className="
+            flex
+            h-12
+            w-12
+            items-center
+            justify-center
+            rounded-full
+            border-[2px]
+            border-[#765034]
+            bg-[#EED19D]
+            text-[23px]
+            font-semibold
+            text-[#5D4734]
+            shadow-[0_5px_12px_rgba(82,55,30,0.28)]
+            transition-all
+            duration-200
+            hover:scale-105
+            hover:bg-[#F3DDAF]
+            active:scale-95
+          "
+        >
+          ←
+        </button>
+      </div>
 
       {/* =====================================================
           MENU BUTTON
       ===================================================== */}
 
-      <button
-        onClick={() => setDrawerOpen(true)}
-        aria-label="Open menu"
-        className="
-          fixed
-          top-6
-          right-6
-          z-[200]
-          flex
-          h-12
-          w-12
-          items-center
-          justify-center
-          rounded-full
-          border-[2px]
-          border-[#765034]
-          bg-[#EED19D]
-          text-[21px]
-          font-semibold
-          text-[#5D4734]
-          shadow-[0_5px_12px_rgba(82,55,30,0.28)]
-          transition-all
-          duration-200
-          hover:scale-105
-          hover:bg-[#F3DDAF]
-          active:scale-95
-        "
+      <div
+        className="fixed"
+        style={{
+          top: 24 / browserZoom,
+          right: 24 / browserZoom,
+          zIndex: 1000,
+          transform: `scale(${1 / browserZoom})`,
+          transformOrigin: "top right",
+        }}
       >
-        ☰
-      </button>
-    </main>
+        <button
+          onClick={() => setDrawerOpen(true)}
+          aria-label="Open menu"
+          className="
+            flex
+            h-12
+            w-12
+            items-center
+            justify-center
+            rounded-full
+            border-[2px]
+            border-[#765034]
+            bg-[#EED19D]
+            text-[21px]
+            font-semibold
+            text-[#5D4734]
+            shadow-[0_5px_12px_rgba(82,55,30,0.28)]
+            transition-all
+            duration-200
+            hover:scale-105
+            hover:bg-[#F3DDAF]
+            active:scale-95
+          "
+        >
+          ☰
+        </button>
+      </div>
+</main>
   );
 }

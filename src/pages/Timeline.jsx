@@ -41,13 +41,14 @@ export default function Timeline() {
   =====================================================
   LOCKED SCENE SCALE
 
-  The visual design was approved at 67% Chrome zoom.
+  The visual design uses a fixed 1536 × 1500
+  design canvas.
 
   Chrome changes devicePixelRatio when browser zoom
   changes. We compensate for that here so the scene
-  keeps the same visual composition.
+  keeps the same physical scale.
 
-  0.67 = our approved reference zoom.
+  0.67 = the existing approved reference scale.
   =====================================================
   */
 
@@ -58,6 +59,88 @@ export default function Timeline() {
 
     return 0.67 / window.devicePixelRatio;
   });
+
+  /*
+  =====================================================
+  FIXED VIEWPORT UI ZOOM COMPENSATION
+
+  Back/Menu are outside the illustrated scene.
+
+  Chrome desktop page zoom changes devicePixelRatio.
+  We capture the devicePixelRatio when this page first
+  loads as the 100% browser-zoom baseline.
+
+  Using the DPR ratio is much more reliable here than
+  comparing outerWidth / innerWidth, because the latter
+  also changes with the browser window and browser chrome.
+
+  This is intentionally separate from sceneScale.
+  =====================================================
+  */
+
+  const [browserZoom, setBrowserZoom] = useState(1);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    /*
+      Capture the display/OS-scaled DPR once.
+
+      Example:
+        initial DPR = 1.25
+
+        100% Chrome -> DPR 1.25 -> zoom 1
+        175% Chrome -> DPR 2.1875 -> zoom 1.75
+        250% Chrome -> DPR 3.125 -> zoom 2.50
+        300% Chrome -> DPR 3.75 -> zoom 3.00
+
+      The UI wrapper then uses 1 / browserZoom,
+      cancelling Chrome page zoom while preserving
+      the requested w-16 / h-16 physical size.
+    */
+    const initialDpr =
+      window.devicePixelRatio || 1;
+
+    const updateBrowserZoom = () => {
+      const currentDpr =
+        window.devicePixelRatio || initialDpr;
+
+      const nextZoom =
+        currentDpr / initialDpr;
+
+      setBrowserZoom(
+        Math.min(4, Math.max(0.25, nextZoom))
+      );
+    };
+
+    updateBrowserZoom();
+
+    window.addEventListener(
+      "resize",
+      updateBrowserZoom
+    );
+
+    /*
+      Chrome can change devicePixelRatio when page
+      zoom changes without giving us a reliable
+      resize sequence. Re-check the value periodically.
+    */
+    const intervalId = window.setInterval(
+      updateBrowserZoom,
+      100
+    );
+
+    return () => {
+      window.removeEventListener(
+        "resize",
+        updateBrowserZoom
+      );
+
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   useEffect(() => {
     let mediaQuery = null;
@@ -183,7 +266,9 @@ export default function Timeline() {
         inset-0
         w-full
         h-full
-        overflow-hidden
+        overflow-y-scroll
+        overflow-x-hidden
+        overscroll-behavior-y: contain
       "
       style={{
         background: "#D9A765",
@@ -191,23 +276,42 @@ export default function Timeline() {
     >
 
       {/* =====================================================
-          VINTAGE WALL
+          VINTAGE WALL — SCROLLING BACKGROUND ONLY
+          =====================================================
+
+          IMPORTANT:
+          This background is intentionally OUTSIDE the transformed
+          1536px design scene.
+
+          It scrolls with the page, but it is NOT affected by
+          sceneScale. This keeps the existing zoom-stable scene
+          completely unchanged.
+
+          Its height follows the same scroll range as the scene,
+          so the background remains visible while scrolling.
           ===================================================== */}
 
-      <img
-        src={vintageWall}
-        alt=""
-        draggable={false}
+      <div
+        aria-hidden="true"
         className="
-          fixed
-          inset-0
+          absolute
+          top-0
+          left-0
           w-full
-          h-full
-          object-cover
           pointer-events-none
           select-none
           z-0
         "
+        style={{
+          height: `${Math.max(
+            typeof window !== "undefined" ? window.innerHeight : 900,
+            1500 * sceneScale + 120
+          )}px`,
+          backgroundImage: `url(${vintageWall})`,
+          backgroundSize: "cover",
+          backgroundPosition: "top center",
+          backgroundRepeat: "no-repeat",
+        }}
       />
 
 
@@ -220,32 +324,36 @@ export default function Timeline() {
           composition lives inside this same coordinate system.
 
           Browser zoom is compensated by sceneScale.
+          The canvas itself is centered independently
+          of the scaled width.
           ===================================================== */}
 
       <div
         className="
-          relative
+          absolute
           z-10
-          mx-auto
         "
         style={{
           width: "1536px",
-          minHeight: "1500px",
+          height: "1500px",
 
           /*
-          Scale the entire scene as ONE unit.
-          */
-          transform: `scale(${sceneScale})`,
+          =====================================================
+          FIXED DESIGN CANVAS POSITIONING
 
-          /*
-          Keep the scene centered after scaling.
+          The scene is positioned from the viewport center
+          first, then scaled as ONE complete unit.
+
+          This avoids mx-auto + transformed-width
+          calculations changing the horizontal position
+          when Chrome zoom changes.
+          =====================================================
           */
+          left: "50%",
+          top: 0,
+
+          transform: `translateX(-50%) scale(${sceneScale})`,
           transformOrigin: "top center",
-
-          /*
-          Keep the existing scene positioning/balance.
-          */
-          marginBottom: `${1500 * (sceneScale - 1)}px`,
         }}
       >
 
@@ -599,6 +707,27 @@ export default function Timeline() {
 
 
       {/* =====================================================
+          SCROLL HEIGHT SPACER
+
+          The illustrated scene is absolutely positioned, so it
+          does not contribute its 1500px height to normal document
+          flow. This invisible spacer creates enough scroll space
+          for the complete existing scene.
+
+          It does NOT move, resize, or change any illustration.
+          ===================================================== */}
+
+      <div
+        aria-hidden="true"
+        style={{
+          width: "1px",
+          height: `${1500 * sceneScale}px`,
+          pointerEvents: "none",
+          userSelect: "none",
+        }}
+      />
+
+      {/* =====================================================
           DRAWER
           ===================================================== */}
 
@@ -612,54 +741,72 @@ export default function Timeline() {
           BACK BUTTON
           ===================================================== */}
 
-      <button
-        onClick={() => navigate(-1)}
-        className="
-          fixed
-          top-6
-          left-6
-          z-50
-          w-12
-          h-12
-          rounded-full
-          bg-white
-          shadow-lg
-          flex
-          items-center
-          justify-center
-          hover:scale-105
-          transition
-        "
+      <div
+        className="fixed"
+        style={{
+          top: 12 / browserZoom,
+          left: 24 / browserZoom,
+          zIndex: 1000,
+          transform: `scale(${1 / browserZoom})`,
+          transformOrigin: "top left",
+        }}
       >
-        ←
-      </button>
+        <button
+          onClick={() => navigate(-1)}
+          aria-label="Go back"
+          className="
+            w-3
+            h-3
+            text-[7px]
+            rounded-full
+            bg-#EED19D
+            shadow-lg
+            flex
+            items-center
+            justify-center
+            hover:scale-105
+            transition
+          "
+        >
+          ←
+        </button>
+      </div>
 
 
       {/* =====================================================
           MENU BUTTON
           ===================================================== */}
 
-      <button
-        onClick={() => setDrawerOpen(true)}
-        className="
-          fixed
-          top-6
-          right-6
-          z-50
-          w-12
-          h-12
-          rounded-full
-          bg-white
-          shadow-lg
-          flex
-          items-center
-          justify-center
-          hover:scale-105
-          transition
-        "
+      <div
+        className="fixed"
+        style={{
+          top: 12 / browserZoom,
+          right: 24 / browserZoom,
+          zIndex: 1000,
+          transform: `scale(${1 / browserZoom})`,
+          transformOrigin: "top right",
+        }}
       >
-        ☰
-      </button>
+        <button
+          onClick={() => setDrawerOpen(true)}
+          aria-label="Open menu"
+          className="
+            w-3
+            h-3
+            text-[7px]
+            rounded-full
+            bg-#EED19D
+            shadow-lg
+            flex
+            items-center
+            justify-center
+            hover:scale-105
+            transition
+          "
+        >
+          ☰
+        </button>
+      </div>
 
     </main>
   );
