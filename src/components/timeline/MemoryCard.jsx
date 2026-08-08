@@ -1,6 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
+import memoryWall from "../../assets/illustrations/timeline-memory-wall.png";
+
 export default function MemoryCard({ memory }) {
   const navigate = useNavigate();
 
@@ -15,18 +17,17 @@ export default function MemoryCard({ memory }) {
       )
     : "";
 
-  /*
-  ======================================
-  IMAGE
-  ======================================
-  */
+  /* ======================================
+     IMAGE
+  ====================================== */
 
   const coverImage =
     memory.cover_image ||
     memory.cover ||
     memory.image ||
     "/placeholder-memory.jpg";
-      return (
+
+  return (
     <div
       onClick={() =>
         navigate(`/timeline/memory/${memory.slug}`)
@@ -35,7 +36,7 @@ export default function MemoryCard({ memory }) {
         group
         cursor-pointer
         relative
-         -translate-y-20
+        -translate-y-20
         rounded-[28px]
         overflow-hidden
         bg-[#FFFDF9]
@@ -49,32 +50,42 @@ export default function MemoryCard({ memory }) {
       "
     >
 
-      {/* ======================================
-          IMAGE
-      ====================================== */}
+   {/* ======================================
+    IMAGE
+====================================== */}
 
-      <div className="overflow-hidden">
+<div
+  className="overflow-hidden h-35"
+  style={{
+    backgroundImage: `url(${coverImage})`,
+    backgroundSize: "100% auto",
+    backgroundPosition: "center 35%",
+    backgroundRepeat: "no-repeat",
+  }}
+>
 
-        <img
-          src={coverImage}
-          alt={memory.title}
-          className="
-            w-full
-            h-35
-            object-cover
-            transition-transform
-            duration-500
-            group-hover:scale-105
-          "
-        />
+</div>
 
-      </div>
 
       {/* ======================================
           CONTENT
       ====================================== */}
 
-      <div className="p-2">
+      <div
+        className="p-2"
+        style={{
+          backgroundImage: `
+            linear-gradient(
+              rgba(221, 181, 116, 0.72),
+              rgba(221, 181, 116, 0.72)
+            ),
+            url(${memoryWall})
+          `,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
 
         {/* Category */}
 
@@ -99,11 +110,13 @@ export default function MemoryCard({ memory }) {
 
         )}
 
+
         {/* Date */}
 
         <p className="mt-1 text-sm text-[#A68B64] font-medium">
           {formattedDate}
         </p>
+
 
         {/* Title */}
 
@@ -123,6 +136,7 @@ export default function MemoryCard({ memory }) {
           {memory.title}
         </h3>
 
+
         {/* Description */}
 
         <p
@@ -136,6 +150,7 @@ export default function MemoryCard({ memory }) {
         >
           {memory.description}
         </p>
+
 
         {/* Button */}
 

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import MemoryGrid from "./MemoryGrid";
 
+import memoryWall from "../../assets/illustrations/timeline-memory-wall.png";
+
 export default function ChapterSection({
   loading,
   book,
@@ -51,18 +53,31 @@ export default function ChapterSection({
       className="
         mx-auto
         rounded-[40px]
-        bg-[#FDFBF6]
         border
-        border-[#EEE5D7]
         shadow-sm
+        overflow-hidden
       "
       style={{
         width: "min(1400px, calc(100% - 10px))",
         height: "505px",
         padding: "0px 50px",
-        marginTop: "-300px",
+        marginTop: "-275px",
         boxSizing: "border-box",
         position: "relative",
+
+        /* ==========================================
+           MEMORY WALLPAPER
+        ========================================== */
+
+        backgroundImage: `url(${memoryWall})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+
+        borderColor: "#CBA66F",
+
+        boxShadow:
+          "inset 0 0 45px rgba(120, 79, 35, 0.16)",
       }}
     >
 
@@ -126,8 +141,9 @@ export default function ChapterSection({
               py-2
               rounded-full
               border
-              border-[#E7DDD0]
+              border-[#CBA66F]
               disabled:opacity-40
+              bg-[#EBD09B]
             "
           >
             ←
@@ -150,7 +166,7 @@ export default function ChapterSection({
                 ${
                   currentPage === page
                     ? "bg-[#B58A5A] text-white"
-                    : "bg-white border border-[#E7DDD0]"
+                    : "bg-[#EBD09B] border border-[#CBA66F]"
                 }
               `}
             >
@@ -172,8 +188,9 @@ export default function ChapterSection({
               py-2
               rounded-full
               border
-              border-[#E7DDD0]
+              border-[#CBA66F]
               disabled:opacity-40
+              bg-[#EBD09B]
             "
           >
             →

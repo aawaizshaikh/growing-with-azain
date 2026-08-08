@@ -33,11 +33,12 @@ export default function JourneyHeader() {
       {/* MAIN TITLE */}
       <h1
         className="
-          text-[#F3E6C8]
+          text-[#5A4030]
           text-6xl
           md:text-7xl
           font-bold
           leading-none
+          -translate-y-8
         "
         style={{
           fontFamily: "Cormorant Garamond, serif",

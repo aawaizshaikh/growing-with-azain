@@ -141,11 +141,15 @@ const BOOKS = {
         className="relative mx-auto"
         style={{
           width: 1080,
-          height: 650,
+          height: 600,
           maxWidth: "100%",
-          transform: "translateY(-130px)",
+          transform: "translateY(-100px)",
+          transform: "translateY(-100px) scale(0.95)",
+          transformOrigin: "center bottom",
         }}
       >
+        
+  
                 {/* ===========================
             BOOKS
         ============================ */}
