@@ -1,4 +1,15 @@
 export default function mapMilestone(item) {
+  const gallery =
+    Array.isArray(item.gallery) && item.gallery.length
+      ? item.gallery
+      : Array.isArray(item.gallery_images) && item.gallery_images.length
+        ? item.gallery_images
+        : [];
+
+  const coverImage =
+    item.cover_image ||
+    "https://placehold.co/1200x800?text=No+Image";
+
   return {
     id: item.id,
     slug: item.slug,
@@ -7,17 +18,9 @@ export default function mapMilestone(item) {
     description: item.description,
     story: item.story,
 
-    coverImage:
-      item.cover_image ||
-      "https://placehold.co/1200x800?text=No+Image",
+    coverImage,
 
-    gallery:
-      item.gallery_images && item.gallery_images.length
-        ? item.gallery_images
-        : [
-            item.cover_image ||
-              "https://placehold.co/1200x800?text=No+Image",
-          ],
+    gallery: gallery.length ? gallery : [coverImage],
 
     highlights: item.highlights || [],
 
@@ -27,9 +30,10 @@ export default function mapMilestone(item) {
     category: item.category || "Milestone",
 
     favorite: item.favorite || false,
+    published: item.published ?? true,
+    memoryType: item.memory_type || "milestone",
 
     circleColor: "#FCEBC8",
-
     icon: "🌱",
   };
 }
