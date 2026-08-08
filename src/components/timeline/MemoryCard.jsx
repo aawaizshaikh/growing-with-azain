@@ -34,6 +34,8 @@ export default function MemoryCard({ memory }) {
       className="
         group
         cursor-pointer
+        relative
+         -translate-y-20
         rounded-[28px]
         overflow-hidden
         bg-[#FFFDF9]
@@ -58,7 +60,7 @@ export default function MemoryCard({ memory }) {
           alt={memory.title}
           className="
             w-full
-            h-64
+            h-35
             object-cover
             transition-transform
             duration-500
@@ -72,7 +74,7 @@ export default function MemoryCard({ memory }) {
           CONTENT
       ====================================== */}
 
-      <div className="p-6">
+      <div className="p-2">
 
         {/* Category */}
 
@@ -99,7 +101,7 @@ export default function MemoryCard({ memory }) {
 
         {/* Date */}
 
-        <p className="mt-4 text-sm text-[#A68B64] font-medium">
+        <p className="mt-1 text-sm text-[#A68B64] font-medium">
           {formattedDate}
         </p>
 
@@ -108,7 +110,7 @@ export default function MemoryCard({ memory }) {
         <h3
           className="
             mt-2
-            text-[30px]
+            text-[24px]
             leading-tight
             font-bold
             text-[#5A4332]
@@ -125,11 +127,11 @@ export default function MemoryCard({ memory }) {
 
         <p
           className="
-            mt-4
+            mt-2
             text-[#75675B]
-            leading-7
-            line-clamp-3
-            min-h-[84px]
+            leading-6
+            line-clamp-2
+            min-h-0
           "
         >
           {memory.description}
@@ -139,7 +141,7 @@ export default function MemoryCard({ memory }) {
 
         <button
           className="
-            mt-8
+            mt-4
             px-5
             py-2.5
             rounded-full

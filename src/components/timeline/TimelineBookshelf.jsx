@@ -143,6 +143,7 @@ const BOOKS = {
           width: 1080,
           height: 650,
           maxWidth: "100%",
+          transform: "translateY(-130px)",
         }}
       >
                 {/* ===========================
