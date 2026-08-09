@@ -1,7 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-import Footer from "../components/Footer";
+import { useNavigate } from "react-router-dom";
 
 import books from "../components/timeline/books";
 
@@ -10,7 +13,7 @@ import JourneyHeader from "../components/timeline/JourneyHeader";
 import TimelineBookshelf from "../components/timeline/TimelineBookshelf";
 import ChapterSection from "../components/timeline/ChapterSection";
 
-import vintageWall from "../assets/illustrations/timeline-vintage-wall.png";
+import vintageWall from "../assets/illustrations/background-new.png";
 import vintageLamp from "../assets/illustrations/timeline-vintage-lamp-new.png";
 import vintageCarpet from "../assets/illustrations/timeline-vintage-carpet-new.png";
 import vintageTeddyPillow from "../assets/illustrations/timeline-vintage-teddy-pillow.png";
@@ -24,163 +27,288 @@ import vintagetoytrain from "../assets/illustrations/timeline-vintage-toytrain.p
 
 import { getTimelineMemories } from "../services/timelineService";
 
+/*
+=====================================================
+MASTER DESIGN CANVAS
+=====================================================
+
+The supplied wallpaper is:
+
+    1920 × 1080
+
+This is the MASTER coordinate system.
+
+Everything visual belongs to this scene.
+
+At 100% browser zoom:
+
+1920 viewport
+    → 1920 × 1080 scene
+
+1440 viewport
+    → scene scales uniformly to 1440 wide
+
+1366 viewport
+    → scene scales uniformly to 1366 wide
+
+The X/Y relationship NEVER changes.
+
+=====================================================
+*/
+
+const SCENE_WIDTH = 1920;
+const SCENE_HEIGHT = 1080;
+
+/*
+=====================================================
+MASTER SCENE POSITIONS
+=====================================================
+*/
+
+const SCENE_LAYOUT = {
+  /*
+  ================================================
+  JOURNEY HEADER
+  ================================================
+  */
+
+  header: {
+    top: 45,
+  },
+
+  /*
+  ================================================
+  BOOKSHELF
+  ================================================
+
+  TimelineBookshelf internally uses:
+
+      1080 × 600
+
+  We position that entire composition inside
+  the master 1920 × 1080 scene.
+  */
+
+  bookshelf: {
+    left: 420,
+    top: 200,
+    width: 1080,
+    height: 600,
+  },
+
+  /*
+  ================================================
+  CHAPTER / MEMORY SECTION
+  ================================================
+  */
+
+  chapter: {
+    left: 260,
+    top: 570,
+    width: 1400,
+  },
+
+  /*
+  ================================================
+  LEFT LAMP
+  ================================================
+  */
+
+  lampLeft: {
+    left: 70,
+    top: 55,
+    width: 150,
+  },
+
+  /*
+  ================================================
+  RIGHT LAMP
+  ================================================
+  */
+
+  lampRight: {
+    right: 70,
+    top: 55,
+    width: 150,
+  },
+
+  /*
+  ================================================
+  ROCKING HORSE
+  ================================================
+  */
+
+  horse: {
+    left: 70,
+    top: 735,
+    width: 375,
+  },
+
+  /*
+  ================================================
+  TEDDY
+  ================================================
+  */
+
+  teddy: {
+    right: 65,
+    top: 735,
+    width: 150,
+  },
+
+  /*
+  ================================================
+  CARPET
+  ================================================
+  */
+
+  carpet: {
+    top: 845,
+    width: 655,
+  },
+
+  /*
+  ================================================
+  UNICORN
+  ================================================
+  */
+
+  unicorn: {
+    right: 300,
+    top: 855,
+    width: 165,
+  },
+
+  /*
+  ================================================
+  ALPHABET BLOCKS — RIGHT
+  ================================================
+  */
+
+  alphabetRight: {
+    right: 40,
+    top: 865,
+    width: 180,
+  },
+
+  /*
+  ================================================
+  ALPHABET BLOCKS — LEFT
+  ================================================
+  */
+
+  alphabetLeft: {
+    left: 600,
+    top: 850,
+    width: 145,
+  },
+
+  /*
+  ================================================
+  FOOTBALL
+  ================================================
+  */
+
+  football: {
+    right: 20,
+    top: 925,
+    width: 120,
+  },
+
+  /*
+  ================================================
+  TOY TRAIN
+  ================================================
+  */
+
+  train: {
+    right: 5,
+    top: 790,
+    width: 150,
+  },
+
+  /*
+  ================================================
+  CARS
+  ================================================
+  */
+
+  cars: {
+    left: 70,
+    top: 850,
+    width: 285,
+  },
+};
+
 export default function Timeline() {
   const navigate = useNavigate();
 
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
-  const [loading, setLoading] = useState(true);
-
-  const [memories, setMemories] = useState([]);
-
-  const [selectedBook, setSelectedBook] = useState(
-    books[0]
-  );
-
   /*
   =====================================================
-  LOCKED SCENE SCALE
-
-  The visual design uses a fixed 1536 × 1500
-  design canvas.
-
-  Chrome changes devicePixelRatio when browser zoom
-  changes. We compensate for that here so the scene
-  keeps the same physical scale.
-
-  0.67 = the existing approved reference scale.
+  STATE
   =====================================================
   */
 
-  const [sceneScale, setSceneScale] = useState(() => {
-    if (typeof window === "undefined") {
-      return 1;
-    }
+  const [drawerOpen, setDrawerOpen] =
+    useState(false);
 
-    return 0.67 / window.devicePixelRatio;
-  });
+  const [loading, setLoading] =
+    useState(true);
+
+  const [memories, setMemories] =
+    useState([]);
+
+  const [selectedBook, setSelectedBook] =
+    useState(books[0]);
 
   /*
   =====================================================
-  FIXED VIEWPORT UI ZOOM COMPENSATION
+  RESPONSIVE MASTER SCALE
+  =====================================================
 
-  Back/Menu are outside the illustrated scene.
+  IMPORTANT:
 
-  Chrome desktop page zoom changes devicePixelRatio.
-  We capture the devicePixelRatio when this page first
-  loads as the 100% browser-zoom baseline.
+  Only viewport WIDTH determines scale.
 
-  Using the DPR ratio is much more reliable here than
-  comparing outerWidth / innerWidth, because the latter
-  also changes with the browser window and browser chrome.
+  The master scene itself is ALWAYS:
 
-  This is intentionally separate from sceneScale.
+      1920 × 1080
+
+  We scale the entire scene uniformly.
+
+  There is no separate X scale.
+  There is no separate Y scale.
+  There are no monitor breakpoints.
   =====================================================
   */
 
-  const [browserZoom, setBrowserZoom] = useState(1);
+  const [sceneScale, setSceneScale] =
+    useState(1);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    /*
-      Capture the display/OS-scaled DPR once.
-
-      Example:
-        initial DPR = 1.25
-
-        100% Chrome -> DPR 1.25 -> zoom 1
-        175% Chrome -> DPR 2.1875 -> zoom 1.75
-        250% Chrome -> DPR 3.125 -> zoom 2.50
-        300% Chrome -> DPR 3.75 -> zoom 3.00
-
-      The UI wrapper then uses 1 / browserZoom,
-      cancelling Chrome page zoom while preserving
-      the requested w-16 / h-16 physical size.
-    */
-    const initialDpr =
-      window.devicePixelRatio || 1;
-
-    const updateBrowserZoom = () => {
-      const currentDpr =
-        window.devicePixelRatio || initialDpr;
-
-      const nextZoom =
-        currentDpr / initialDpr;
-
-      setBrowserZoom(
-        Math.min(4, Math.max(0.25, nextZoom))
-      );
-    };
-
-    updateBrowserZoom();
-
-    window.addEventListener(
-      "resize",
-      updateBrowserZoom
-    );
-
-    /*
-      Chrome can change devicePixelRatio when page
-      zoom changes without giving us a reliable
-      resize sequence. Re-check the value periodically.
-    */
-    const intervalId = window.setInterval(
-      updateBrowserZoom,
-      100
-    );
-
-    return () => {
-      window.removeEventListener(
-        "resize",
-        updateBrowserZoom
-      );
-
-      window.clearInterval(intervalId);
-    };
-  }, []);
-
-  useEffect(() => {
-    let mediaQuery = null;
-
     const updateSceneScale = () => {
-      if (typeof window === "undefined") {
+      if (
+        typeof window === "undefined"
+      ) {
         return;
       }
 
-      const dpr = window.devicePixelRatio || 1;
+      const viewportWidth =
+        window.innerWidth;
 
-      /*
-      Keep the same physical composition as the
-      approved 67% reference.
-      */
-      const newScale = 0.67 / dpr;
+      const nextScale =
+        viewportWidth /
+        SCENE_WIDTH;
 
-      setSceneScale(newScale);
-    };
-
-    const watchResolution = () => {
-      if (mediaQuery) {
-        mediaQuery.removeEventListener(
-          "change",
-          watchResolution
-        );
-      }
-
-      mediaQuery = window.matchMedia(
-        `(resolution: ${window.devicePixelRatio}dppx)`
-      );
-
-      mediaQuery.addEventListener(
-        "change",
-        watchResolution
+      setSceneScale(
+        Number.isFinite(nextScale) &&
+          nextScale > 0
+          ? nextScale
+          : 1
       );
     };
 
     updateSceneScale();
-    watchResolution();
 
     window.addEventListener(
       "resize",
@@ -192,13 +320,6 @@ export default function Timeline() {
         "resize",
         updateSceneScale
       );
-
-      if (mediaQuery) {
-        mediaQuery.removeEventListener(
-          "change",
-          watchResolution
-        );
-      }
     };
   }, []);
 
@@ -211,7 +332,8 @@ export default function Timeline() {
   useEffect(() => {
     async function loadMemories() {
       try {
-        const data = await getTimelineMemories();
+        const data =
+          await getTimelineMemories();
 
         setMemories(data || []);
       } catch (err) {
@@ -226,29 +348,30 @@ export default function Timeline() {
 
   /*
   =====================================================
-  GROUP MEMORIES
+  GROUP MEMORIES BY CHAPTER
   =====================================================
   */
 
-  const memoriesByChapter = useMemo(() => {
-    const grouped = {};
+  const memoriesByChapter =
+    useMemo(() => {
+      const grouped = {};
 
-    books.forEach((book) => {
-      grouped[book.slug] = [];
-    });
+      books.forEach((book) => {
+        grouped[book.slug] = [];
+      });
 
-    memories.forEach((memory) => {
-      const chapter =
-        memory.category?.toLowerCase() ||
-        memory.age?.toLowerCase();
+      memories.forEach((memory) => {
+        const chapter =
+          memory.category?.toLowerCase() ||
+          memory.age?.toLowerCase();
 
-      if (grouped[chapter]) {
-        grouped[chapter].push(memory);
-      }
-    });
+        if (grouped[chapter]) {
+          grouped[chapter].push(memory);
+        }
+      });
 
-    return grouped;
-  }, [memories]);
+      return grouped;
+    }, [memories]);
 
   /*
   =====================================================
@@ -257,475 +380,565 @@ export default function Timeline() {
   */
 
   const selectedMemories =
-    memoriesByChapter[selectedBook.slug] || [];
+    memoriesByChapter[
+      selectedBook.slug
+    ] || [];
+
+  /*
+  =====================================================
+  MASTER SCENE HEIGHT
+
+  Because transform does not participate in normal
+  document flow, the wrapper gets the scaled height.
+
+  There is NO FOOTER after this scene.
+
+  Therefore the 1920 × 1080 artwork is the complete
+  Timeline visual composition.
+  =====================================================
+  */
+
+  const scaledSceneHeight =
+    SCENE_HEIGHT * sceneScale;
 
   return (
     <main
       className="
-        fixed
-        inset-0
+        relative
         w-full
-        h-full
-        overflow-y-scroll
         overflow-x-hidden
-        overscroll-behavior-y: contain
       "
       style={{
-        background: "#D9A765",
+        backgroundImage:
+          `url(${vintageWall})`,
+        backgroundRepeat:
+          "no-repeat",
+        backgroundPosition:
+          "center center",
+        backgroundSize:
+          "cover",
+        backgroundAttachment:
+          "fixed",
+        backgroundColor:
+          "#D9A765",
       }}
     >
-
       {/* =====================================================
-          VINTAGE WALL — SCROLLING BACKGROUND ONLY
-          =====================================================
-
-          IMPORTANT:
-          This background is intentionally OUTSIDE the transformed
-          1536px design scene.
-
-          It scrolls with the page, but it is NOT affected by
-          sceneScale. This keeps the existing zoom-stable scene
-          completely unchanged.
-
-          Its height follows the same scroll range as the scene,
-          so the background remains visible while scrolling.
+          MASTER SCENE WRAPPER
           ===================================================== */}
 
       <div
-        aria-hidden="true"
         className="
-          absolute
-          top-0
-          left-0
+          relative
           w-full
-          pointer-events-none
-          select-none
-          z-0
         "
         style={{
-          height: `${Math.max(
-            typeof window !== "undefined" ? window.innerHeight : 900,
-            1500 * sceneScale + 120
-          )}px`,
-          backgroundImage: `url(${vintageWall})`,
-          backgroundSize: "cover",
-          backgroundPosition: "top center",
-          backgroundRepeat: "no-repeat",
-        }}
-      />
-
-
-      {/* =====================================================
-          LOCKED DESIGN SCENE
-
-          IMPORTANT:
-
-          Everything that belongs to the visual scrapbook
-          composition lives inside this same coordinate system.
-
-          Browser zoom is compensated by sceneScale.
-          The canvas itself is centered independently
-          of the scaled width.
-          ===================================================== */}
-
-      <div
-        className="
-          absolute
-          z-10
-        "
-        style={{
-          width: "1536px",
-          height: "1500px",
-
-          /*
-          =====================================================
-          FIXED DESIGN CANVAS POSITIONING
-
-          The scene is positioned from the viewport center
-          first, then scaled as ONE complete unit.
-
-          This avoids mx-auto + transformed-width
-          calculations changing the horizontal position
-          when Chrome zoom changes.
-          =====================================================
-          */
-          left: "50%",
-          top: 0,
-
-          transform: `translateX(-50%) scale(${sceneScale})`,
-          transformOrigin: "top center",
+          height:
+            `${scaledSceneHeight}px`,
         }}
       >
-
         {/* =====================================================
-            DECORATIVE LEFT LAMP
-            ===================================================== */}
+            1920 × 1080 MASTER SCENE
 
-        <img
-          src={vintageLamp}
-          alt=""
-          draggable={false}
-          className="
-            absolute
-            pointer-events-none
-            select-none
-          "
-          style={{
-            left: "-250px",
-            top: "120px",
-            width: "245px",
-            height: "auto",
-            zIndex: 10,
-          }}
-        />
-
-
-        {/* =====================================================
-            DECORATIVE RIGHT LAMP
-            ===================================================== */}
-
-        <img
-          src={vintageLamp}
-          alt=""
-          draggable={false}
-          className="
-            absolute
-            pointer-events-none
-            select-none
-          "
-          style={{
-            right: "-250px",
-            top: "120px",
-            width: "245px",
-            height: "auto",
-            transform: "scaleX(-1)",
-            transformOrigin: "center",
-            zIndex: 10,
-          }}
-        />
-
-
-        {/* =====================================================
-            HEADER
+            EVERYTHING visual belongs inside here.
             ===================================================== */}
 
         <div
           className="
-            relative
-            z-20
+            absolute
+            top-0
+            left-0
           "
+          style={{
+            width:
+              `${SCENE_WIDTH}px`,
+
+            height:
+              `${SCENE_HEIGHT}px`,
+
+            transform:
+              `scale(${sceneScale})`,
+
+            transformOrigin:
+              "top left",
+
+            /*
+            ================================================
+            EXACT 16:9 WALLPAPER
+            ================================================
+            */
+
+            backgroundColor:
+              "transparent",
+          }}
         >
-          <JourneyHeader />
-        </div>
-
-
-        {/* =====================================================
-            BOOKSHELF
-
-            Existing bookshelf remains unchanged.
-            ===================================================== */}
-
-        <div
-          className="
-            relative
-            z-30
-          "
-        >
-          <TimelineBookshelf
-            books={books}
-            memoriesByChapter={memoriesByChapter}
-            selectedBook={selectedBook}
-            onSelectBook={setSelectedBook}
-          />
-        </div>
-
-
-        {/* =====================================================
-            CHAPTER SECTION
-
-            Existing ChapterSection positioning is preserved.
-            ===================================================== */}
-
-        <div
-          className="
-            relative
-            z-20
-          "
-        >
-          <ChapterSection
-            loading={loading}
-            book={selectedBook}
-            memories={selectedMemories}
-          />
-        </div>
-
-
-        {/* =====================================================
-            CARPET
-
-            The carpet belongs to the same locked scene.
-            ===================================================== */}
-
-        <img
-          src={vintageCarpet}
-          alt=""
-          draggable={false}
-          className="
-            absolute
-            pointer-events-none
-            select-none
-          "
-          style={{
-            left: "50%",
-            transform: "translateX(-50%)",
-            top: "1150px",
-            width: "1080px",
-            height: "auto",
-            zIndex: 1,
-          }}
-        />
-
-
-        {/* =====================================================
-            TEDDY BEAR ON FLOOR
-            ===================================================== */}
-
-        <img
-          src={vintageTeddyPillow}
-          alt=""
-          draggable={false}
-          className="
-            absolute
-            pointer-events-none
-            select-none
-          "
-          style={{
-            left: "105%",
-            top: "1000px",
-            width: "260px",
-            height: "auto",
-            zIndex: 25,
-          }}
-        />
-
-
-        {/* =====================================================
-            ROCKING HORSE ANIMATION
-            ===================================================== */}
-
-        <style>
-          {`
-            @keyframes timelineRockingHorse {
-              0% {
-                transform: rotate(-4deg);
-              }
-              25% {
-                transform: rotate(0deg);
-              }
-              50% {
-                transform: rotate(4deg);
-              }
-              75% {
-                transform: rotate(0deg);
-              }
-              100% {
-                transform: rotate(-4deg);
-              }
-            }
-          `}
-        </style>
-
-        {/* =====================================================
-            ROCKING HORSE ON FLOOR
-            ===================================================== */}
-
-        <img
-          src={vintageRockingHorse}
-          alt=""
-          draggable={false}
-          className="
-            absolute
-            pointer-events-none
-            select-none
-          "
-          style={{
-            right: "100%",
-            top: "925px",
-            width: "475px",
-            height: "auto",
-            transformOrigin: "50% 88%",
-            animation: "timelineRockingHorse 2.8s ease-in-out infinite",
-            zIndex: 50,
-          }}
-        />
-
-
-        {/* =====================================================
-            ALPHABET BLOCKS — COLOR SET 1
-            ===================================================== */}
-
-        <img
-          src={vintageAlphabetBlocks1}
-          alt=""
-          draggable={false}
-          className="
-            absolute
-            pointer-events-none
-            select-none
-          "
-          style={{
-            left: "95%",
-            top: "1150px",
-            width: "180px",
-            height: "auto",
-            zIndex: 25,
-          }}
-        />
-
-
-        {/* =====================================================
-            ALPHABET BLOCKS — COLOR SET 2
-            ===================================================== */}
-
-        <img
-          src={vintageAlphabetBlocks2}
-          alt=""
-          draggable={false}
-          className="
-            absolute
-            pointer-events-none
-            select-none
-          "
-          style={{
-            right: "55%",
-            top: "1150px",
-            width: "180px",
-            height: "auto",
-            zIndex: 25,
-          }}
-        />
           {/* =====================================================
-              Football
-            ===================================================== */}
+              LEFT LAMP
+              ===================================================== */}
 
-        <img
-          src={vintagefootball}
-          alt=""
-          draggable={false}
-          className="
-            absolute
-            pointer-events-none
-            select-none
-          "
-          style={{
-            right: "-15%",
-            top: "1250px",
-            width: "180px",
-            height: "auto",
-            zIndex: 25,
-          }}
-        />{/* =====================================================
-              TOYTRAIN
-            ===================================================== */}
+          <img
+            src={vintageLamp}
+            alt=""
+            draggable={false}
+            className="
+              absolute
+              pointer-events-none
+              select-none
+            "
+            style={{
+              left:
+                `${SCENE_LAYOUT.lampLeft.left}px`,
 
-        <img
-          src={vintagetoytrain}
-          alt=""
-          draggable={false}
-          className="
-            absolute
-            pointer-events-none
-            select-none
-          "
-          style={{
-            right: "-29%",
-            top: "1200px",
-            width: "180px",
-            height: "auto",
-            zIndex: 25,
-          }}
-        />
-        {/* =====================================================
+              top:
+                `${SCENE_LAYOUT.lampLeft.top}px`,
+
+              width:
+                `${SCENE_LAYOUT.lampLeft.width}px`,
+
+              height: "auto",
+
+              zIndex: 10,
+            }}
+          />
+
+          {/* =====================================================
+              RIGHT LAMP
+              ===================================================== */}
+
+          <img
+            src={vintageLamp}
+            alt=""
+            draggable={false}
+            className="
+              absolute
+              pointer-events-none
+              select-none
+            "
+            style={{
+              right:
+                `${SCENE_LAYOUT.lampRight.right}px`,
+
+              top:
+                `${SCENE_LAYOUT.lampRight.top}px`,
+
+              width:
+                `${SCENE_LAYOUT.lampRight.width}px`,
+
+              height: "auto",
+
+              transform:
+                "scaleX(-1)",
+
+              transformOrigin:
+                "center",
+
+              zIndex: 10,
+            }}
+          />
+
+          {/* =====================================================
+              JOURNEY HEADER
+              ===================================================== */}
+
+          <div
+            className="
+              absolute
+              left-1/2
+              -translate-x-1/2
+              z-20
+            "
+            style={{
+              top:
+                `${SCENE_LAYOUT.header.top}px`,
+            }}
+          >
+            <JourneyHeader />
+          </div>
+
+          {/* =====================================================
+              BOOKSHELF
+              ===================================================== */}
+
+          <div
+            className="
+              absolute
+              z-30
+            "
+            style={{
+              left:
+                `${SCENE_LAYOUT.bookshelf.left}px`,
+
+              top:
+                `${SCENE_LAYOUT.bookshelf.top}px`,
+
+              width:
+                `${SCENE_LAYOUT.bookshelf.width}px`,
+
+              height:
+                `${SCENE_LAYOUT.bookshelf.height}px`,
+            }}
+          >
+            <TimelineBookshelf
+              books={books}
+              memoriesByChapter={
+                memoriesByChapter
+              }
+              selectedBook={
+                selectedBook
+              }
+              onSelectBook={
+                setSelectedBook
+              }
+            />
+          </div>
+
+          {/* =====================================================
+              CHAPTER / MEMORY SECTION
+              ===================================================== */}
+
+          <div
+            className="
+              absolute
+              z-20
+            "
+            style={{
+              left:
+                `${SCENE_LAYOUT.chapter.left}px`,
+
+              top:
+                `${SCENE_LAYOUT.chapter.top}px`,
+
+              width:
+                `${SCENE_LAYOUT.chapter.width}px`,
+            }}
+          >
+            <ChapterSection
+              loading={loading}
+              book={selectedBook}
+              memories={
+                selectedMemories
+              }
+            />
+          </div>
+
+          {/* =====================================================
+              CARPET
+              ===================================================== */}
+
+          <img
+            src={vintageCarpet}
+            alt=""
+            draggable={false}
+            className="
+              absolute
+              pointer-events-none
+              select-none
+            "
+            style={{
+              left: "50%",
+
+              top:
+                `${SCENE_LAYOUT.carpet.top}px`,
+
+              width:
+                `${SCENE_LAYOUT.carpet.width}px`,
+
+              height: "auto",
+
+              transform:
+                "translateX(-50%)",
+
+              zIndex: 1,
+            }}
+          />
+
+          {/* =====================================================
+              TEDDY
+              ===================================================== */}
+
+          <img
+            src={vintageTeddyPillow}
+            alt=""
+            draggable={false}
+            className="
+              absolute
+              pointer-events-none
+              select-none
+            "
+            style={{
+              right:
+                `${SCENE_LAYOUT.teddy.right}px`,
+
+              top:
+                `${SCENE_LAYOUT.teddy.top}px`,
+
+              width:
+                `${SCENE_LAYOUT.teddy.width}px`,
+
+              height: "auto",
+
+              zIndex: 25,
+            }}
+          />
+
+          {/* =====================================================
+              ROCKING HORSE ANIMATION
+              ===================================================== */}
+
+          <style>
+            {`
+              @keyframes timelineRockingHorse {
+                0% {
+                  transform: rotate(-4deg);
+                }
+
+                25% {
+                  transform: rotate(0deg);
+                }
+
+                50% {
+                  transform: rotate(4deg);
+                }
+
+                75% {
+                  transform: rotate(0deg);
+                }
+
+                100% {
+                  transform: rotate(-4deg);
+                }
+              }
+            `}
+          </style>
+
+          {/* =====================================================
+              ROCKING HORSE
+              ===================================================== */}
+
+          <img
+            src={vintageRockingHorse}
+            alt=""
+            draggable={false}
+            className="
+              absolute
+              pointer-events-none
+              select-none
+            "
+            style={{
+              left:
+                `${SCENE_LAYOUT.horse.left}px`,
+
+              top:
+                `${SCENE_LAYOUT.horse.top}px`,
+
+              width:
+                `${SCENE_LAYOUT.horse.width}px`,
+
+              height: "auto",
+
+              transformOrigin:
+                "50% 88%",
+
+              animation:
+                "timelineRockingHorse 2.8s ease-in-out infinite",
+
+              zIndex: 50,
+            }}
+          />
+
+          {/* =====================================================
+              ALPHABET BLOCKS — RIGHT
+              ===================================================== */}
+
+          <img
+            src={
+              vintageAlphabetBlocks1
+            }
+            alt=""
+            draggable={false}
+            className="
+              absolute
+              pointer-events-none
+              select-none
+            "
+            style={{
+              right:
+                `${SCENE_LAYOUT.alphabetRight.right}px`,
+
+              top:
+                `${SCENE_LAYOUT.alphabetRight.top}px`,
+
+              width:
+                `${SCENE_LAYOUT.alphabetRight.width}px`,
+
+              height: "auto",
+
+              zIndex: 25,
+            }}
+          />
+
+          {/* =====================================================
+              ALPHABET BLOCKS — LEFT
+              ===================================================== */}
+
+          <img
+            src={
+              vintageAlphabetBlocks2
+            }
+            alt=""
+            draggable={false}
+            className="
+              absolute
+              pointer-events-none
+              select-none
+            "
+            style={{
+              left:
+                `${SCENE_LAYOUT.alphabetLeft.left}px`,
+
+              top:
+                `${SCENE_LAYOUT.alphabetLeft.top}px`,
+
+              width:
+                `${SCENE_LAYOUT.alphabetLeft.width}px`,
+
+              height: "auto",
+
+              zIndex: 25,
+            }}
+          />
+
+          {/* =====================================================
+              FOOTBALL
+              ===================================================== */}
+
+          <img
+            src={vintagefootball}
+            alt=""
+            draggable={false}
+            className="
+              absolute
+              pointer-events-none
+              select-none
+            "
+            style={{
+              right:
+                `${SCENE_LAYOUT.football.right}px`,
+
+              top:
+                `${SCENE_LAYOUT.football.top}px`,
+
+              width:
+                `${SCENE_LAYOUT.football.width}px`,
+
+              height: "auto",
+
+              zIndex: 25,
+            }}
+          />
+
+          {/* =====================================================
+              TOY TRAIN
+              ===================================================== */}
+
+          <img
+            src={vintagetoytrain}
+            alt=""
+            draggable={false}
+            className="
+              absolute
+              pointer-events-none
+              select-none
+            "
+            style={{
+              right:
+                `${SCENE_LAYOUT.train.right}px`,
+
+              top:
+                `${SCENE_LAYOUT.train.top}px`,
+
+              width:
+                `${SCENE_LAYOUT.train.width}px`,
+
+              height: "auto",
+
+              zIndex: 25,
+            }}
+          />
+
+          {/* =====================================================
               UNICORN
-            ===================================================== */}
+              ===================================================== */}
 
-        <img
-          src={vintageunicorn}
-          alt=""
-          draggable={false}
-          className="
-            absolute
-            pointer-events-none
-            select-none
-          "
-          style={{
-            right: "5%",
-            top: "1125px",
-            width: "280px",
-            height: "auto",
-            zIndex: 25,
-            
-          }}
-        />
-        {/* =====================================================
+          <img
+            src={vintageunicorn}
+            alt=""
+            draggable={false}
+            className="
+              absolute
+              pointer-events-none
+              select-none
+            "
+            style={{
+              right:
+                `${SCENE_LAYOUT.unicorn.right}px`,
+
+              top:
+                `${SCENE_LAYOUT.unicorn.top}px`,
+
+              width:
+                `${SCENE_LAYOUT.unicorn.width}px`,
+
+              height: "auto",
+
+              zIndex: 25,
+            }}
+          />
+
+          {/* =====================================================
               CARS
-            ===================================================== */}
+              ===================================================== */}
 
-        <img
-          src={vintagecars}
-          alt=""
-          draggable={false}
-          className="
-            absolute
-            pointer-events-none
-            select-none
-          "
-          style={{
-            right: "82%",
-            top: "1200px",
-            width: "285px",
-            height: "auto",
-            zIndex: 25,
-            
-          }}
-        />
+          <img
+            src={vintagecars}
+            alt=""
+            draggable={false}
+            className="
+              absolute
+              pointer-events-none
+              select-none
+            "
+            style={{
+              left:
+                `${SCENE_LAYOUT.cars.left}px`,
 
-        {/* =====================================================
-            FOOTER
-            ===================================================== */}
+              top:
+                `${SCENE_LAYOUT.cars.top}px`,
 
-        <div
-          className="
-            relative
-            z-20
-          "
-        >
-          <Footer />
+              width:
+                `${SCENE_LAYOUT.cars.width}px`,
+
+              height: "auto",
+
+              zIndex: 25,
+            }}
+          />
         </div>
-
       </div>
 
-
       {/* =====================================================
-          SCROLL HEIGHT SPACER
+          NO FOOTER HERE
 
-          The illustrated scene is absolutely positioned, so it
-          does not contribute its 1500px height to normal document
-          flow. This invisible spacer creates enough scroll space
-          for the complete existing scene.
+          The 1920 × 1080 wallpaper is the complete
+          Timeline scene.
 
-          It does NOT move, resize, or change any illustration.
+          This prevents:
+
+          - orange area below the artwork
+          - "Made with love..." appearing after it
+          - additional document height
+          - footer affecting the master composition
           ===================================================== */}
-
-      <div
-        aria-hidden="true"
-        style={{
-          width: "1px",
-          height: `${1500 * sceneScale}px`,
-          pointerEvents: "none",
-          userSelect: "none",
-        }}
-      />
 
       {/* =====================================================
           DRAWER
@@ -733,81 +946,66 @@ export default function Timeline() {
 
       <TimelineDrawer
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={() =>
+          setDrawerOpen(false)
+        }
       />
-
 
       {/* =====================================================
           BACK BUTTON
           ===================================================== */}
 
-      <div
-        className="fixed"
-        style={{
-          top: 12 / browserZoom,
-          left: 24 / browserZoom,
-          zIndex: 1000,
-          transform: `scale(${1 / browserZoom})`,
-          transformOrigin: "top left",
-        }}
+      <button
+        onClick={() =>
+          navigate(-1)
+        }
+        className="
+          fixed
+          top-6
+          left-6
+          z-50
+          w-12
+          h-12
+          rounded-full
+          bg-white
+          shadow-lg
+          flex
+          items-center
+          justify-center
+          hover:scale-105
+          transition
+        "
       >
-        <button
-          onClick={() => navigate(-1)}
-          aria-label="Go back"
-          className="
-            w-3
-            h-3
-            text-[7px]
-            rounded-full
-            bg-#EED19D
-            shadow-lg
-            flex
-            items-center
-            justify-center
-            hover:scale-105
-            transition
-          "
-        >
-          ←
-        </button>
-      </div>
-
+        ←
+      </button>
 
       {/* =====================================================
           MENU BUTTON
           ===================================================== */}
 
-      <div
-        className="fixed"
-        style={{
-          top: 12 / browserZoom,
-          right: 24 / browserZoom,
-          zIndex: 1000,
-          transform: `scale(${1 / browserZoom})`,
-          transformOrigin: "top right",
-        }}
+      <button
+        onClick={() =>
+          setDrawerOpen(true)
+        }
+        className="
+          fixed
+          top-6
+          right-6
+          z-50
+          w-12
+          h-12
+          rounded-full
+          bg-white
+          shadow-lg
+          flex
+          items-center
+          justify-center
+          hover:scale-105
+          transition
+        "
       >
-        <button
-          onClick={() => setDrawerOpen(true)}
-          aria-label="Open menu"
-          className="
-            w-3
-            h-3
-            text-[7px]
-            rounded-full
-            bg-#EED19D
-            shadow-lg
-            flex
-            items-center
-            justify-center
-            hover:scale-105
-            transition
-          "
-        >
-          ☰
-        </button>
-      </div>
-
+        ☰
+      </button>
     </main>
   );
 }

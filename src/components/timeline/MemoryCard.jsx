@@ -6,8 +6,16 @@ import memoryWall from "../../assets/illustrations/timeline-memory-wall.png";
 export default function MemoryCard({ memory }) {
   const navigate = useNavigate();
 
+  /*
+  =====================================================
+  FORMATTED DATE
+  =====================================================
+  */
+
   const formattedDate = memory.date
-    ? new Date(memory.date).toLocaleDateString(
+    ? new Date(
+        memory.date
+      ).toLocaleDateString(
         "en-IN",
         {
           day: "numeric",
@@ -17,9 +25,11 @@ export default function MemoryCard({ memory }) {
       )
     : "";
 
-  /* ======================================
-     IMAGE
-  ====================================== */
+  /*
+  =====================================================
+  MEMORY COVER IMAGE
+  =====================================================
+  */
 
   const coverImage =
     memory.cover_image ||
@@ -27,16 +37,26 @@ export default function MemoryCard({ memory }) {
     memory.image ||
     "/placeholder-memory.jpg";
 
+  /*
+  =====================================================
+  OPEN MEMORY
+  =====================================================
+  */
+
+  function openMemory() {
+    navigate(
+      `/timeline/memory/${memory.slug}`
+    );
+  }
+
   return (
     <div
-      onClick={() =>
-        navigate(`/timeline/memory/${memory.slug}`)
-      }
+      onClick={openMemory}
       className="
         group
         cursor-pointer
         relative
-        -translate-y-20
+        w-full
         rounded-[28px]
         overflow-hidden
         bg-[#FFFDF9]
@@ -49,27 +69,48 @@ export default function MemoryCard({ memory }) {
         hover:shadow-xl
       "
     >
+      {/* =====================================================
+          COVER IMAGE
 
-   {/* ======================================
-    IMAGE
-====================================== */}
+          IMPORTANT:
 
-<div
-  className="overflow-hidden h-35"
-  style={{
-    backgroundImage: `url(${coverImage})`,
-    backgroundSize: "100% auto",
-    backgroundPosition: "center 35%",
-    backgroundRepeat: "no-repeat",
-  }}
->
+          The image has a deliberate master-scene height.
 
-</div>
+          We do NOT allow the source image's natural
+          dimensions to determine the card height.
 
+          object-cover preserves the image geometry without
+          distorting the photograph.
+          ===================================================== */}
 
-      {/* ======================================
+      <div
+        style={{
+          width: "100%",
+          height: "150px",
+          overflow: "hidden",
+        }}
+      >
+        <img
+          src={coverImage}
+          alt={
+            memory.title ||
+            "Memory"
+          }
+          draggable={false}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center",
+            display: "block",
+            userSelect: "none",
+          }}
+        />
+      </div>
+
+      {/* =====================================================
           CONTENT
-      ====================================== */}
+          ===================================================== */}
 
       <div
         className="p-2"
@@ -86,11 +127,11 @@ export default function MemoryCard({ memory }) {
           backgroundRepeat: "no-repeat",
         }}
       >
-
-        {/* Category */}
+        {/* =================================================
+            CATEGORY
+            ================================================= */}
 
         {memory.category && (
-
           <span
             className="
               inline-block
@@ -107,18 +148,26 @@ export default function MemoryCard({ memory }) {
           >
             {memory.category}
           </span>
-
         )}
 
+        {/* =================================================
+            DATE
+            ================================================= */}
 
-        {/* Date */}
-
-        <p className="mt-1 text-sm text-[#A68B64] font-medium">
+        <p
+          className="
+            mt-1
+            text-sm
+            text-[#A68B64]
+            font-medium
+          "
+        >
           {formattedDate}
         </p>
 
-
-        {/* Title */}
+        {/* =================================================
+            TITLE
+            ================================================= */}
 
         <h3
           className="
@@ -136,8 +185,9 @@ export default function MemoryCard({ memory }) {
           {memory.title}
         </h3>
 
-
-        {/* Description */}
+        {/* =================================================
+            DESCRIPTION
+            ================================================= */}
 
         <p
           className="
@@ -151,10 +201,16 @@ export default function MemoryCard({ memory }) {
           {memory.description}
         </p>
 
-
-        {/* Button */}
+        {/* =================================================
+            BUTTON
+            ================================================= */}
 
         <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            openMemory();
+          }}
           className="
             mt-4
             px-5
@@ -170,9 +226,7 @@ export default function MemoryCard({ memory }) {
         >
           Read Memory →
         </button>
-
       </div>
-
     </div>
   );
 }
