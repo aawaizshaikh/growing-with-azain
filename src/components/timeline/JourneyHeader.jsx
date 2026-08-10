@@ -33,7 +33,7 @@ export default function JourneyHeader() {
       {/* MAIN TITLE */}
       <h1
         className="
-          text-[#5A4030]
+          text-[#4A2E22]
           text-6xl
           md:text-7xl
           font-bold
@@ -52,11 +52,16 @@ export default function JourneyHeader() {
       <p
         className="
           mt-1
-          text-[#E8D3A8]
-          text-base
+          w-[45vw]
+          max-w-[650px]
+          text-[#4A2E22]
+          text-lg
         "
       >
-        Every stage, every smile, every memory.
+        Every little moment of your journey is tucked away in these pages — every giggle, every tear, every tiny wonder, and every beautiful thing you do.
+For you are our greatest blessing, our sweetest story, and the most precious chapter of our lives.
+
+
       </p>
 
     </div>

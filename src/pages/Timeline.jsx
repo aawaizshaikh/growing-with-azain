@@ -127,8 +127,8 @@ const RESPONSIVE_LAYOUT = {
   */
 
   bookshelf: {
-    left: "21.88%",
-    top: "18.52%",
+    left: "31.88%",
+    top: "14.52%",
   },
 
   /*
@@ -138,10 +138,10 @@ const RESPONSIVE_LAYOUT = {
   */
 
   chapter: {
-    left: "13.54%",
-    top: "52.78%",
+    left: "17.54%",
+    top: "41.78%",
     width:
-      "min(72.92vw, 1400px)",
+      "min(100.92vw, 1640px)",
   },
 
   /*
@@ -164,7 +164,7 @@ const RESPONSIVE_LAYOUT = {
   */
 
   lampRight: {
-    right: "3.65%",
+    right: "5.65%",
     top: "5.09%",
     width:
       "clamp(90px, 7.81vw, 150px)",
@@ -190,10 +190,10 @@ const RESPONSIVE_LAYOUT = {
   */
 
   teddy: {
-    right: "3.39%",
-    top: "68.06%",
+    right: "6.39%",
+    top: "65.06%",
     width:
-      "clamp(90px, 7.81vw, 150px)",
+      "clamp(130px, 12.81vw, 500px)",
   },
 
   /*
@@ -205,7 +205,7 @@ const RESPONSIVE_LAYOUT = {
   carpet: {
     top: "78.24%",
     width:
-      "min(34.11vw, 655px)",
+      "min(39.11vw, 955px)",
   },
 
   /*
@@ -215,10 +215,10 @@ const RESPONSIVE_LAYOUT = {
   */
 
   unicorn: {
-    right: "15.62%",
-    top: "79.17%",
+    right: "25.62%",
+    top: "75.17%",
     width:
-      "min(8.59vw, 165px)",
+      "min(11.59vw, 365px)",
   },
 
   /*
@@ -228,8 +228,8 @@ const RESPONSIVE_LAYOUT = {
   */
 
   alphabetRight: {
-    right: "2.08%",
-    top: "80.09%",
+    right: "38.08%",
+    top: "84.09%",
     width:
       "min(9.38vw, 180px)",
   },
@@ -254,8 +254,8 @@ const RESPONSIVE_LAYOUT = {
   */
 
   football: {
-    right: "1.04%",
-    top: "85.65%",
+    right: "75.04%",
+    top: "78.65%",
     width:
       "min(6.25vw, 120px)",
   },
@@ -267,8 +267,8 @@ const RESPONSIVE_LAYOUT = {
   */
 
   train: {
-    right: "0.26%",
-    top: "73.15%",
+    right: "73.26%",
+    top: "87.15%",
     width:
       "min(7.81vw, 150px)",
   },
@@ -280,8 +280,8 @@ const RESPONSIVE_LAYOUT = {
   */
 
   cars: {
-    left: "3.65%",
-    top: "78.70%",
+    left: "75.65%",
+    top: "84.70%",
     width:
       "min(14.84vw, 285px)",
   },
@@ -346,6 +346,32 @@ export default function Timeline() {
       );
     };
   }, []);
+  const [viewportHeight, setViewportHeight] =
+  useState(() =>
+    typeof window !== "undefined"
+      ? window.innerHeight
+      : 1080
+  );
+
+useEffect(() => {
+  const updateViewportHeight = () => {
+    setViewportHeight(window.innerHeight);
+  };
+
+  updateViewportHeight();
+
+  window.addEventListener(
+    "resize",
+    updateViewportHeight
+  );
+
+  return () => {
+    window.removeEventListener(
+      "resize",
+      updateViewportHeight
+    );
+  };
+}, []);
 
   /*
   =====================================================
@@ -362,10 +388,25 @@ export default function Timeline() {
   =====================================================
   */
 
-  const bookshelfScale = Math.min(
-    viewportWidth / 1920,
-    1
-  );
+  const BOOKSHELF_SIZE = 0.75;
+
+const bookshelfScale =
+  Math.min(viewportWidth / 1920, 1) * BOOKSHELF_SIZE;
+  const chapterScale = Math.min(
+  Math.max(
+    0.75 +
+      ((viewportHeight - 700) / 380) *
+        0.15,
+    0.75
+  ),
+  0.90
+);
+const chapterTop =
+  41.78 -
+  Math.max(
+    0,
+    (1080 - viewportHeight) / 380
+  ) * 9;
 
   /*
   =====================================================
@@ -584,6 +625,7 @@ export default function Timeline() {
           z-20
         "
         style={{
+          left: "15%",
           top:
             RESPONSIVE_LAYOUT
               .header
@@ -684,15 +726,16 @@ export default function Timeline() {
               .chapter
               .left,
 
-          top:
-            RESPONSIVE_LAYOUT
-              .chapter
-              .top,
+           top: `${chapterTop}%`,
+
 
           width:
             RESPONSIVE_LAYOUT
               .chapter
               .width,
+
+            transform: `scale(${chapterScale})`,
+            transformOrigin: "top left",   
         }}
       >
         <ChapterSection

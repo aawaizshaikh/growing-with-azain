@@ -121,7 +121,7 @@ export default function ChapterSection({
 
         width: "1400px",
 
-        height: "505px",
+        height: "clamp(400px, 46.76vh, 505px)",
 
         padding: "0px 50px",
 
