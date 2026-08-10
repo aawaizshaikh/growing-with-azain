@@ -1,13 +1,112 @@
 import { useEffect, useState } from "react";
 
-import SongCard from "./SongCard";
+import SongVinyl from "./SongVinyl";
 
 import { getFavoriteSongs } from "../../services/favoriteSongService";
 import mapFavoriteSong from "../../utils/mapFavoriteSong";
 
+/*
+These are FIXED positions belonging to the 1672 × 941
+master scene.
+
+The bookshelf always contains all of these vinyl positions,
+regardless of how many songs currently exist in Admin.
+*/
+
+const VINYL_SLOTS = [
+  // =========================
+  // ROW 1
+  // =========================
+
+  {
+    left: "5.6%",
+    top: "16.3%",
+    width: "9.8%",
+  },
+  {
+    left: "17.5%",
+    top: "16.8%",
+    width: "9.6%",
+  },
+  {
+    left: "29.4%",
+    top: "17.6%",
+    width: "9.2%",
+  },
+  {
+    left: "39.9%",
+    top: "18.4%",
+    width: "8.8%",
+  },
+  {
+    left: "49.5%",
+    top: "19.3%",
+    width: "8.4%",
+  },
+
+  // =========================
+  // ROW 2
+  // =========================
+
+  {
+    left: "5.6%",
+    top: "34.3%",
+    width: "9.8%",
+  },
+  {
+    left: "17.5%",
+    top: "34.8%",
+    width: "9.6%",
+  },
+  {
+    left: "29.4%",
+    top: "35%",
+    width: "9.2%",
+  },
+  {
+    left: "39.9%",
+    top: "35.4%",
+    width: "8.8%",
+  },
+  {
+    left: "49.5%",
+    top: "35.8%",
+    width: "8.4%",
+  },
+
+  // =========================
+  // ROW 3
+  // =========================
+
+  {
+    left: "5.6%",
+    top: "52.8%",
+    width: "9.8%",
+  },
+  {
+    left: "17.5%",
+    top: "52.8%",
+    width: "9.6%",
+  },
+  {
+    left: "29.4%",
+    top: "52.2%",
+    width: "9.6%",
+  },
+  {
+    left: "39.7%",
+    top: "52.4%",
+    width: "9.4%",
+  },
+  {
+    left: "49.5%",
+    top: "52.8%",
+    width: "8.6%",
+  },
+];
+
 export default function SongTimeline() {
   const [songs, setSongs] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadSongs();
@@ -15,63 +114,49 @@ export default function SongTimeline() {
 
   async function loadSongs() {
     try {
+      console.log("=================================");
+      console.log("🎵 LOADING FAVOURITE SONGS...");
+      console.log("=================================");
+
       const data = await getFavoriteSongs();
 
-      setSongs(data.map(mapFavoriteSong));
+      console.log("🎵 RAW SUPABASE DATA:", data);
+      console.log("🎵 SONG COUNT:", data?.length);
+
+      const mappedSongs = (data || []).map(mapFavoriteSong);
+
+      console.log("🎵 MAPPED SONGS:", mappedSongs);
+
+      console.log(
+        "🎵 SONG SLUGS:",
+        mappedSongs.map((song) => ({
+          title: song?.title,
+          slug: song?.slug,
+          id: song?.id,
+        }))
+      );
+
+      setSongs(mappedSongs);
     } catch (err) {
-      console.error(err);
+      console.error("❌ FAILED TO LOAD FAVOURITE SONGS:", err);
+
       setSongs([]);
-    } finally {
-      setLoading(false);
     }
   }
 
-  if (loading) {
-    return (
-      <section className="mt-12 text-center py-20">
-        <h2
-          className="text-4xl text-[#5F534A]"
-          style={{ fontFamily: "Baloo 2" }}
-        >
-          Loading...
-        </h2>
-      </section>
-    );
-  }
-
-  if (!songs.length) {
-    return (
-      <section className="mt-12 text-center py-20">
-
-        <h2
-          className="text-5xl text-[#5F534A]"
-          style={{ fontFamily: "Baloo 2" }}
-        >
-          No Favourite Songs Yet
-        </h2>
-
-        <p className="mt-5 text-gray-500 text-lg">
-          Songs added from the Admin Panel will appear here.
-        </p>
-
-      </section>
-    );
-  }
-
   return (
-    <section className="mt-12">
+    <>
+      {VINYL_SLOTS.map((position, index) => {
+        const song = songs[index] || null;
 
-      <div className="space-y-14">
-
-        {songs.map((song) => (
-          <SongCard
-            key={song.id}
+        return (
+          <SongVinyl
+            key={`vinyl-slot-${index}`}
             song={song}
+            position={position}
           />
-        ))}
-
-      </div>
-
-    </section>
+        );
+      })}
+    </>
   );
 }

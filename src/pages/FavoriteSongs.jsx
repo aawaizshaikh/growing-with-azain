@@ -1,25 +1,422 @@
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import { FaArrowLeft, FaMusic } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
-import SongHeader from "../components/songs/SongHeader";
 import SongTimeline from "../components/songs/SongTimeline";
 
+import background from "../assets/illustrations/favsongs/background.png";
+
+import AnimatedGuitarBoy from "../components/songs/AnimatedGuitarBoy";
+import AnimatedDancingGirl from "../components/songs/AnimatedDancingGirl";
+import AnimatedGirlWithMic from "../components/songs/AnimatedGirlWithMic";
+import AnimatedDancingBoy from "../components/songs/AnimatedDancingBoy";
+import AnimatedBoyDj from "../components/songs/AnimatedBoyDj";
+
+import boyDancing from "../assets/illustrations/favsongs/boy-dancing.png";
+import boyDj from "../assets/illustrations/favsongs/boy-dj.png";
+import girlDancing from "../assets/illustrations/favsongs/girl-dancing.png";
+
+import table from "../assets/illustrations/favsongs/table.png";
+import bluestool from "../assets/illustrations/favsongs/blue-stool.png";
+import greenstool from "../assets/illustrations/favsongs/green-stool.png";
+import discoLight from "../assets/illustrations/favsongs/disco-light.png";
+
+
+const SCENE_WIDTH = 1672;
+const SCENE_HEIGHT = 941;
+
+const ILLUSTRATIONS = {
+  /* ==========================================================
+     BOY WITH GUITAR
+     ========================================================== */
+
+  boyWithGuitar: {
+    left: "9%",
+    top: "56%",
+    width: "12%",
+  },
+
+  /* ==========================================================
+     BOY DANCING
+     ========================================================== */
+
+  boyDancing: {
+    left: "40%",
+    top: "55%",
+    width: "14%",
+  },
+  discoLight: {
+  left: "58%",
+  top: "-1%",
+  width: "8%",
+},
+
+  /* ==========================================================
+     GIRL DANCING
+     ========================================================== */
+
+  girlDancing: {
+    left: "27%",
+    top: "60%",
+    width: "13%",
+  },
+
+  /* ==========================================================
+     TABLE
+     ========================================================== */
+
+  table: {
+    left: "59%",
+    top: "76%",
+    width: "35%",
+  },
+  table2: {
+  left: "15%",
+  top: "65%",
+  width: "15%",
+},
+  
+
+  /* ==========================================================
+     BLUE STOOL
+     ========================================================== */
+
+  bluestool: {
+    left: "3%",
+    top: "82%",
+    width: "8%",
+  },
+
+  /* ==========================================================
+     GREEN STOOL
+     ========================================================== */
+
+  greenstool: {
+    left: "9%",
+    top: "75%",
+    width: "8%",
+  },
+
+  /* ==========================================================
+     GIRL WITH MICROPHONE
+     ========================================================== */
+
+  girlWithMic: {
+    left: "54%",
+    top: "45%",
+    width: "13%",
+    flip: true,
+  },
+
+  /* ==========================================================
+     BOY DJ
+     ========================================================== */
+
+  boyDj: {
+    left: "66%",
+    top: "38%",
+    width: "19%",
+    rotate: "10deg",
+  },
+};
+
 export default function FavoriteSongs() {
+  const navigate = useNavigate();
+
   return (
     <>
-      <Navbar />
+      {/* ==========================================================
+          MASTER SCENE AREA
 
-      <section className="min-h-screen bg-[#FAF8F5] pt-36 pb-14">
-        <div className="max-w-7xl mx-auto px-6">
+          This area belongs exclusively to Favourite Songs.
 
-          <SongHeader />
+          No Navbar.
+          No Footer.
+          No SongHeader.
+          ========================================================== */}
+
+      <div className="absolute inset-0 flex items-center justify-center">
+        {/* ========================================================
+            MASTER SCENE
+
+            Exact artwork ratio:
+            1672 × 941
+
+            Everything inside this container is positioned relative
+            to this scene using percentages.
+            ======================================================== */}
+
+        <div
+          className="relative overflow-hidden shrink-0"
+          style={{
+            width: `min(100%, calc(100dvh * ${
+              SCENE_WIDTH / SCENE_HEIGHT
+            }))`,
+            aspectRatio: `${SCENE_WIDTH} / ${SCENE_HEIGHT}`,
+          }}
+        >
+          {/* ======================================================
+              BACKGROUND IMAGE
+              ====================================================== */}
+
+          <img
+            src={background}
+            alt=""
+            draggable="false"
+            className="
+              absolute
+              inset-0
+              block
+              w-full
+              h-full
+              select-none
+              pointer-events-none
+            "
+          />
+
+          {/* ======================================================
+              BACK BUTTON
+              ====================================================== */}
+
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            aria-label="Go back"
+            className="
+              absolute
+              z-[100]
+              flex
+              items-center
+              justify-center
+              rounded-full
+              bg-[#FFF4DB]
+              border
+              border-[#E5C99D]
+              shadow-lg
+              text-[#5A4635]
+              hover:bg-white
+              hover:scale-105
+              active:scale-95
+              transition-all
+            "
+            style={{
+              left: "2.2%",
+              top: "2%",
+              width: "2.5%",
+              aspectRatio: "1",
+            }}
+          >
+            <FaArrowLeft
+              style={{
+                width: "36%",
+                height: "36%",
+              }}
+            />
+          </button>
+
+          {/* ======================================================
+              TOP RIGHT MUSIC BUTTON
+              ====================================================== */}
+
+          <button
+            type="button"
+            onClick={() => navigate("/favorite-songs")}
+            aria-label="Favourite Songs"
+            className="
+              absolute
+              z-[100]
+              flex
+              items-center
+              justify-center
+              rounded-full
+              bg-[#FFF4DB]
+              border
+              border-[#E5C99D]
+              shadow-lg
+              text-[#5A4635]
+              hover:bg-white
+              hover:scale-105
+              active:scale-95
+              transition-all
+            "
+            style={{
+              right: "2.2%",
+              top: "2%",
+              width: "2.5%",
+              aspectRatio: "1",
+            }}
+          >
+            <FaMusic
+              style={{
+                width: "38%",
+                height: "38%",
+              }}
+            />
+          </button>
+          {/* DISCO LIGHT FIXTURE */}
+
+<img
+  src={discoLight}
+  alt=""
+  draggable="false"
+  className="absolute z-[50] pointer-events-none select-none"
+  style={{
+    left: ILLUSTRATIONS.discoLight.left,
+    top: ILLUSTRATIONS.discoLight.top,
+    width: ILLUSTRATIONS.discoLight.width,
+  }}
+/>
+
+          {/* ======================================================
+              DYNAMIC VINYL LAYER
+
+              Vinyls remain above the background but below the
+              decorative foreground characters.
+              ====================================================== */}
 
           <SongTimeline />
 
-        </div>
-      </section>
+          {/* ======================================================
+              TABLE + STOOLS
 
-      <Footer />
+              These are placed BEFORE the characters so that the
+              characters visually sit in front of them.
+              ====================================================== */}
+
+          <img
+            src={table}
+            alt=""
+            draggable="false"
+            className="
+              absolute
+              z-[40]
+              pointer-events-none
+              select-none
+            "
+            style={{
+              left: ILLUSTRATIONS.table.left,
+              top: ILLUSTRATIONS.table.top,
+              width: ILLUSTRATIONS.table.width,
+            }}
+          />
+          {/* TABLE 2 */}
+<img
+  src={table}
+  alt=""
+  draggable="false"
+  className="
+    absolute
+    z-[40]
+    pointer-events-none
+    select-none
+  "
+  style={{
+    left: ILLUSTRATIONS.table2.left,
+    top: ILLUSTRATIONS.table2.top,
+    width: ILLUSTRATIONS.table2.width,
+  }}
+/>
+
+          <img
+            src={bluestool}
+            alt=""
+            draggable="false"
+            className="
+              absolute
+              z-[40]
+              pointer-events-none
+              select-none
+            "
+            style={{
+              left: ILLUSTRATIONS.bluestool.left,
+              top: ILLUSTRATIONS.bluestool.top,
+              width: ILLUSTRATIONS.bluestool.width,
+            }}
+          />
+
+          <img
+            src={greenstool}
+            alt=""
+            draggable="false"
+            className="
+              absolute
+              z-[40]
+              pointer-events-none
+              select-none
+            "
+            style={{
+              left: ILLUSTRATIONS.greenstool.left,
+              top: ILLUSTRATIONS.greenstool.top,
+              width: ILLUSTRATIONS.greenstool.width,
+            }}
+          />
+
+          {/* ======================================================
+              BOY WITH GUITAR
+              ====================================================== */}
+
+          <AnimatedGuitarBoy
+            position={{
+              left: ILLUSTRATIONS.boyWithGuitar.left,
+              top: ILLUSTRATIONS.boyWithGuitar.top,
+              width: ILLUSTRATIONS.boyWithGuitar.width,
+              zIndex: 60,
+            }}
+          />
+
+          {/* ======================================================
+              BOY DANCING
+              ====================================================== */}
+
+          <AnimatedDancingBoy
+  position={{
+    left: ILLUSTRATIONS.boyDancing.left,
+    top: ILLUSTRATIONS.boyDancing.top,
+    width: ILLUSTRATIONS.boyDancing.width,
+    zIndex: 60,
+  }}
+/>
+
+          {/* ======================================================
+              GIRL DANCING
+              ====================================================== */}
+
+          <AnimatedDancingGirl
+  position={{
+    left: ILLUSTRATIONS.girlDancing.left,
+    top: ILLUSTRATIONS.girlDancing.top,
+    width: ILLUSTRATIONS.girlDancing.width,
+    zIndex: 60,
+  }}
+/>
+
+          {/* ======================================================
+              GIRL WITH MICROPHONE
+              ====================================================== */}
+
+          <AnimatedGirlWithMic
+            position={{
+              left: ILLUSTRATIONS.girlWithMic.left,
+              top: ILLUSTRATIONS.girlWithMic.top,
+              width: ILLUSTRATIONS.girlWithMic.width,
+              zIndex: 60,
+              flip: ILLUSTRATIONS.girlWithMic.flip,
+            }}
+          />
+
+          {/* ======================================================
+              BOY DJ
+              ====================================================== */}
+
+          <AnimatedBoyDj
+  position={{
+    left: ILLUSTRATIONS.boyDj.left,
+    top: ILLUSTRATIONS.boyDj.top,
+    width: ILLUSTRATIONS.boyDj.width,
+    zIndex: 60,
+  }}
+/>
+        </div>
+      </div>
     </>
   );
 }

@@ -18,6 +18,7 @@ import {
 import mapFavoriteSong from "../utils/mapFavoriteSong";
 
 export default function FavoriteSongMemory() {
+  console.log("🔥 FAVORITE SONG MEMORY PAGE LOADED");
   const navigate = useNavigate();
   const { slug } = useParams();
 
