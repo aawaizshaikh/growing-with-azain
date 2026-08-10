@@ -29,261 +29,256 @@ import { getTimelineMemories } from "../services/timelineService";
 
 /*
 =====================================================
-PROFESSIONAL RESPONSIVE TIMELINE
+RESPONSIVE STORYBOOK SCENE
 =====================================================
 
-BACKGROUND
-----------
-The wallpaper is the first visual layer.
+IMPORTANT ARCHITECTURE
+----------------------
 
-It fills the actual browser viewport:
+The entire Timeline is now treated as ONE illustrated
+storybook room.
 
-    width  = 100vw
-    height = 100vh
-    object-fit = cover
+REFERENCE SCENE
+---------------
 
-It is NOT part of a 1920 × 1080 master canvas.
+    1920 × 1080
 
-ELEMENTS
---------
-Every major element is positioned relative to the
-actual viewport.
+The wallpaper and ALL visual elements live inside
+this same scene coordinate system.
 
-IMPORTANT
----------
-The bookshelf is treated as ONE COMPLETE UNIT.
+The browser viewport only controls the SCALE of the
+complete scene.
 
-TimelineBookshelf itself is NOT modified here.
+Therefore:
 
-Its internal books, shelves, proportions and layout
-remain untouched.
+    wallpaper
+    bookshelf
+    Journey
+    chapter
+    lamps
+    horse
+    teddy
+    carpet
+    unicorn
+    blocks
+    football
+    train
+    cars
 
-We only control:
+all scale together.
 
-    left
-    top
-    overall width
+This means their visual relationships remain intact.
 
-for the COMPLETE bookshelf component.
+=====================================================
+BOOKSHELF
+=====================================================
+
+TimelineBookshelf remains completely untouched.
+
+Its internal design remains:
+
+    1080 × 600
+
+We only control the complete bookshelf unit.
+
+=====================================================
 =====================================================
 */
+
+const SCENE_WIDTH = 1920;
+const SCENE_HEIGHT = 1080;
 
 /*
 =====================================================
-RESPONSIVE LAYOUT
-=====================================================
+SCENE LAYOUT
 
-These are INITIAL values only.
+These positions are now RELATIVE TO THE 1920 × 1080
+STORYBOOK SCENE.
 
-We will manually fine-tune them after confirming
-the responsive structure works correctly.
+They are NOT relative to the browser viewport.
 
-POSITION
---------
-left / right = viewport percentage
-top / bottom = viewport percentage
-
-SIZE
------
-vw / clamp()
-
-Images preserve their natural proportions.
-
+This is the important architectural change.
 =====================================================
 */
 
-const RESPONSIVE_LAYOUT = {
+const SCENE_LAYOUT = {
   /*
-  =====================================================
-  HEADER
-  =====================================================
+  ===================================================
+  JOURNEY HEADER
+  ===================================================
   */
 
   header: {
+    left: "15%",
     top: "4.17%",
   },
 
   /*
-  =====================================================
+  ===================================================
   BOOKSHELF — COMPLETE UNIT
-  =====================================================
+  ===================================================
 
-  IMPORTANT:
-
-  TimelineBookshelf is treated as ONE object.
-
-  Original complete unit:
+  Original internal component:
 
       1080 × 600
 
-  Nothing inside this component is individually
-  positioned or resized here.
+  Current visual scale:
 
-  We only control the complete unit.
+      0.75
 
-  CURRENT POSITION IS ONLY A STARTING POINT.
-  We will adjust this manually later.
-  =====================================================
+  The bookshelf itself is NOT modified.
   */
 
   bookshelf: {
-    left: "31.88%",
-    top: "14.52%",
+    left: "23.88%",
+    top: "14.8%",
+    width: "1480px",
+    height: "600px",
+    scale: 0.75,
   },
 
   /*
-  =====================================================
+  ===================================================
   CHAPTER / MEMORY SECTION
-  =====================================================
+  ===================================================
   */
 
   chapter: {
-    left: "17.54%",
-    top: "41.78%",
-    width:
-      "min(100.92vw, 1640px)",
+    left: "16.54%",
+    top: "44.78%",
+    width: "1640px",
+    scale: 0.85,
   },
 
   /*
-  =====================================================
+  ===================================================
   LEFT LAMP
-  =====================================================
+  ===================================================
   */
 
   lampLeft: {
     left: "3.65%",
     top: "5.09%",
-    width:
-      "clamp(90px, 7.81vw, 150px)",
+    width: "150px",
   },
 
   /*
-  =====================================================
+  ===================================================
   RIGHT LAMP
-  =====================================================
+  ===================================================
   */
 
   lampRight: {
     right: "5.65%",
     top: "5.09%",
-    width:
-      "clamp(90px, 7.81vw, 150px)",
+    width: "150px",
   },
 
   /*
-  =====================================================
+  ===================================================
   ROCKING HORSE
-  =====================================================
+  ===================================================
   */
 
   horse: {
     left: "3.65%",
-    top: "68.06%",
-    width:
-      "min(19.53vw, 375px)",
+    top: "58.06%",
+    width: "375px",
   },
 
   /*
-  =====================================================
+  ===================================================
   TEDDY
-  =====================================================
+  ===================================================
   */
 
   teddy: {
-    right: "6.39%",
-    top: "65.06%",
-    width:
-      "clamp(130px, 12.81vw, 500px)",
+    right: "3.39%",
+    top: "55.06%",
+    width: "346px",
   },
 
   /*
-  =====================================================
+  ===================================================
   CARPET
-  =====================================================
+  ===================================================
   */
 
   carpet: {
-    top: "78.24%",
-    width:
-      "min(39.11vw, 955px)",
+    top: "76.24%",
+    width: "751px",
   },
 
   /*
-  =====================================================
+  ===================================================
   UNICORN
-  =====================================================
+  ===================================================
   */
 
   unicorn: {
-    right: "25.62%",
+    right: "23.62%",
     top: "75.17%",
-    width:
-      "min(11.59vw, 365px)",
+    width: "263px",
   },
 
   /*
-  =====================================================
+  ===================================================
   ALPHABET BLOCKS — RIGHT
-  =====================================================
+  ===================================================
   */
 
   alphabetRight: {
     right: "38.08%",
     top: "84.09%",
-    width:
-      "min(9.38vw, 180px)",
+    width: "180px",
   },
 
   /*
-  =====================================================
+  ===================================================
   ALPHABET BLOCKS — LEFT
-  =====================================================
+  ===================================================
   */
 
   alphabetLeft: {
     left: "31.25%",
     top: "78.70%",
-    width:
-      "min(7.55vw, 145px)",
+    width: "145px",
   },
 
   /*
-  =====================================================
+  ===================================================
   FOOTBALL
-  =====================================================
+  ===================================================
   */
 
   football: {
-    right: "75.04%",
+    right: "70.04%",
     top: "78.65%",
-    width:
-      "min(6.25vw, 120px)",
+    width: "120px",
   },
 
   /*
-  =====================================================
+  ===================================================
   TOY TRAIN
-  =====================================================
+  ===================================================
   */
 
   train: {
-    right: "73.26%",
-    top: "87.15%",
-    width:
-      "min(7.81vw, 150px)",
+    right: "71.26%",
+    top: "85.15%",
+    width: "150px",
   },
 
   /*
-  =====================================================
+  ===================================================
   CARS
-  =====================================================
+  ===================================================
   */
 
   cars: {
     left: "75.65%",
-    top: "84.70%",
-    width:
-      "min(14.84vw, 285px)",
+    top: "82.70%",
+    width: "255px",
   },
 };
 
@@ -291,9 +286,9 @@ export default function Timeline() {
   const navigate = useNavigate();
 
   /*
-  =====================================================
+  ===================================================
   STATE
-  =====================================================
+  ===================================================
   */
 
   const [drawerOpen, setDrawerOpen] =
@@ -309,109 +304,101 @@ export default function Timeline() {
     useState(books[0]);
 
   /*
-  =====================================================
-  VIEWPORT WIDTH
-  =====================================================
+  ===================================================
+  VIEWPORT
+  ===================================================
 
-  Used only to scale the COMPLETE bookshelf unit.
+  The viewport is ONLY used to calculate the scale
+  of the COMPLETE STORYBOOK SCENE.
 
-  The bookshelf itself remains a fixed 1080 × 600
-  composition internally.
-  =====================================================
+  Nothing inside the scene individually responds to
+  the browser anymore.
+  ===================================================
   */
 
-  const [viewportWidth, setViewportWidth] =
-    useState(() =>
-      typeof window !== "undefined"
-        ? window.innerWidth
-        : 1920
-    );
+  const [viewport, setViewport] =
+    useState(() => ({
+      width:
+        typeof window !== "undefined"
+          ? window.innerWidth
+          : SCENE_WIDTH,
+
+      height:
+        typeof window !== "undefined"
+          ? window.innerHeight
+          : SCENE_HEIGHT,
+    }));
 
   useEffect(() => {
-    const updateViewportWidth = () => {
-      setViewportWidth(window.innerWidth);
+    const updateViewport = () => {
+      setViewport({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
     };
 
-    updateViewportWidth();
+    updateViewport();
 
     window.addEventListener(
       "resize",
-      updateViewportWidth
+      updateViewport
     );
 
     return () => {
       window.removeEventListener(
         "resize",
-        updateViewportWidth
+        updateViewport
       );
     };
   }, []);
-  const [viewportHeight, setViewportHeight] =
-  useState(() =>
-    typeof window !== "undefined"
-      ? window.innerHeight
-      : 1080
-  );
-
-useEffect(() => {
-  const updateViewportHeight = () => {
-    setViewportHeight(window.innerHeight);
-  };
-
-  updateViewportHeight();
-
-  window.addEventListener(
-    "resize",
-    updateViewportHeight
-  );
-
-  return () => {
-    window.removeEventListener(
-      "resize",
-      updateViewportHeight
-    );
-  };
-}, []);
 
   /*
-  =====================================================
-  COMPLETE BOOKSHELF SCALE
+  ===================================================
+  COMPLETE SCENE SCALE
+  ===================================================
 
-  1920px viewport = original 1080px bookshelf.
+  COVER BEHAVIOUR
 
-  Smaller screens scale the COMPLETE unit down.
+  We use the larger of:
 
-  Larger screens do not enlarge the bookshelf beyond
-  its original 1080px design size.
+      viewport width ratio
+      viewport height ratio
 
-  The internal bookshelf is never resized or distorted.
-  =====================================================
+  This means the scene ALWAYS fills the viewport.
+
+  There will be:
+
+      NO empty margins
+      NO distortion
+
+  Some cropping is intentionally allowed on unusual
+  aspect ratios.
+
+  Examples:
+
+      1920 × 1080
+      scale = 1
+
+      1536 × 864
+      scale = 0.8
+
+      1200 × 700
+      scale ≈ 0.648
+
+      2560 × 1080
+      scale ≈ 1.333
+  ===================================================
   */
 
-  const BOOKSHELF_SIZE = 0.75;
-
-const bookshelfScale =
-  Math.min(viewportWidth / 1920, 1) * BOOKSHELF_SIZE;
-  const chapterScale = Math.min(
-  Math.max(
-    0.75 +
-      ((viewportHeight - 700) / 380) *
-        0.15,
-    0.75
-  ),
-  0.90
-);
-const chapterTop =
-  41.78 -
-  Math.max(
-    0,
-    (1080 - viewportHeight) / 380
-  ) * 9;
+  const sceneScale = Math.max(
+    viewport.width / SCENE_WIDTH,
+    viewport.height / SCENE_HEIGHT
+  );
 
   /*
-  =====================================================
+  ===================================================
   PREVENT PAGE SCROLLING
-  =====================================================
+  ===================================================
   */
 
   useEffect(() => {
@@ -428,9 +415,9 @@ const chapterTop =
   }, []);
 
   /*
-  =====================================================
+  ===================================================
   LOAD MEMORIES
-  =====================================================
+  ===================================================
   */
 
   useEffect(() => {
@@ -451,9 +438,9 @@ const chapterTop =
   }, []);
 
   /*
-  =====================================================
+  ===================================================
   GROUP MEMORIES BY CHAPTER
-  =====================================================
+  ===================================================
   */
 
   const memoriesByChapter =
@@ -478,9 +465,9 @@ const chapterTop =
     }, [memories]);
 
   /*
-  =====================================================
+  ===================================================
   CURRENT CHAPTER
-  =====================================================
+  ===================================================
   */
 
   const selectedMemories =
@@ -501,612 +488,654 @@ const chapterTop =
           "#D9A765",
       }}
     >
+      {/*
+      =================================================
+      COMPLETE STORYBOOK SCENE
+      =================================================
 
-      {/* =================================================
-          BACKGROUND
-          =================================================
+      EVERYTHING inside this container belongs to
+      the same 1920 × 1080 coordinate system.
 
-          This is the first visual layer.
+      The container itself is the ONLY thing that
+      responds to viewport size.
 
-          It belongs directly to the viewport.
-
-          It is NOT inside the bookshelf.
-          It is NOT inside a 1920 × 1080 stage.
-          ================================================= */}
-
-      <img
-        src={vintageWall}
-        alt=""
-        aria-hidden="true"
-        draggable={false}
-        className="
-          absolute
-          inset-0
-          w-full
-          h-full
-          object-cover
-          object-center
-          pointer-events-none
-          select-none
-        "
-        style={{
-          zIndex: 0,
-        }}
-      />
-
-      {/* =================================================
-          LEFT LAMP
-          ================================================= */}
-
-      <img
-        src={vintageLamp}
-        alt=""
-        draggable={false}
-        className="
-          absolute
-          pointer-events-none
-          select-none
-        "
-        style={{
-          left:
-            RESPONSIVE_LAYOUT
-              .lampLeft
-              .left,
-
-          top:
-            RESPONSIVE_LAYOUT
-              .lampLeft
-              .top,
-
-          width:
-            RESPONSIVE_LAYOUT
-              .lampLeft
-              .width,
-
-          height:
-            "auto",
-
-          zIndex: 10,
-        }}
-      />
-
-      {/* =================================================
-          RIGHT LAMP
-          ================================================= */}
-
-      <img
-        src={vintageLamp}
-        alt=""
-        draggable={false}
-        className="
-          absolute
-          pointer-events-none
-          select-none
-        "
-        style={{
-          right:
-            RESPONSIVE_LAYOUT
-              .lampRight
-              .right,
-
-          top:
-            RESPONSIVE_LAYOUT
-              .lampRight
-              .top,
-
-          width:
-            RESPONSIVE_LAYOUT
-              .lampRight
-              .width,
-
-          height:
-            "auto",
-
-          transform:
-            "scaleX(-1)",
-
-          transformOrigin:
-            "center",
-
-          zIndex: 10,
-        }}
-      />
-
-      {/* =================================================
-          JOURNEY HEADER
-          ================================================= */}
+      =================================================
+      */}
 
       <div
-        className="
-          absolute
-          left-1/2
-          -translate-x-1/2
-          max-w-[90vw]
-          z-20
-        "
         style={{
-          left: "15%",
-          top:
-            RESPONSIVE_LAYOUT
-              .header
-              .top,
-        }}
-      >
-        <JourneyHeader />
-      </div>
+          position: "absolute",
 
-      {/* =================================================
-          BOOKSHELF — COMPLETE UNIT
-          =================================================
+          width: `${SCENE_WIDTH}px`,
+          height: `${SCENE_HEIGHT}px`,
 
-          IMPORTANT:
+          left: "50%",
+          top: "50%",
 
-          DO NOT MODIFY TimelineBookshelf itself.
-
-          This wrapper controls ONLY:
-
-              position
-              overall size
-
-          The entire bookshelf remains one unit.
-
-          Original internal ratio:
-
-              1080 × 600
-          ================================================= */}
-
-      <div
-        className="
-          absolute
-          z-30
-        "
-        style={{
-          left:
-            RESPONSIVE_LAYOUT
-              .bookshelf
-              .left,
-
-          top:
-            RESPONSIVE_LAYOUT
-              .bookshelf
-              .top,
-
-          /*
-          =================================================
-          COMPLETE BOOKSHELF UNIT
-
-          The component continues to live in its original
-          1080 × 600 coordinate space.
-
-          Only the COMPLETE UNIT is scaled.
-
-          Nothing inside TimelineBookshelf is changed.
-          =================================================
-          */
-
-          width: "1080px",
-          height: "600px",
-
-          transform:
-            `scale(${bookshelfScale})`,
+          transform: `
+            translate(-50%, -49%)
+            scale(${sceneScale})
+          `,
 
           transformOrigin:
-            "top left",
+            "center center",
 
-          overflow:
-            "visible",
+          overflow: "visible",
         }}
       >
-        <TimelineBookshelf
-          books={books}
-          memoriesByChapter={
-            memoriesByChapter
-          }
-          selectedBook={
-            selectedBook
-          }
-          onSelectBook={
-            setSelectedBook
-          }
+        {/*
+        ================================================
+        WALLPAPER
+        ================================================
+        */}
+
+        <img
+          src={vintageWall}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          style={{
+            position: "absolute",
+
+            left: 0,
+            top: 0,
+
+            width: `${SCENE_WIDTH}px`,
+            height: `${SCENE_HEIGHT}px`,
+
+            objectFit: "cover",
+            objectPosition: "center",
+
+            pointerEvents: "none",
+            userSelect: "none",
+
+            zIndex: 0,
+          }}
+        />
+
+        {/*
+        ================================================
+        LEFT LAMP
+        ================================================
+        */}
+
+        <img
+          src={vintageLamp}
+          alt=""
+          draggable={false}
+          style={{
+            position: "absolute",
+
+            left:
+              SCENE_LAYOUT
+                .lampLeft
+                .left,
+
+            top:
+              SCENE_LAYOUT
+                .lampLeft
+                .top,
+
+            width:
+              SCENE_LAYOUT
+                .lampLeft
+                .width,
+
+            height: "auto",
+
+            pointerEvents: "none",
+            userSelect: "none",
+
+            zIndex: 10,
+          }}
+        />
+
+        {/*
+        ================================================
+        RIGHT LAMP
+        ================================================
+        */}
+
+        <img
+          src={vintageLamp}
+          alt=""
+          draggable={false}
+          style={{
+            position: "absolute",
+
+            right:
+              SCENE_LAYOUT
+                .lampRight
+                .right,
+
+            top:
+              SCENE_LAYOUT
+                .lampRight
+                .top,
+
+            width:
+              SCENE_LAYOUT
+                .lampRight
+                .width,
+
+            height: "auto",
+
+            transform:
+              "scaleX(-1)",
+
+            transformOrigin:
+              "center",
+
+            pointerEvents: "none",
+            userSelect: "none",
+
+            zIndex: 10,
+          }}
+        />
+
+        {/*
+        ================================================
+        JOURNEY HEADER
+        ================================================
+        */}
+
+        <div
+  style={{
+    position: "absolute",
+    left: "10%",
+    top: "8%",
+    width: "15%",
+  }}
+>
+  <JourneyHeader />
+</div>
+
+        {/*
+        ================================================
+        BOOKSHELF — COMPLETE UNIT
+        ================================================
+
+        DO NOT MODIFY TimelineBookshelf.
+
+        It remains:
+
+            1080 × 600
+
+        We scale the COMPLETE UNIT only.
+
+        ================================================
+        */}
+
+        <div
+          style={{
+            position: "absolute",
+
+            left:
+              SCENE_LAYOUT
+                .bookshelf
+                .left,
+
+            top:
+              SCENE_LAYOUT
+                .bookshelf
+                .top,
+
+            width:
+              SCENE_LAYOUT
+                .bookshelf
+                .width,
+
+            height:
+              SCENE_LAYOUT
+                .bookshelf
+                .height,
+
+            transform:
+              `scale(${SCENE_LAYOUT.bookshelf.scale})`,
+
+            transformOrigin:
+              "top left",
+
+            overflow:
+              "visible",
+
+            zIndex: 30,
+          }}
+        >
+          <TimelineBookshelf
+            books={books}
+            memoriesByChapter={
+              memoriesByChapter
+            }
+            selectedBook={
+              selectedBook
+            }
+            onSelectBook={
+              setSelectedBook
+            }
+          />
+        </div>
+
+        {/*
+        ================================================
+        CHAPTER / MEMORY SECTION
+        ================================================
+        */}
+
+        <div
+          style={{
+            position: "absolute",
+
+            left:
+              SCENE_LAYOUT
+                .chapter
+                .left,
+
+            top:
+              SCENE_LAYOUT
+                .chapter
+                .top,
+
+            width:
+              SCENE_LAYOUT
+                .chapter
+                .width,
+
+            transform:
+              `scale(${SCENE_LAYOUT.chapter.scale})`,
+
+            transformOrigin:
+              "top left",
+
+            zIndex: 20,
+          }}
+        >
+          <ChapterSection
+            loading={loading}
+            book={selectedBook}
+            memories={
+              selectedMemories
+            }
+          />
+        </div>
+
+        {/*
+        ================================================
+        CARPET
+        ================================================
+        */}
+
+        <img
+          src={vintageCarpet}
+          alt=""
+          draggable={false}
+          style={{
+            position: "absolute",
+
+            left: "50%",
+
+            top:
+              SCENE_LAYOUT
+                .carpet
+                .top,
+
+            width:
+              SCENE_LAYOUT
+                .carpet
+                .width,
+
+            height: "auto",
+
+            transform:
+              "translateX(-50%)",
+
+            pointerEvents: "none",
+            userSelect: "none",
+
+            zIndex: 1,
+          }}
+        />
+
+        {/*
+        ================================================
+        TEDDY
+        ================================================
+        */}
+
+        <img
+          src={vintageTeddyPillow}
+          alt=""
+          draggable={false}
+          style={{
+            position: "absolute",
+
+            right:
+              SCENE_LAYOUT
+                .teddy
+                .right,
+
+            top:
+              SCENE_LAYOUT
+                .teddy
+                .top,
+
+            width:
+              SCENE_LAYOUT
+                .teddy
+                .width,
+
+            height: "auto",
+
+            pointerEvents: "none",
+            userSelect: "none",
+
+            zIndex: 25,
+          }}
+        />
+
+        {/*
+        ================================================
+        ROCKING HORSE ANIMATION
+        ================================================
+        */}
+
+        <style>
+          {`
+            @keyframes timelineRockingHorse {
+              0% {
+                transform: rotate(-4deg);
+              }
+
+              25% {
+                transform: rotate(0deg);
+              }
+
+              50% {
+                transform: rotate(4deg);
+              }
+
+              75% {
+                transform: rotate(0deg);
+              }
+
+              100% {
+                transform: rotate(-4deg);
+              }
+            }
+          `}
+        </style>
+
+        {/*
+        ================================================
+        ROCKING HORSE
+        ================================================
+        */}
+
+        <img
+          src={vintageRockingHorse}
+          alt=""
+          draggable={false}
+          style={{
+            position: "absolute",
+
+            left:
+              SCENE_LAYOUT
+                .horse
+                .left,
+
+            top:
+              SCENE_LAYOUT
+                .horse
+                .top,
+
+            width:
+              SCENE_LAYOUT
+                .horse
+                .width,
+
+            height: "auto",
+
+            transformOrigin:
+              "50% 88%",
+
+            animation:
+              "timelineRockingHorse 2.8s ease-in-out infinite",
+
+            pointerEvents: "none",
+            userSelect: "none",
+
+            zIndex: 50,
+          }}
+        />
+
+        {/*
+        ================================================
+        ALPHABET BLOCKS — RIGHT
+        ================================================
+        */}
+
+        <img
+          src={vintageAlphabetBlocks1}
+          alt=""
+          draggable={false}
+          style={{
+            position: "absolute",
+
+            right:
+              SCENE_LAYOUT
+                .alphabetRight
+                .right,
+
+            top:
+              SCENE_LAYOUT
+                .alphabetRight
+                .top,
+
+            width:
+              SCENE_LAYOUT
+                .alphabetRight
+                .width,
+
+            height: "auto",
+
+            pointerEvents: "none",
+            userSelect: "none",
+
+            zIndex: 25,
+          }}
+        />
+
+        {/*
+        ================================================
+        ALPHABET BLOCKS — LEFT
+        ================================================
+        */}
+
+        <img
+          src={vintageAlphabetBlocks2}
+          alt=""
+          draggable={false}
+          style={{
+            position: "absolute",
+
+            left:
+              SCENE_LAYOUT
+                .alphabetLeft
+                .left,
+
+            top:
+              SCENE_LAYOUT
+                .alphabetLeft
+                .top,
+
+            width:
+              SCENE_LAYOUT
+                .alphabetLeft
+                .width,
+
+            height: "auto",
+
+            pointerEvents: "none",
+            userSelect: "none",
+
+            zIndex: 25,
+          }}
+        />
+
+        {/*
+        ================================================
+        FOOTBALL
+        ================================================
+        */}
+
+        <img
+          src={vintagefootball}
+          alt=""
+          draggable={false}
+          style={{
+            position: "absolute",
+
+            right:
+              SCENE_LAYOUT
+                .football
+                .right,
+
+            top:
+              SCENE_LAYOUT
+                .football
+                .top,
+
+            width:
+              SCENE_LAYOUT
+                .football
+                .width,
+
+            height: "auto",
+
+            pointerEvents: "none",
+            userSelect: "none",
+
+            zIndex: 25,
+          }}
+        />
+
+        {/*
+        ================================================
+        TOY TRAIN
+        ================================================
+        */}
+
+        <img
+          src={vintagetoytrain}
+          alt=""
+          draggable={false}
+          style={{
+            position: "absolute",
+
+            right:
+              SCENE_LAYOUT
+                .train
+                .right,
+
+            top:
+              SCENE_LAYOUT
+                .train
+                .top,
+
+            width:
+              SCENE_LAYOUT
+                .train
+                .width,
+
+            height: "auto",
+
+            pointerEvents: "none",
+            userSelect: "none",
+
+            zIndex: 25,
+          }}
+        />
+
+        {/*
+        ================================================
+        UNICORN
+        ================================================
+        */}
+
+        <img
+          src={vintageunicorn}
+          alt=""
+          draggable={false}
+          style={{
+            position: "absolute",
+
+            right:
+              SCENE_LAYOUT
+                .unicorn
+                .right,
+
+            top:
+              SCENE_LAYOUT
+                .unicorn
+                .top,
+
+            width:
+              SCENE_LAYOUT
+                .unicorn
+                .width,
+
+            height: "auto",
+
+            pointerEvents: "none",
+            userSelect: "none",
+
+            zIndex: 25,
+          }}
+        />
+
+        {/*
+        ================================================
+        CARS
+        ================================================
+        */}
+
+        <img
+          src={vintagecars}
+          alt=""
+          draggable={false}
+          style={{
+            position: "absolute",
+
+            left:
+              SCENE_LAYOUT
+                .cars
+                .left,
+
+            top:
+              SCENE_LAYOUT
+                .cars
+                .top,
+
+            width:
+              SCENE_LAYOUT
+                .cars
+                .width,
+
+            height: "auto",
+
+            pointerEvents: "none",
+            userSelect: "none",
+
+            zIndex: 25,
+          }}
         />
       </div>
 
-      {/* =================================================
-          CHAPTER / MEMORY SECTION
-          ================================================= */}
-
-      <div
-        className="
-          absolute
-          z-20
-        "
-        style={{
-          left:
-            RESPONSIVE_LAYOUT
-              .chapter
-              .left,
-
-           top: `${chapterTop}%`,
-
-
-          width:
-            RESPONSIVE_LAYOUT
-              .chapter
-              .width,
-
-            transform: `scale(${chapterScale})`,
-            transformOrigin: "top left",   
-        }}
-      >
-        <ChapterSection
-          loading={loading}
-          book={selectedBook}
-          memories={
-            selectedMemories
-          }
-        />
-      </div>
-
-      {/* =================================================
-          CARPET
-          ================================================= */}
-
-      <img
-        src={vintageCarpet}
-        alt=""
-        draggable={false}
-        className="
-          absolute
-          left-1/2
-          -translate-x-1/2
-          pointer-events-none
-          select-none
-        "
-        style={{
-          top:
-            RESPONSIVE_LAYOUT
-              .carpet
-              .top,
-
-          width:
-            RESPONSIVE_LAYOUT
-              .carpet
-              .width,
-
-          height:
-            "auto",
-
-          zIndex: 1,
-        }}
-      />
-
-      {/* =================================================
-          TEDDY
-          ================================================= */}
-
-      <img
-        src={vintageTeddyPillow}
-        alt=""
-        draggable={false}
-        className="
-          absolute
-          pointer-events-none
-          select-none
-        "
-        style={{
-          right:
-            RESPONSIVE_LAYOUT
-              .teddy
-              .right,
-
-          top:
-            RESPONSIVE_LAYOUT
-              .teddy
-              .top,
-
-          width:
-            RESPONSIVE_LAYOUT
-              .teddy
-              .width,
-
-          height:
-            "auto",
-
-          zIndex: 25,
-        }}
-      />
-
-      {/* =================================================
-          ROCKING HORSE ANIMATION
-          ================================================= */}
-
-      <style>
-        {`
-          @keyframes timelineRockingHorse {
-            0% {
-              transform: rotate(-4deg);
-            }
-
-            25% {
-              transform: rotate(0deg);
-            }
-
-            50% {
-              transform: rotate(4deg);
-            }
-
-            75% {
-              transform: rotate(0deg);
-            }
-
-            100% {
-              transform: rotate(-4deg);
-            }
-          }
-        `}
-      </style>
-
-      {/* =================================================
-          ROCKING HORSE
-          ================================================= */}
-
-      <img
-        src={vintageRockingHorse}
-        alt=""
-        draggable={false}
-        className="
-          absolute
-          pointer-events-none
-          select-none
-        "
-        style={{
-          left:
-            RESPONSIVE_LAYOUT
-              .horse
-              .left,
-
-          top:
-            RESPONSIVE_LAYOUT
-              .horse
-              .top,
-
-          width:
-            RESPONSIVE_LAYOUT
-              .horse
-              .width,
-
-          height:
-            "auto",
-
-          transformOrigin:
-            "50% 88%",
-
-          animation:
-            "timelineRockingHorse 2.8s ease-in-out infinite",
-
-          zIndex: 50,
-        }}
-      />
-
-      {/* =================================================
-          ALPHABET BLOCKS — RIGHT
-          ================================================= */}
-
-      <img
-        src={vintageAlphabetBlocks1}
-        alt=""
-        draggable={false}
-        className="
-          absolute
-          pointer-events-none
-          select-none
-        "
-        style={{
-          right:
-            RESPONSIVE_LAYOUT
-              .alphabetRight
-              .right,
-
-          top:
-            RESPONSIVE_LAYOUT
-              .alphabetRight
-              .top,
-
-          width:
-            RESPONSIVE_LAYOUT
-              .alphabetRight
-              .width,
-
-          height:
-            "auto",
-
-          zIndex: 25,
-        }}
-      />
-
-      {/* =================================================
-          ALPHABET BLOCKS — LEFT
-          ================================================= */}
-
-      <img
-        src={vintageAlphabetBlocks2}
-        alt=""
-        draggable={false}
-        className="
-          absolute
-          pointer-events-none
-          select-none
-        "
-        style={{
-          left:
-            RESPONSIVE_LAYOUT
-              .alphabetLeft
-              .left,
-
-          top:
-            RESPONSIVE_LAYOUT
-              .alphabetLeft
-              .top,
-
-          width:
-            RESPONSIVE_LAYOUT
-              .alphabetLeft
-              .width,
-
-          height:
-            "auto",
-
-          zIndex: 25,
-        }}
-      />
-
-      {/* =================================================
-          FOOTBALL
-          ================================================= */}
-
-      <img
-        src={vintagefootball}
-        alt=""
-        draggable={false}
-        className="
-          absolute
-          pointer-events-none
-          select-none
-        "
-        style={{
-          right:
-            RESPONSIVE_LAYOUT
-              .football
-              .right,
-
-          top:
-            RESPONSIVE_LAYOUT
-              .football
-              .top,
-
-          width:
-            RESPONSIVE_LAYOUT
-              .football
-              .width,
-
-          height:
-            "auto",
-
-          zIndex: 25,
-        }}
-      />
-
-      {/* =================================================
-          TOY TRAIN
-          ================================================= */}
-
-      <img
-        src={vintagetoytrain}
-        alt=""
-        draggable={false}
-        className="
-          absolute
-          pointer-events-none
-          select-none
-        "
-        style={{
-          right:
-            RESPONSIVE_LAYOUT
-              .train
-              .right,
-
-          top:
-            RESPONSIVE_LAYOUT
-              .train
-              .top,
-
-          width:
-            RESPONSIVE_LAYOUT
-              .train
-              .width,
-
-          height:
-            "auto",
-
-          zIndex: 25,
-        }}
-      />
-
-      {/* =================================================
-          UNICORN
-          ================================================= */}
-
-      <img
-        src={vintageunicorn}
-        alt=""
-        draggable={false}
-        className="
-          absolute
-          pointer-events-none
-          select-none
-        "
-        style={{
-          right:
-            RESPONSIVE_LAYOUT
-              .unicorn
-              .right,
-
-          top:
-            RESPONSIVE_LAYOUT
-              .unicorn
-              .top,
-
-          width:
-            RESPONSIVE_LAYOUT
-              .unicorn
-              .width,
-
-          height:
-            "auto",
-
-          zIndex: 25,
-        }}
-      />
-
-      {/* =================================================
-          CARS
-          ================================================= */}
-
-      <img
-        src={vintagecars}
-        alt=""
-        draggable={false}
-        className="
-          absolute
-          pointer-events-none
-          select-none
-        "
-        style={{
-          left:
-            RESPONSIVE_LAYOUT
-              .cars
-              .left,
-
-          top:
-            RESPONSIVE_LAYOUT
-              .cars
-              .top,
-
-          width:
-            RESPONSIVE_LAYOUT
-              .cars
-              .width,
-
-          height:
-            "auto",
-
-          zIndex: 25,
-        }}
-      />
-
-      {/* =================================================
-          DRAWER
-          ================================================= */}
+      {/*
+      =================================================
+      DRAWER
+      =================================================
+      */}
 
       <TimelineDrawer
         open={drawerOpen}
@@ -1115,9 +1144,11 @@ const chapterTop =
         }
       />
 
-      {/* =================================================
-          BACK BUTTON
-          ================================================= */}
+      {/*
+      =================================================
+      BACK BUTTON
+      =================================================
+      */}
 
       <button
         onClick={() =>
@@ -1143,9 +1174,11 @@ const chapterTop =
         ←
       </button>
 
-      {/* =================================================
-          MENU BUTTON
-          ================================================= */}
+      {/*
+      =================================================
+      MENU BUTTON
+      =================================================
+      */}
 
       <button
         onClick={() =>

@@ -50,12 +50,17 @@ export default function JourneyHeader() {
 
       {/* SUB TITLE */}
       <p
+      style={{
+      position: "relative",
+      left: "-50%",
+    }}
         className="
           mt-1
           w-[45vw]
           max-w-[650px]
           text-[#4A2E22]
-          text-lg
+          text-1g
+          font-bold
         "
       >
         Every little moment of your journey is tucked away in these pages — every giggle, every tear, every tiny wonder, and every beautiful thing you do.
