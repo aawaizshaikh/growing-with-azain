@@ -1,8 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+
 // ================= PUBLIC PAGES =================
 
 import Home from "./pages/Home";
+
 import Timeline from "./pages/Timeline";
 import Memory from "./pages/Memory";
 import MemoryDetails from "./pages/MemoryDetails";
@@ -15,6 +17,13 @@ import AboutAzain from "./pages/AboutAzain";
 
 import FavoriteSongs from "./pages/FavoriteSongs";
 import FavoriteSongMemory from "./pages/FavoriteSongMemory";
+
+
+// ================= LETTERS =================
+
+import Letters from "./pages/Letters";
+import LetterMemory from "./pages/LetterMemory";
+
 
 // ================= ADMIN =================
 
@@ -33,18 +42,43 @@ import FavoriteSongManager from "./pages/admin/FavoriteSongManager";
 import NewFavoriteSong from "./pages/admin/NewFavoriteSong";
 import EditFavoriteSong from "./pages/admin/EditFavoriteSong";
 
+
+// ================= LETTERS ADMIN =================
+
+import LetterManager from "./pages/admin/LetterManager";
+import NewLetter from "./pages/admin/NewLetter";
+import EditLetter from "./pages/admin/EditLetter";
+
+
+// ================= AUTH =================
+
 import ProtectedRoute from "./components/admin/ProtectedRoute";
+
+
+// ============================================================================
+// APP
+// ============================================================================
 
 export default function App() {
   return (
     <BrowserRouter>
+
       <Routes>
 
-        {/* ================= PUBLIC WEBSITE ================= */}
 
-        <Route path="/" element={<Home />} />
+        {/* ==================================================================
+            PUBLIC WEBSITE
+            ================================================================== */}
 
-        {/* Timeline */}
+        <Route
+          path="/"
+          element={<Home />}
+        />
+
+
+        {/* ==================================================================
+            TIMELINE
+            ================================================================== */}
 
         <Route
           path="/timeline"
@@ -56,14 +90,15 @@ export default function App() {
           element={<Memory />}
         />
 
-        {/* NEW MEMORY DETAILS PAGE */}
-
         <Route
           path="/timeline/memory/:slug"
           element={<MemoryDetails />}
         />
 
-        {/* Milestones */}
+
+        {/* ==================================================================
+            MILESTONES
+            ================================================================== */}
 
         <Route
           path="/milestones"
@@ -75,7 +110,10 @@ export default function App() {
           element={<MilestoneMemory />}
         />
 
-        {/* Favourite Songs */}
+
+        {/* ==================================================================
+            FAVOURITE SONGS
+            ================================================================== */}
 
         <Route
           path="/favorite-songs"
@@ -87,26 +125,65 @@ export default function App() {
           element={<FavoriteSongMemory />}
         />
 
-        {/* Other Pages */}
+
+        {/* ==================================================================
+            GALLERY
+            ================================================================== */}
 
         <Route
           path="/gallery"
           element={<Gallery />}
         />
 
+
+        {/* ==================================================================
+            ABOUT AZAIN
+            ================================================================== */}
+
         <Route
           path="/about"
           element={<AboutAzain />}
         />
 
-        {/* ================= LOGIN ================= */}
+
+        {/* ==================================================================
+            LETTERS
+            ==================================================================
+
+            Main illustrated Letters world:
+
+                /letters
+
+            Individual letter:
+
+                /letters/:slug
+
+            ================================================================== */}
+
+        <Route
+          path="/letters"
+          element={<Letters />}
+        />
+
+        <Route
+          path="/letters/:slug"
+          element={<LetterMemory />}
+        />
+
+
+        {/* ==================================================================
+            ADMIN LOGIN
+            ================================================================== */}
 
         <Route
           path="/admin/login"
           element={<Login />}
         />
 
-        {/* ================= ADMIN ================= */}
+
+        {/* ==================================================================
+            ADMIN DASHBOARD
+            ================================================================== */}
 
         <Route
           path="/admin"
@@ -117,7 +194,10 @@ export default function App() {
           }
         />
 
-        {/* ================= Timeline CMS ================= */}
+
+        {/* ==================================================================
+            TIMELINE CMS
+            ================================================================== */}
 
         <Route
           path="/admin/timeline"
@@ -146,7 +226,10 @@ export default function App() {
           }
         />
 
-        {/* ================= Milestone CMS ================= */}
+
+        {/* ==================================================================
+            MILESTONE CMS
+            ================================================================== */}
 
         <Route
           path="/admin/milestones"
@@ -175,7 +258,10 @@ export default function App() {
           }
         />
 
-        {/* ================= Favourite Songs CMS ================= */}
+
+        {/* ==================================================================
+            FAVOURITE SONGS CMS
+            ================================================================== */}
 
         <Route
           path="/admin/songs"
@@ -204,7 +290,10 @@ export default function App() {
           }
         />
 
-        {/* ================= Coming Soon ================= */}
+
+        {/* ==================================================================
+            GALLERY CMS
+            ================================================================== */}
 
         <Route
           path="/admin/gallery"
@@ -217,18 +306,63 @@ export default function App() {
           }
         />
 
+
+        {/* ==================================================================
+            LETTERS CMS
+            ==================================================================
+
+            Letter Manager:
+
+                /admin/letters
+
+            Create Letter:
+
+                /admin/letters/new
+
+            Edit Letter:
+
+                /admin/letters/edit/:id
+
+            All Letters Admin pages remain protected by the existing
+            authentication system.
+
+            The Admin controls LETTER CONTENT only.
+
+            Visual positioning of stones, background artwork and the
+            illustrated world remains hardcoded in the public pages.
+
+            ================================================================== */}
+
         <Route
           path="/admin/letters"
           element={
             <ProtectedRoute>
-              <div className="p-10 text-3xl font-semibold">
-                💌 Letters CMS Coming Soon
-              </div>
+              <LetterManager />
             </ProtectedRoute>
           }
         />
 
+        <Route
+          path="/admin/letters/new"
+          element={
+            <ProtectedRoute>
+              <NewLetter />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/letters/edit/:id"
+          element={
+            <ProtectedRoute>
+              <EditLetter />
+            </ProtectedRoute>
+          }
+        />
+
+
       </Routes>
+
     </BrowserRouter>
   );
 }
