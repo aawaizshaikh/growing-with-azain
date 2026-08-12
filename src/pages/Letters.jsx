@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import TimelineDrawer from "../components/timeline/TimelineDrawer";
+
 import { getPublishedLetters } from "../services/letterService";
 
 // ============================================================================
@@ -14,7 +16,8 @@ import caveDad from "../assets/illustrations/letters/cave-dad.png";
 import caveFire from "../assets/illustrations/letters/cave-fire.png";
 import caveMom from "../assets/illustrations/letters/cave-mom.png";
 import caveGirl from "../assets/illustrations/letters/cave-girl.png";
-
+import letterChildBackground from "../assets/illustrations/letters/letter-child-background.png";
+import tigerRug from "../assets/illustrations/letters/tiger-rug.png";
 import caveStone from "../assets/illustrations/letters/cave-stone.png";
 
 // ============================================================================
@@ -170,6 +173,7 @@ function CaveCharacters() {
           width: "15%",
         }}
       />
+      
 
       {/* ====================================================================
           MOM
@@ -305,7 +309,7 @@ function LetterStone({
       {/* ====================================================================
           TITLE
           ==================================================================== */}
-      
+
       {hasLetter && (
         <div
           className="
@@ -322,6 +326,7 @@ function LetterStone({
             top: `calc(${slot.stoneTop} + ${slot.stoneWidth} * 0.22)`,
             width: `calc(${slot.stoneWidth} * 0.68)`,
             minHeight: `calc(${slot.stoneWidth} * 0.30)`,
+            transform: "translateY(300%)",
           }}
         >
           <span
@@ -394,111 +399,6 @@ function LetterStone({
           </span>
         </div>
       )}
-    </>
-  );
-}
-
-// ============================================================================
-// HEADER
-// ============================================================================
-
-function SceneHeader() {
-  return (
-    <>
-      {/* ====================================================================
-          SMALL LABEL
-          ==================================================================== */}
-
-      <div
-        className="
-          absolute
-          left-[4%]
-          top-[4%]
-          z-[100]
-          pointer-events-none
-          rounded-full
-          border
-          border-[#D7B985]/80
-          bg-[#FFF3D6]/80
-          px-[1.3%]
-          py-[0.5%]
-          shadow-[0_3px_10px_rgba(50,30,15,0.15)]
-        "
-      >
-        <span
-          className="
-            uppercase
-            tracking-[0.22em]
-            font-bold
-            text-[#68492F]
-          "
-          style={{
-            fontFamily:
-              "Nunito, Arial, sans-serif",
-
-            fontSize:
-              "clamp(7px, 0.55vw, 12px)",
-          }}
-        >
-          Growing With Azain
-        </span>
-      </div>
-
-      {/* ====================================================================
-          MAIN TITLE
-          ==================================================================== */}
-
-      <div
-        className="
-          absolute
-          left-1/2
-          top-[4%]
-          z-[100]
-          -translate-x-1/2
-          text-center
-          pointer-events-none
-        "
-      >
-        <h1
-          className="
-            m-0
-            uppercase
-            tracking-[0.18em]
-            font-bold
-            text-[#FFF0C7]
-            drop-shadow-[0_3px_3px_rgba(40,23,12,0.5)]
-          "
-          style={{
-            fontFamily:
-              "Cormorant Garamond, Georgia, serif",
-
-            fontSize:
-              "clamp(30px, 3.2vw, 64px)",
-
-            lineHeight: 0.9,
-          }}
-        >
-          LETTERS
-        </h1>
-
-        <div
-          className="
-            mt-[0.35vw]
-            text-[#E9C991]
-            tracking-[0.18em]
-            uppercase
-          "
-          style={{
-            fontFamily:
-              "Nunito, Arial, sans-serif",
-
-            fontSize:
-              "clamp(7px, 0.52vw, 12px)",
-          }}
-        >
-          Words to keep forever
-        </div>
-      </div>
     </>
   );
 }
@@ -867,6 +767,8 @@ function ErrorOverlay({
 export default function Letters() {
   const navigate = useNavigate();
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   const [
     letters,
     setLetters,
@@ -1145,16 +1047,84 @@ export default function Letters() {
         />
 
         {/* ==================================================================
+            BACK BUTTON
+            ================================================================== */}
+
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          aria-label="Back to home"
+          className="
+            absolute
+            left-[2%]
+            top-[3%]
+            z-[200]
+            flex
+            items-center
+            justify-center
+            rounded-full
+            border
+            border-[#D7B985]
+            bg-[#FFF3D6]/90
+            text-[#68492F]
+            shadow-[0_3px_10px_rgba(45,25,12,0.25)]
+            transition-all
+            duration-200
+            hover:scale-105
+            hover:bg-[#FFF8E8]
+            active:scale-95
+          "
+          style={{
+            width: "clamp(34px, 3vw, 52px)",
+            height: "clamp(34px, 3vw, 52px)",
+            fontSize: "clamp(18px, 1.5vw, 28px)",
+          }}
+        >
+          ←
+        </button>
+
+        {/* ==================================================================
+            NAVIGATION BUTTON
+            ================================================================== */}
+
+        <button
+          type="button"
+          onClick={() => setDrawerOpen(true)}
+          aria-label="Open navigation"
+          className="
+            absolute
+            right-[2%]
+            top-[3%]
+            z-[200]
+            flex
+            items-center
+            justify-center
+            rounded-full
+            border
+            border-[#D7B985]
+            bg-[#FFF3D6]/90
+            text-[#68492F]
+            shadow-[0_3px_10px_rgba(45,25,12,0.25)]
+            transition-all
+            duration-200
+            hover:scale-105
+            hover:bg-[#FFF8E8]
+            active:scale-95
+          "
+          style={{
+            width: "clamp(34px, 3vw, 52px)",
+            height: "clamp(34px, 3vw, 52px)",
+            fontSize: "clamp(17px, 1.3vw, 24px)",
+          }}
+        >
+          ☰
+        </button>
+
+        {/* ==================================================================
             CAVE CHARACTERS
             ================================================================== */}
 
         <CaveCharacters />
-
-        {/* ==================================================================
-            HEADER
-            ================================================================== */}
-
-        <SceneHeader />
 
         {/* ==================================================================
             FIRE
@@ -1233,6 +1203,15 @@ export default function Letters() {
           />
         )}
       </div>
+
+      {/* ====================================================================
+          EXISTING WEBSITE NAVIGATION DRAWER
+          ==================================================================== */}
+
+      <TimelineDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      />
     </div>
   );
 }

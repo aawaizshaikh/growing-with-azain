@@ -3,9 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { getLetterBySlug } from "../services/letterService";
 
-import background from "../assets/illustrations/letters/background.png";
-import caveStone from "../assets/illustrations/letters/cave-stone.png";
-import caveFire from "../assets/illustrations/letters/cave-fire.png";
+import letterChildBackground from "../assets/illustrations/letters/letter-child-background.png";
+import tigerRug from "../assets/illustrations/letters/tiger-rug.png";
 
 
 // ============================================================================
@@ -260,7 +259,11 @@ function LetterBody({ content }) {
 
   return (
     <div
-      className="text-[#4F3827] text-left"
+      className="
+        text-[#4F3827]
+        text-left
+        font-semibold
+      "
       style={{
         fontFamily:
           "Cormorant Garamond, Georgia, serif",
@@ -272,7 +275,11 @@ function LetterBody({ content }) {
       {paragraphs.map((paragraph, index) => (
         <p
           key={index}
-          className="m-0 mb-[1.1em] last:mb-0"
+          className="
+            m-0
+            mb-[1.1em]
+            last:mb-0
+          "
           style={{
             whiteSpace: "pre-wrap",
           }}
@@ -286,10 +293,13 @@ function LetterBody({ content }) {
 
 
 // ============================================================================
-// LETTER TABLET
+// LETTER CONTENT
+//
+// The new background already contains the parchment.
+// Therefore we DO NOT render cave-stone.png here.
 // ============================================================================
 
-function LetterTablet({ letter }) {
+function LetterContent({ letter }) {
   const categoryLabel =
     getCategoryLabel(letter.slot_key);
 
@@ -297,60 +307,71 @@ function LetterTablet({ letter }) {
     <div
       className="
         absolute
-        left-1/2
-        top-[12%]
-        z-40
-        -translate-x-1/2
+        z-30
+        flex
+        flex-col
+        items-center
       "
       style={{
-        width: "51%",
-        height: "76%",
+        left: "14%",
+        top: "15%",
+        width: "48%",
+        height: "58%",
       }}
     >
 
-      {/* ==============================================================
-          STONE
-          ============================================================== */}
+      {/* ==================================================================
+          LETTER TITLE
+          
+          Positioned independently over the small hanging parchment.
+          ================================================================== */}
 
-      <img
-        src={caveStone}
-        alt=""
-        draggable={false}
+      <h1
         className="
           absolute
-          inset-0
-          w-full
-          h-full
-          object-fill
-          pointer-events-none
-          select-none
+          z-40
+          text-center
+          font-bold
+          leading-[0.95]
+          text-[#4A3020]
         "
         style={{
-          filter:
-            "drop-shadow(0 10px 15px rgba(38,22,12,0.35))",
+          left: "27%",
+          top: "16%",
+          width: "46%",
+          fontFamily:
+            "Cormorant Garamond, Georgia, serif",
+          fontSize:
+            "clamp(18px, 1.55vw, 32px)",
         }}
-      />
+      >
+        {letter.title}
+      </h1>
 
 
-      {/* ==============================================================
-          LETTER CONTENT
-          ============================================================== */}
+      {/* ================================================================
+          CONTENT AREA
+          ================================================================ */}
 
       <div
         className="
-          absolute
-          left-[15%]
-          right-[15%]
-          top-[13%]
-          bottom-[13%]
-          overflow-hidden
+          w-full
+          h-full
           flex
           flex-col
           items-center
         "
+        style={{
+          paddingLeft: "9%",
+          paddingRight: "9%",
+          paddingTop: "5%",
+          paddingBottom: "5%",
+        }}
       >
 
-        {/* CATEGORY */}
+        {/* ==============================================================
+            CATEGORY
+            ============================================================== */}
 
         <div
           className="
@@ -358,6 +379,7 @@ function LetterTablet({ letter }) {
             tracking-[0.18em]
             text-[#88623E]
             text-center
+            flex-shrink-0
           "
           style={{
             fontFamily:
@@ -370,35 +392,23 @@ function LetterTablet({ letter }) {
         </div>
 
 
-        {/* TITLE */}
+        {/* ==============================================================
+            TITLE
+            ============================================================== */}
 
-        <h1
-          className="
-            mt-[1.2%]
-            mb-0
-            max-w-[92%]
-            text-center
-            font-bold
-            leading-[0.95]
-            text-[#4A3020]
-          "
-          style={{
-            fontFamily:
-              "Cormorant Garamond, Georgia, serif",
-            fontSize:
-              "clamp(25px, 2.35vw, 48px)",
-          }}
-        >
-          {letter.title}
-        </h1>
+        {/* Title intentionally removed from normal content flow.
+            It is positioned above on the hanging parchment. */}
 
 
-        {/* HEART */}
+        {/* ==============================================================
+            HEART
+            ============================================================== */}
 
         <div
           className="
             mt-[1.2%]
             text-[#9C6843]
+            flex-shrink-0
           "
           style={{
             fontSize:
@@ -409,12 +419,12 @@ function LetterTablet({ letter }) {
         </div>
 
 
-        {/* DATE / AGE */}
-
-        <LetterMeta letter={letter} />
+      
 
 
-        {/* DIVIDER */}
+        {/* ==============================================================
+            DIVIDER
+            ============================================================== */}
 
         <div
           className="
@@ -423,6 +433,7 @@ function LetterTablet({ letter }) {
             items-center
             justify-center
             w-[70%]
+            flex-shrink-0
           "
         >
           <div
@@ -456,15 +467,23 @@ function LetterTablet({ letter }) {
         </div>
 
 
-        {/* LETTER */}
+        {/* ==============================================================
+            LETTER BODY
+            ============================================================== */}
 
         <div
           className="
             w-full
             flex-1
+            min-h-0
             overflow-y-auto
             pr-[2%]
           "
+          style={{
+            scrollbarWidth: "thin",
+            scrollbarColor:
+              "#A9825B transparent",
+          }}
         >
           <LetterBody
             content={letter.letter_content}
@@ -472,7 +491,9 @@ function LetterTablet({ letter }) {
         </div>
 
 
-        {/* SIGNATURE */}
+        {/* ==============================================================
+            SIGNATURE
+            ============================================================== */}
 
         {letter.signature && (
           <div
@@ -481,6 +502,7 @@ function LetterTablet({ letter }) {
               w-full
               text-right
               text-[#62432D]
+              flex-shrink-0
             "
             style={{
               fontFamily:
@@ -501,67 +523,43 @@ function LetterTablet({ letter }) {
 
 
 // ============================================================================
-// FIRE
-// ============================================================================
-
-function FireDecoration() {
-  return (
-    <img
-      src={caveFire}
-      alt=""
-      draggable={false}
-      className="
-        absolute
-        left-[3%]
-        bottom-[4%]
-        z-20
-        pointer-events-none
-        select-none
-      "
-      style={{
-        width: "11%",
-      }}
-    />
-  );
-}
-
-
-// ============================================================================
 // BACK BUTTON
+//
+// The supplied background already contains the visual arrow.
+// This button provides the actual clickable functionality on top of it.
 // ============================================================================
 
 function BackButton({ onClick }) {
   return (
     <button
       type="button"
+      aria-label="Back to Letters"
       onClick={onClick}
       className="
         absolute
-        left-[4%]
-        bottom-[5%]
+        left-[2.3%]
+        top-[2.5%]
         z-[100]
+        flex
+        items-center
+        justify-center
         rounded-full
-        border
-        border-[#C7A16D]
-        bg-[#FFF1D3]/90
-        px-[1.4%]
-        py-[0.7%]
-        text-[#64452D]
-        font-bold
-        shadow-[0_4px_12px_rgba(45,25,12,0.2)]
+        bg-transparent
+        border-0
+        p-0
+        cursor-pointer
         transition
-        hover:bg-[#FFF7E7]
-        hover:-translate-y-[2%]
+        hover:scale-105
         active:scale-95
       "
       style={{
-        fontFamily:
-          "Nunito, Arial, sans-serif",
-        fontSize:
-          "clamp(8px, 0.65vw, 14px)",
+        width: "5.2%",
+        aspectRatio: "1 / 1",
       }}
     >
-      ← Back to Letters
+      <span className="sr-only">
+        Back to Letters
+      </span>
     </button>
   );
 }
@@ -580,9 +578,9 @@ export default function LetterMemory() {
   const [error, setError] = useState(null);
 
 
-  // --------------------------------------------------------------------------
+  // ==========================================================================
   // LOAD LETTER
-  // --------------------------------------------------------------------------
+  // ==========================================================================
 
   useEffect(() => {
     let mounted = true;
@@ -629,18 +627,18 @@ export default function LetterMemory() {
   }, [slug]);
 
 
-  // --------------------------------------------------------------------------
+  // ==========================================================================
   // LOADING
-  // --------------------------------------------------------------------------
+  // ==========================================================================
 
   if (loading) {
     return <LoadingScreen />;
   }
 
 
-  // --------------------------------------------------------------------------
+  // ==========================================================================
   // ERROR
-  // --------------------------------------------------------------------------
+  // ==========================================================================
 
   if (error || !letter) {
     return (
@@ -651,9 +649,9 @@ export default function LetterMemory() {
   }
 
 
-  // --------------------------------------------------------------------------
+  // ==========================================================================
   // SCENE
-  // --------------------------------------------------------------------------
+  // ==========================================================================
 
   return (
     <div
@@ -665,9 +663,9 @@ export default function LetterMemory() {
       "
     >
 
-      {/* ================================================================
-          MASTER 16:9 SCENE
-          ================================================================ */}
+      {/* ==================================================================
+          MASTER SCENE
+          ================================================================== */}
 
       <div
         className="
@@ -687,10 +685,12 @@ export default function LetterMemory() {
         }}
       >
 
-        {/* BACKGROUND */}
+        {/* ================================================================
+            NEW CHILD PAGE BACKGROUND
+            ================================================================ */}
 
         <img
-          src={background}
+          src={letterChildBackground}
           alt=""
           draggable={false}
           className="
@@ -703,9 +703,28 @@ export default function LetterMemory() {
             select-none
           "
         />
+<img
+  src={tigerRug}
+  alt=""
+  draggable={false}
+  className="
+    absolute
+    z-20
+    pointer-events-none
+    select-none
+    object-contain
+  "
+  style={{
+    left: "30%",
+    bottom: "-2%",
+    width: "20%",
+     transform: "rotate(8deg)",
+  }}
+/>
 
-
-        {/* SOFT OVERLAY */}
+        {/* ================================================================
+            VERY SOFT OVERLAY
+            ================================================================ */}
 
         <div
           className="
@@ -716,131 +735,29 @@ export default function LetterMemory() {
           "
           style={{
             background:
-              "radial-gradient(circle at 50% 47%, rgba(255,235,195,0.08) 0%, rgba(45,28,16,0.08) 45%, rgba(25,15,9,0.16) 100%)",
+              "radial-gradient(circle at 50% 45%, rgba(255,235,195,0.04) 0%, rgba(45,28,16,0.04) 55%, rgba(25,15,9,0.10) 100%)",
           }}
         />
 
 
-        {/* FIRE */}
+        {/* ================================================================
+            ACTUAL LETTER
+            ================================================================ */}
 
-        <FireDecoration />
-
-
-        {/* LETTER */}
-
-        <LetterTablet
+        <LetterContent
           letter={letter}
         />
 
 
-        {/* BACK */}
+        {/* ================================================================
+            BACK BUTTON
+            ================================================================ */}
 
         <BackButton
           onClick={() => navigate("/letters")}
         />
 
-
-        {/* TOP LABEL */}
-
-        <div
-          className="
-            absolute
-            left-1/2
-            top-[4%]
-            z-[100]
-            -translate-x-1/2
-            text-center
-            pointer-events-none
-          "
-        >
-
-          <div
-            className="
-              uppercase
-              tracking-[0.25em]
-              text-[#F1D5A3]
-              drop-shadow-[0_2px_3px_rgba(30,17,9,0.5)]
-            "
-            style={{
-              fontFamily:
-                "Nunito, Arial, sans-serif",
-              fontSize:
-                "clamp(7px, 0.55vw, 12px)",
-            }}
-          >
-            A treasured memory
-          </div>
-
-          <div
-            className="
-              mt-[0.3vw]
-              text-[#FFF1CE]
-              font-bold
-              drop-shadow-[0_3px_3px_rgba(30,17,9,0.45)]
-            "
-            style={{
-              fontFamily:
-                "Cormorant Garamond, Georgia, serif",
-              fontSize:
-                "clamp(18px, 1.6vw, 32px)",
-            }}
-          >
-            Written with love
-          </div>
-
-        </div>
-
-
-        {/* BOTTOM RIGHT */}
-
-        <div
-          className="
-            absolute
-            right-[4%]
-            bottom-[5%]
-            z-[100]
-            pointer-events-none
-            text-right
-          "
-        >
-
-          <div
-            className="
-              text-[#F0D4A0]
-              tracking-[0.12em]
-              uppercase
-              drop-shadow-[0_2px_3px_rgba(30,17,9,0.45)]
-            "
-            style={{
-              fontFamily:
-                "Nunito, Arial, sans-serif",
-              fontSize:
-                "clamp(7px, 0.52vw, 12px)",
-            }}
-          >
-            Cherish forever
-          </div>
-
-          <div
-            className="
-              mt-[0.25vw]
-              text-[#FFE8B9]
-              font-bold
-            "
-            style={{
-              fontFamily:
-                "Cormorant Garamond, Georgia, serif",
-              fontSize:
-                "clamp(12px, 1vw, 20px)",
-            }}
-          >
-            ♥
-          </div>
-
-        </div>
-
       </div>
-
     </div>
   );
 }

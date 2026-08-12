@@ -1,29 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-import memoryWall from "../../assets/illustrations/timeline-memory-wall.png";
-
 export default function MemoryCard({ memory }) {
   const navigate = useNavigate();
-
-  /*
-  =====================================================
-  FORMATTED DATE
-  =====================================================
-  */
-
-  const formattedDate = memory.date
-    ? new Date(
-        memory.date
-      ).toLocaleDateString(
-        "en-IN",
-        {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        }
-      )
-    : "";
 
   /*
   =====================================================
@@ -44,10 +23,14 @@ export default function MemoryCard({ memory }) {
   */
 
   function openMemory() {
-    navigate(
-      `/timeline/memory/${memory.slug}`
-    );
+    navigate(`/timeline/memory/${memory.slug}`);
   }
+
+  /*
+  =====================================================
+  RENDER
+  =====================================================
+  */
 
   return (
     <div
@@ -59,7 +42,6 @@ export default function MemoryCard({ memory }) {
         w-full
         rounded-[28px]
         overflow-hidden
-        bg-[#FFFDF9]
         border
         border-[#EEE4D7]
         shadow-sm
@@ -68,164 +50,84 @@ export default function MemoryCard({ memory }) {
         hover:-translate-y-2
         hover:shadow-xl
       "
+      style={{
+        height: "320px",
+      }}
     >
       {/* =====================================================
           COVER IMAGE
-
-          IMPORTANT:
-
-          The image has a deliberate master-scene height.
-
-          We do NOT allow the source image's natural
-          dimensions to determine the card height.
-
-          object-cover preserves the image geometry without
-          distorting the photograph.
           ===================================================== */}
 
-      <div
+      <img
+        src={coverImage}
+        alt={memory.title || "Memory"}
+        draggable={false}
+        className="
+          absolute
+          inset-0
+          w-full
+          h-full
+          object-cover
+          transition-transform
+          duration-500
+          group-hover:scale-[1.03]
+        "
         style={{
-          width: "100%",
-          height: "150px",
-          overflow: "hidden",
+          objectPosition: "center",
+          userSelect: "none",
         }}
-      >
-        <img
-          src={coverImage}
-          alt={
-            memory.title ||
-            "Memory"
-          }
-          draggable={false}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: "center",
-            display: "block",
-            userSelect: "none",
-          }}
-        />
-      </div>
+      />
 
       {/* =====================================================
-          CONTENT
+          SUBTLE BOTTOM GRADIENT
+
+          Keeps the title readable without creating the
+          beige content section.
           ===================================================== */}
 
       <div
-        className="p-2"
+        className="
+          absolute
+          inset-x-0
+          bottom-0
+          h-[45%]
+          pointer-events-none
+        "
         style={{
-          backgroundImage: `
-            linear-gradient(
-              rgba(221, 181, 116, 0.72),
-              rgba(221, 181, 116, 0.72)
-            ),
-            url(${memoryWall})
-          `,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
+          background:
+            "linear-gradient(to top, rgba(55, 38, 25, 0.72), rgba(55, 38, 25, 0))",
         }}
+      />
+
+      {/* =====================================================
+          TITLE
+          ===================================================== */}
+
+      <div
+        className="
+          absolute
+          left-0
+          right-0
+          bottom-0
+          px-5
+          pb-5
+          pointer-events-none
+        "
       >
-        {/* =================================================
-            CATEGORY
-            ================================================= */}
-
-        {memory.category && (
-          <span
-            className="
-              inline-block
-              px-3
-              py-1
-              rounded-full
-              bg-[#F3ECE1]
-              text-[#A67F4C]
-              text-xs
-              font-semibold
-              uppercase
-              tracking-wider
-            "
-          >
-            {memory.category}
-          </span>
-        )}
-
-        {/* =================================================
-            DATE
-            ================================================= */}
-
-        <p
-          className="
-            mt-1
-            text-sm
-            text-[#A68B64]
-            font-medium
-          "
-        >
-          {formattedDate}
-        </p>
-
-        {/* =================================================
-            TITLE
-            ================================================= */}
-
         <h3
           className="
-            mt-2
             text-[24px]
             leading-tight
             font-bold
-            text-[#5A4332]
+            text-white
+            drop-shadow-[0_2px_3px_rgba(0,0,0,0.45)]
           "
           style={{
-            fontFamily:
-              "Cormorant Garamond, serif",
+            fontFamily: "Cormorant Garamond, serif",
           }}
         >
           {memory.title}
         </h3>
-
-        {/* =================================================
-            DESCRIPTION
-            ================================================= */}
-
-        <p
-          className="
-            mt-2
-            text-[#75675B]
-            leading-6
-            line-clamp-2
-            min-h-0
-          "
-        >
-          {memory.description}
-        </p>
-
-        {/* =================================================
-            BUTTON
-            ================================================= */}
-
-        <button
-          type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            openMemory();
-          }}
-          className="
-            mt-4
-            px-5
-            py-2.5
-            rounded-full
-            bg-[#B58A5A]
-            text-white
-            font-semibold
-            transition-colors
-            duration-300
-            hover:bg-[#9C7448]
-          "
-        >
-          Read Memory →
-        </button>
       </div>
     </div>
   );

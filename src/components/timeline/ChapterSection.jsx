@@ -1,202 +1,165 @@
 import React, {
   useEffect,
-  useRef,
+  useMemo,
   useState,
 } from "react";
 
 import MemoryGrid from "./MemoryGrid";
-
 import memoryWall from "../../assets/illustrations/timeline-memory-wall.png";
+
+/*
+=====================================================
+TIMELINE MEMORY PAGINATION
+=====================================================
+
+The design has three memory cards across, so each page
+shows three memories.
+
+Example:
+
+10 memories -> 4 pages
+Page 1 -> 1, 2, 3
+Page 2 -> 4, 5, 6
+Page 3 -> 7, 8, 9
+Page 4 -> 10
+
+The admin panel and Timeline data source remain untouched.
+=====================================================
+*/
+
+const MEMORIES_PER_PAGE = 3;
+const MAX_VISIBLE_PAGE_BUTTONS = 5;
+
+const paginationButtonClass = `
+  w-10
+  h-10
+  rounded-full
+  border
+  border-[#CBA66F]
+  bg-[#F5E3B8]
+  text-[#6B4B2F]
+  font-semibold
+  shadow-sm
+  transition-all
+  duration-200
+  hover:-translate-y-0.5
+  hover:shadow-md
+`;
 
 export default function ChapterSection({
   loading,
   book,
   memories,
 }) {
-  const [currentPage, setCurrentPage] =
-    useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  /*
-  =====================================================
-  CHAPTER SECTION REF
-
-  Pagination scrolls to the actual chapter section
-  instead of using a fixed browser-pixel scroll
-  position.
-  =====================================================
-  */
-
-  const chapterSectionRef = useRef(null);
-
-  /*
-  =====================================================
-  PAGINATION
-  =====================================================
-  */
-
-  const MEMORIES_PER_PAGE = 6;
-
-  /*
-  =====================================================
-  FILTER
-  =====================================================
-  */
-
-  const filteredMemories = memories;
-
-  /*
-  =====================================================
-  PAGINATION CALCULATION
-  =====================================================
-  */
+  const filteredMemories = memories || [];
 
   const totalPages = Math.max(
     1,
     Math.ceil(
-      filteredMemories.length /
-        MEMORIES_PER_PAGE
+      filteredMemories.length / MEMORIES_PER_PAGE
     )
   );
 
-  const paginatedMemories =
-    filteredMemories.slice(
-      (currentPage - 1) *
-        MEMORIES_PER_PAGE,
-      currentPage *
-        MEMORIES_PER_PAGE
-    );
+  const paginatedMemories = filteredMemories.slice(
+    (currentPage - 1) * MEMORIES_PER_PAGE,
+    currentPage * MEMORIES_PER_PAGE
+  );
 
-  /*
-  =====================================================
-  RESET PAGINATION WHEN CHAPTER CHANGES
-  =====================================================
-  */
-
+  /* Reset pagination whenever another book is selected. */
   useEffect(() => {
     setCurrentPage(1);
   }, [book?.slug]);
 
+  /* Keep the current page valid if the memory count changes. */
+  useEffect(() => {
+    setCurrentPage((page) =>
+      Math.min(Math.max(page, 1), totalPages)
+    );
+  }, [totalPages]);
+
   /*
   =====================================================
-  PAGINATION NAVIGATION
+  PAGE NUMBERS
+  =====================================================
 
-  Scroll to the actual ChapterSection rather than
-  using a hard-coded browser position.
+  Five page buttons are the maximum shown at once.
+  This keeps pagination compact even if a book eventually
+  contains dozens of memories.
   =====================================================
   */
+  const visiblePages = useMemo(() => {
+    if (totalPages <= MAX_VISIBLE_PAGE_BUTTONS) {
+      return Array.from(
+        { length: totalPages },
+        (_, index) => index + 1
+      );
+    }
+
+    let start = Math.max(1, currentPage - 2);
+    let end = Math.min(
+      totalPages,
+      start + MAX_VISIBLE_PAGE_BUTTONS - 1
+    );
+
+    if (end - start + 1 < MAX_VISIBLE_PAGE_BUTTONS) {
+      start = Math.max(
+        1,
+        end - MAX_VISIBLE_PAGE_BUTTONS + 1
+      );
+    }
+
+    return Array.from(
+      { length: end - start + 1 },
+      (_, index) => start + index
+    );
+  }, [currentPage, totalPages]);
 
   function goToPage(page) {
-    setCurrentPage(page);
-
-    requestAnimationFrame(() => {
-      chapterSectionRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    });
+    setCurrentPage(
+      Math.min(Math.max(page, 1), totalPages)
+    );
   }
+
+  const firstVisiblePage = visiblePages[0];
+  const lastVisiblePage =
+    visiblePages[visiblePages.length - 1];
 
   return (
     <div
-      ref={chapterSectionRef}
-      className="
-        mx-auto
-        rounded-[40px]
-        border
-        shadow-sm
-        overflow-hidden
-      "
+      className="mx-auto rounded-[40px] border shadow-sm"
       style={{
-        /*
-        =================================================
-        MASTER SCENE GEOMETRY
-
-        The parent Timeline scene is 1920px wide.
-
-        This ChapterSection occupies 1400px of the
-        master scene and therefore scales together
-        with the rest of the Timeline composition.
-        =================================================
-        */
-
         width: "1400px",
-
         height: "clamp(400px, 46.76vh, 505px)",
-
         padding: "0px 50px",
-
-        /*
-        =================================================
-        IMPORTANT TEST
-
-        Previously this section was pulled upward by:
-
-            marginTop: "-275px"
-
-        That created an artificial overlap between the
-        ChapterSection and the room/floor scene.
-
-        We are now testing its natural position inside
-        the master scene.
-
-        Do not compensate with another negative value
-        until we inspect the result.
-        =================================================
-        */
-
         marginTop: "0px",
-
         boxSizing: "border-box",
-
         position: "relative",
 
         /*
-        ================================================
-        MEMORY WALLPAPER
-        ================================================
+        The pagination sits just below the memory cards,
+        so it must not be clipped by the chapter container.
         */
+        overflow: "visible",
 
         backgroundImage: `url(${memoryWall})`,
-
         backgroundSize: "cover",
-
         backgroundPosition: "center",
-
         backgroundRepeat: "no-repeat",
-
-        /*
-        ================================================
-        BORDER
-        ================================================
-        */
-
         borderColor: "#CBA66F",
-
-        /*
-        ================================================
-        INNER SHADOW
-        ================================================
-        */
-
         boxShadow:
           "inset 0 0 45px rgba(120, 79, 35, 0.16)",
       }}
     >
       {/* =====================================================
-          HEADING
+          CHAPTER TITLE
           ===================================================== */}
-
       <div className="text-center">
         <h2
-          className="
-            mt-5
-            text-[54px]
-            font-bold
-            text-[#5A4332]
-          "
+          className="mt-1 text-[34px] font-bold text-[#5A4332]"
           style={{
-            fontFamily:
-              "Cormorant Garamond, serif",
+            fontFamily: "Cormorant Garamond, serif",
           }}
         >
           {book.title}
@@ -204,9 +167,11 @@ export default function ChapterSection({
       </div>
 
       {/* =====================================================
-          MEMORY GRID
-          ===================================================== */}
+          MEMORY CARDS
 
+          Exactly three cards are rendered per page so the
+          existing one-row design remains unchanged.
+          ===================================================== */}
       <MemoryGrid
         loading={loading}
         memories={paginatedMemories}
@@ -215,94 +180,110 @@ export default function ChapterSection({
       {/* =====================================================
           PAGINATION
           ===================================================== */}
-
-      {totalPages > 1 && (
+      {!loading && totalPages > 1 && (
         <div
           className="
+            absolute
+            left-0
+            right-0
+            -bottom-0
+            z-50
             flex
-            justify-center
             items-center
-            gap-3
-            mt-14
+            justify-center
+            gap-2
           "
+          aria-label="Memory pagination"
         >
-          {/* =================================================
-              PREVIOUS
-              ================================================= */}
-
+          {/* PREVIOUS */}
           <button
+            type="button"
             disabled={currentPage === 1}
-            onClick={() =>
-              goToPage(
-                currentPage - 1
-              )
-            }
-            className="
-              px-5
-              py-2
-              rounded-full
-              border
-              border-[#CBA66F]
-              disabled:opacity-40
-              bg-[#EBD09B]
-            "
+            onClick={() => goToPage(currentPage - 1)}
+            aria-label="Previous page"
+            className={`
+              ${paginationButtonClass}
+              font-bold
+              disabled:opacity-35
+              disabled:cursor-not-allowed
+              disabled:hover:translate-y-0
+            `}
           >
             ←
           </button>
 
-          {/* =================================================
-              PAGE NUMBERS
-              ================================================= */}
+          {/* FIRST PAGE + LEFT ELLIPSIS */}
+          {firstVisiblePage > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={() => goToPage(1)}
+                className={paginationButtonClass}
+              >
+                1
+              </button>
 
-          {Array.from(
-            {
-              length: totalPages,
-            },
-            (_, i) => i + 1
-          ).map((page) => (
+              <span
+                className="px-1 font-semibold text-[#8A6B4B]"
+                aria-hidden="true"
+              >
+                …
+              </span>
+            </>
+          )}
+
+          {/* VISIBLE PAGE NUMBERS */}
+          {visiblePages.map((page) => (
             <button
+              type="button"
               key={page}
-              onClick={() =>
-                goToPage(page)
+              onClick={() => goToPage(page)}
+              aria-current={
+                currentPage === page ? "page" : undefined
               }
-              className={`
-                w-10
-                h-10
-                rounded-full
-                transition-all
-                ${
-                  currentPage === page
-                    ? "bg-[#B58A5A] text-white"
-                    : "bg-[#EBD09B] border border-[#CBA66F]"
-                }
-              `}
+              className={
+                currentPage === page
+                  ? `${paginationButtonClass} bg-[#B58A5A] text-white border-[#B58A5A] scale-105`
+                  : paginationButtonClass
+              }
             >
               {page}
             </button>
           ))}
 
-          {/* =================================================
-              NEXT
-              ================================================= */}
+          {/* RIGHT ELLIPSIS + LAST PAGE */}
+          {lastVisiblePage < totalPages && (
+            <>
+              <span
+                className="px-1 font-semibold text-[#8A6B4B]"
+                aria-hidden="true"
+              >
+                …
+              </span>
 
+              <button
+                type="button"
+                onClick={() => goToPage(totalPages)}
+                className={paginationButtonClass}
+              >
+                {totalPages}
+              </button>
+            </>
+          )}
+
+          {/* NEXT */}
           <button
-            disabled={
-              currentPage === totalPages
-            }
-            onClick={() =>
-              goToPage(
-                currentPage + 1
-              )
-            }
-            className="
-              px-5
-              py-2
-              rounded-full
-              border
-              border-[#CBA66F]
-              disabled:opacity-40
-              bg-[#EBD09B]
-            "
+            type="button"
+            disabled={currentPage === totalPages}
+            onClick={() => goToPage(currentPage + 1)}
+            aria-label="Next page"
+            className={`
+              ${paginationButtonClass}
+              font-bold
+              disabled:opacity-35
+              disabled:cursor-not-allowed
+              disabled:hover:translate-y-0
+            `}
           >
             →
           </button>
