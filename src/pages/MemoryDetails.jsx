@@ -1,37 +1,3 @@
-// ==============================
-// SCRAPBOOK ILLUSTRATIONS
-// ==============================
-
-import blob1 from "../assets/illustrations/blob-1.png";
-import blob2 from "../assets/illustrations/blob-2.png";
-import blob3 from "../assets/illustrations/blob-3.png";
-import hotAirBalloon from "../assets/illustrations/hot-air-baloon.png";
-import headphones from "../assets/illustrations/headphones.png";
-import heart from "../assets/illustrations/heart.png";
-import polaroidShadow from "../assets/illustrations/polaroid-shadow.png";
-
-import paintSplash from "../assets/illustrations/paint-splash.png";
-
-import butterfly from "../assets/illustrations/butterfly.png";
-import floatingLeaves from "../assets/illustrations/floating-leaves.png";
-import sparkles from "../assets/illustrations/sparkles.png";
-
-import headerDecoration from "../assets/illustrations/timeline-header-decoration.png";
-
-import cloud from "../assets/illustrations/floating-cloud.png";
-
-import leafDivider from "../assets/illustrations/leaf-divider.png";
-
-import storyPaper from "../assets/illustrations/timeline-story-paper.png";
-
-import goldClip from "../assets/illustrations/paperclip-gold.png";
-import silverClip from "../assets/illustrations/paperclip-silver.png";
-
-import washiCream from "../assets/illustrations/washi-tape-cream.png";
-import washiFloral from "../assets/illustrations/washi-tape-floral.png";
-
-import photoCorner from "../assets/illustrations/photo-corner.png";
-
 import React, {
   useEffect,
   useMemo,
@@ -48,9 +14,252 @@ import {
   getTimelineMemories,
 } from "../services/timelineService";
 
+import diaryBackground from "../assets/illustrations/timeline-memory-diary.png";
+import vintageRockingHorse from "../assets/illustrations/timeline-vintage-rocking-horse.png";
+import vintageTeddyPillow from "../assets/illustrations/timeline-vintage-teddy-pillow.png";
+
+
+/*
+=====================================================
+MEMORY CHILD PAGE — PERCENTAGE BASED MASTER SCENE
+=====================================================
+
+MASTER DESIGN
+-------------
+
+The diary artwork is the master 1920 × 1080 scene.
+
+ALL PAGE ELEMENTS are positioned relative to this
+master scene using percentages.
+
+PHOTO BEHAVIOUR
+---------------
+
+DIARY PAGE:
+
+    Page 1 -> photos 1, 2, 3
+    Page 2 -> photos 4, 5, 6
+    Page 3 -> photos 7, 8, 9
+
+LIGHTBOX:
+
+    The lightbox has access to ALL photos.
+
+    Page 1:
+        click photo 3
+        ↓
+        lightbox photo 3
+        ↓
+        next
+        ↓
+        photo 4
+
+    It does NOT stop at the end of the current
+    diary page.
+
+ADMIN PANEL
+-----------
+
+No Admin Panel files are changed by this page.
+=====================================================
+*/
+
+const SCENE_WIDTH = 1920;
+const SCENE_HEIGHT = 1080;
+
+const SUPPORTING_PHOTOS_PER_PAGE = 3;
+
+/*
+=====================================================
+MASTER SCENE ELEMENT POSITIONS
+=====================================================
+*/
+
+const LAYOUT = {
+  /*
+  -----------------------------------------------
+  BACK BUTTON
+  -----------------------------------------------
+  */
+
+  backButton: {
+    left: "2.9%",
+    top: "4.2%",
+    width: "3.4%",
+    height: "5.9%",
+  },
+
+  /*
+  -----------------------------------------------
+  MEMORY TITLE
+  -----------------------------------------------
+  */
+
+  title: {
+    left: "29.2%",
+    top: "5.1%",
+    width: "41.6%",
+    height: "11.1%",
+  },
+
+  /*
+  -----------------------------------------------
+  COVER PHOTO
+  -----------------------------------------------
+  */
+
+  cover: {
+    left: "22.5%",
+    top: "30.4%",
+    width: "24.1%",
+    height: "52.3%",
+  },
+
+  /*
+  -----------------------------------------------
+  OUR STORY
+  -----------------------------------------------
+  */
+
+  story: {
+    left: "53.9%",
+    top: "28.2%",
+    width: "28.1%",
+    height: "16.2%",
+  },
+
+  /*
+  -----------------------------------------------
+  AGE
+  -----------------------------------------------
+  */
+
+  age: {
+    left: "53.9%",
+    top: "43.5%",
+    width: "28.1%",
+    height: "10.2%",
+  },
+
+  /*
+  -----------------------------------------------
+  SUPPORTING PHOTOS
+  -----------------------------------------------
+  */
+
+  supportingPhotos: {
+    left: "52.1%",
+    top: "59.3%",
+    width: "31.3%",
+    height: "22.2%",
+  },
+
+  /*
+  -----------------------------------------------
+  PHOTO PAGINATION
+  -----------------------------------------------
+  */
+
+  photoPagination: {
+    left: "52.1%",
+    top: "81.9%",
+    width: "31.3%",
+    height: "4.6%",
+  },
+
+  /*
+  -----------------------------------------------
+  MEMORY NAVIGATION
+  -----------------------------------------------
+  */
+
+  memoryNavigation: {
+    left: "31.8%",
+    top: "88.9%",
+    width: "36.5%",
+    height: "6.5%",
+  },
+
+  /*
+  -----------------------------------------------
+  ROCKING HORSE
+  Decorative floor illustration from Timeline
+  -----------------------------------------------
+  */
+
+  rockingHorse: {
+    left: "3.8%",
+    top: "72.5%",
+    width: "17.5%",
+  },
+
+  /*
+  -----------------------------------------------
+  TEDDY WITH PILLOW
+  Decorative floor illustration from Timeline
+  -----------------------------------------------
+  */
+
+  teddy: {
+    right: "3.8%",
+    top: "70.5%",
+    width: "18%",
+  },
+};
+
+/*
+=====================================================
+HELPERS
+=====================================================
+*/
+
+function parseArray(value) {
+  if (Array.isArray(value)) {
+    return value.filter(Boolean);
+  }
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+
+      if (Array.isArray(parsed)) {
+        return parsed.filter(Boolean);
+      }
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+}
+
+function normalize(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+}
+
+function getMemoryChapter(memory) {
+  return normalize(
+    memory?.category || memory?.age
+  );
+}
+
+/*
+=====================================================
+COMPONENT
+=====================================================
+*/
+
 export default function MemoryDetails() {
   const navigate = useNavigate();
   const { slug } = useParams();
+
+  /*
+  =====================================================
+  DATA
+  =====================================================
+  */
 
   const [loading, setLoading] =
     useState(true);
@@ -61,18 +270,101 @@ export default function MemoryDetails() {
   const [allMemories, setAllMemories] =
     useState([]);
 
-  // NEW
+  /*
+  =====================================================
+  DIARY PHOTO PAGINATION
+
+  Controls which 3 photos are physically visible
+  on the diary page.
+  =====================================================
+  */
+
+  const [photoPage, setPhotoPage] =
+    useState(1);
+
+  /*
+  =====================================================
+  LIGHTBOX
+
+  IMPORTANT:
+
+  This stores the index from the COMPLETE
+  supportingPhotos array.
+
+  It does NOT store the index from visiblePhotos.
+  =====================================================
+  */
+
   const [lightboxIndex, setLightboxIndex] =
     useState(null);
 
   /*
-  ======================================
-  LOAD MEMORY
-  ======================================
+  =====================================================
+  MASTER SCENE SCALE
+  =====================================================
+  */
+
+  const [sceneScale, setSceneScale] =
+    useState(1);
+
+  /*
+  =====================================================
+  SCALE MASTER SCENE
+  =====================================================
   */
 
   useEffect(() => {
-    async function load() {
+    function updateSceneScale() {
+      const viewportWidth =
+        window.innerWidth;
+
+      const viewportHeight =
+        window.innerHeight;
+
+      const scaleX =
+        viewportWidth /
+        SCENE_WIDTH;
+
+      const scaleY =
+        viewportHeight /
+        SCENE_HEIGHT;
+
+      const scale =
+        Math.min(
+          scaleX,
+          scaleY
+        );
+
+      setSceneScale(scale);
+    }
+
+    updateSceneScale();
+
+    window.addEventListener(
+      "resize",
+      updateSceneScale
+    );
+
+    return () => {
+      window.removeEventListener(
+        "resize",
+        updateSceneScale
+      );
+    };
+  }, []);
+
+  /*
+  =====================================================
+  LOAD MEMORY
+  =====================================================
+  */
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadMemory() {
+      setLoading(true);
+
       try {
         const [current, all] =
           await Promise.all([
@@ -80,722 +372,412 @@ export default function MemoryDetails() {
             getTimelineMemories(),
           ]);
 
-        setMemory(current);
-        setAllMemories(all || []);
+        if (cancelled) {
+          return;
+        }
 
-      } catch (err) {
-        console.error(err);
+        setMemory(
+          current || null
+        );
 
+        setAllMemories(
+          all || []
+        );
+
+        setPhotoPage(1);
+
+        setLightboxIndex(null);
+      } catch (error) {
+        console.error(
+          "Failed to load memory:",
+          error
+        );
+
+        if (!cancelled) {
+          setMemory(null);
+          setAllMemories([]);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
-    load();
+    loadMemory();
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug]);
 
   /*
-  ======================================
-  GALLERY
-  ======================================
+  =====================================================
+  COVER IMAGE
+  =====================================================
   */
 
-  const gallery = useMemo(() => {
-    if (!memory) return [];
+  const coverImage =
+    memory?.cover_image ||
+    memory?.cover ||
+    memory?.image ||
+    "/placeholder-memory.jpg";
 
-    let images = [];
+  /*
+  =====================================================
+  ALL SUPPORTING PHOTOS
+  =====================================================
 
-    if (
-      Array.isArray(memory.gallery_images)
-    ) {
-      images = [...memory.gallery_images];
+  THIS IS THE COMPLETE PHOTO COLLECTION.
 
-    } else if (
-      typeof memory.gallery_images ===
-      "string"
-    ) {
-      try {
-        images = JSON.parse(
+  Pagination only controls what is displayed.
+
+  The lightbox uses this COMPLETE array.
+  =====================================================
+  */
+
+  const supportingPhotos =
+    useMemo(() => {
+      if (!memory) {
+        return [];
+      }
+
+      const gallery =
+        parseArray(
           memory.gallery_images
         );
-      } catch {
-        images = [];
-      }
-    }
 
-    if (
-      memory.cover_image &&
-      !images.includes(memory.cover_image)
-    ) {
-      images.unshift(memory.cover_image);
-    }
-
-    return images;
-
-  }, [memory]);
+      return gallery.filter(
+        (image) =>
+          image !== coverImage
+      );
+    }, [
+      memory,
+      coverImage,
+    ]);
 
   /*
-  ======================================
-  HIGHLIGHTS
-  ======================================
+  =====================================================
+  PHOTO PAGINATION
+  =====================================================
   */
 
-  const highlights = useMemo(() => {
-    if (!memory?.highlights)
-      return [];
-
-    if (
-      Array.isArray(memory.highlights)
-    ) {
-      return memory.highlights;
-    }
-
-    try {
-      return JSON.parse(
-        memory.highlights
-      );
-    } catch {
-      return [];
-    }
-
-  }, [memory]);
+  const totalPhotoPages =
+    Math.max(
+      1,
+      Math.ceil(
+        supportingPhotos.length /
+          SUPPORTING_PHOTOS_PER_PAGE
+      )
+    );
 
   /*
-  ======================================
-  KEYBOARD CONTROLS
-  ======================================
+  =====================================================
+  ONLY THESE PHOTOS APPEAR ON THE CURRENT DIARY PAGE
+  =====================================================
+  */
+
+  const visiblePhotos =
+    supportingPhotos.slice(
+      (photoPage - 1) *
+        SUPPORTING_PHOTOS_PER_PAGE,
+
+      photoPage *
+        SUPPORTING_PHOTOS_PER_PAGE
+    );
+
+  /*
+  =====================================================
+  KEEP PHOTO PAGE VALID
+  =====================================================
   */
 
   useEffect(() => {
-    function handleKey(e) {
+    setPhotoPage((page) =>
+      Math.min(
+        Math.max(
+          page,
+          1
+        ),
+        totalPhotoPages
+      )
+    );
+  }, [
+    totalPhotoPages,
+  ]);
 
-      if (lightboxIndex === null)
+  /*
+  =====================================================
+  SAME CHAPTER MEMORIES
+  =====================================================
+  */
+
+  const chapterMemories =
+    useMemo(() => {
+      if (!memory) {
+        return [];
+      }
+
+      const chapter =
+        getMemoryChapter(
+          memory
+        );
+
+      if (!chapter) {
+        return allMemories;
+      }
+
+      return allMemories.filter(
+        (item) =>
+          getMemoryChapter(
+            item
+          ) === chapter
+      );
+    }, [
+      allMemories,
+      memory,
+    ]);
+
+  /*
+  =====================================================
+  CURRENT MEMORY
+  =====================================================
+  */
+
+  const currentMemoryIndex =
+    chapterMemories.findIndex(
+      (item) =>
+        item.slug === slug
+    );
+
+  /*
+  =====================================================
+  PREVIOUS MEMORY
+  =====================================================
+  */
+
+  const previousMemory =
+    currentMemoryIndex > 0
+      ? chapterMemories[
+          currentMemoryIndex - 1
+        ]
+      : null;
+
+  /*
+  =====================================================
+  NEXT MEMORY
+  =====================================================
+  */
+
+  const nextMemory =
+    currentMemoryIndex >= 0 &&
+    currentMemoryIndex <
+      chapterMemories.length - 1
+      ? chapterMemories[
+          currentMemoryIndex + 1
+        ]
+      : null;
+
+  /*
+  =====================================================
+  STORY
+  =====================================================
+  */
+
+  const story =
+    memory?.story ||
+    memory?.description ||
+    "";
+
+  /*
+  =====================================================
+  OPEN PHOTO
+
+  VERY IMPORTANT:
+
+  visibleIndex = position of the photo on the
+  CURRENT diary page.
+
+  We convert that into the GLOBAL index inside
+  supportingPhotos.
+
+  Example:
+
+      Page 1 -> visibleIndex 2
+      globalIndex = 0 * 3 + 2 = 2
+
+      Page 2 -> visibleIndex 0
+      globalIndex = 1 * 3 + 0 = 3
+  =====================================================
+  */
+
+  function openPhoto(
+    visibleIndex
+  ) {
+    const globalIndex =
+      (photoPage - 1) *
+        SUPPORTING_PHOTOS_PER_PAGE +
+      visibleIndex;
+
+    if (
+      globalIndex >= 0 &&
+      globalIndex <
+        supportingPhotos.length
+    ) {
+      setLightboxIndex(
+        globalIndex
+      );
+    }
+  }
+
+  /*
+  =====================================================
+  CLOSE LIGHTBOX
+  =====================================================
+  */
+
+  function closePhoto() {
+    setLightboxIndex(null);
+  }
+
+  /*
+  =====================================================
+  PREVIOUS PHOTO
+
+  IMPORTANT:
+
+  Uses supportingPhotos, NOT visiblePhotos.
+
+  Therefore it can cross page boundaries.
+  =====================================================
+  */
+
+  function previousPhoto() {
+    setLightboxIndex(
+      (index) => {
+        if (
+          index === null
+        ) {
+          return null;
+        }
+
+        return Math.max(
+          0,
+          index - 1
+        );
+      }
+    );
+  }
+
+  /*
+  =====================================================
+  NEXT PHOTO
+
+  IMPORTANT:
+
+  Uses the COMPLETE supportingPhotos array.
+
+  Therefore:
+
+      photo 3 → photo 4
+      photo 6 → photo 7
+      etc.
+  =====================================================
+  */
+
+  function nextPhoto() {
+    setLightboxIndex(
+      (index) => {
+        if (
+          index === null
+        ) {
+          return null;
+        }
+
+        return Math.min(
+          supportingPhotos.length - 1,
+          index + 1
+        );
+      }
+    );
+  }
+
+  /*
+  =====================================================
+  KEYBOARD CONTROLS
+  =====================================================
+  */
+
+  useEffect(() => {
+    function handleKeyDown(
+      event
+    ) {
+      if (
+        lightboxIndex === null
+      ) {
         return;
-
-      if (e.key === "Escape") {
-        setLightboxIndex(null);
       }
 
       if (
-        e.key === "ArrowRight" &&
-        lightboxIndex <
-          gallery.length - 1
+        event.key ===
+        "Escape"
       ) {
-        setLightboxIndex(
-          lightboxIndex + 1
-        );
+        closePhoto();
       }
 
       if (
-        e.key === "ArrowLeft" &&
-        lightboxIndex > 0
+        event.key ===
+        "ArrowLeft"
       ) {
-        setLightboxIndex(
-          lightboxIndex - 1
-        );
+        previousPhoto();
+      }
+
+      if (
+        event.key ===
+        "ArrowRight"
+      ) {
+        nextPhoto();
       }
     }
 
     window.addEventListener(
       "keydown",
-      handleKey
+      handleKeyDown
     );
 
-    return () =>
+    return () => {
       window.removeEventListener(
         "keydown",
-        handleKey
+        handleKeyDown
       );
-
-  }, [lightboxIndex, gallery]);
+    };
+  }, [
+    lightboxIndex,
+    supportingPhotos.length,
+  ]);
 
   /*
-  ======================================
-  PREVIOUS / NEXT
-  ======================================
+  =====================================================
+  LOADING
+  =====================================================
   */
- const currentIndex = allMemories.findIndex(
-  (m) => m.slug === slug
-);
 
-const previousMemory =
-  currentIndex > 0
-    ? allMemories[currentIndex - 1]
-    : null;
-
-const nextMemory =
-  currentIndex <
-  allMemories.length - 1
-    ? allMemories[currentIndex + 1]
-    : null;
-
-const formattedDate = memory?.date
-  ? new Date(memory.date).toLocaleDateString(
-      "en-IN",
-      {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }
-    )
-  : "";
-  // ==============================
-// SCRAPBOOK HELPERS
-// ==============================
-
-const blobs = [blob1, blob2, blob3];
-
-const tapes = [
-  washiCream,
-  washiFloral,
-];
-
-const clips = [
-  goldClip,
-  silverClip,
-];
-
-const rotations = [
-  "-rotate-2",
-  "rotate-1",
-  "-rotate-1",
-  "rotate-2",
-  "-rotate-3",
-  "rotate-3",
-];
-
-if (loading) {
-  return (
-    <div className="min-h-screen flex items-center justify-center text-xl">
-      Loading memory...
-    </div>
-  );
-}
-
-if (!memory) {
-  return (
-    <div className="min-h-screen flex items-center justify-center text-xl">
-      Memory not found.
-    </div>
-  );
-}
-
-return (
-
-
-<main
-  className="
-    relative
-    min-h-0
-    overflow-x-hidden
-    bg-[#FAF7F2]
-  "
->
-
-  {/* ======================================
-      SCRAPBOOK BACKGROUND
-  ====================================== */}
-
-  <img
-    src={blob1}
-    alt=""
-    className="
-      pointer-events-none
-      absolute
-      top-0
-      left-0
-      w-[340px]
-      opacity-70
-      select-none
-      -z-10
-    "
-  />
-
-  <img
-    src={blob2}
-    alt=""
-    className="
-      pointer-events-none
-      absolute
-      top-[550px]
-      right-0
-      w-[360px]
-      opacity-70
-      select-none
-      -z-10
-    "
-  />
-
-  <img
-    src={blob3}
-    alt=""
-    className="
-      pointer-events-none
-      absolute
-      bottom-0
-      left-0
-      w-[450px]
-      opacity-60
-      select-none
-      -z-10
-    "
-  />
-
-  <img
-    src={paintSplash}
-    alt=""
-    className="
-      pointer-events-none
-      absolute
-      top-24
-      right-10
-      w-600
-      opacity-25
-      select-none
-    "
-  />
-
-  <img
-    src={paintSplash}
-    alt=""
-    className="
-      pointer-events-none
-      absolute
-      bottom-44
-      left-12
-      w-56
-      opacity-20
-      rotate-180
-      select-none
-    "
-  />
-
-  <img
-    src={sparkles}
-    alt=""
-    className="
-      pointer-events-none
-      absolute
-      top-40
-      left-20
-      w-100
-      opacity-70
-      animate-pulse
-      select-none
-    "
-  />
-
-  <img
-    src={sparkles}
-    alt=""
-    className="
-      pointer-events-none
-      absolute
-      right-24
-      top-[900px]
-      w-100
-      opacity-60
-      animate-pulse
-      select-none
-    "
-  />  
-
-  {/* ============================
-      BACK BUTTON
-  ============================ */}
-
-  <button
-    onClick={() => navigate(-1)}
-    className="
-      fixed
-      top-6
-      left-6
-      z-50
-      w-12
-      h-12
-      rounded-full
-      bg-white
-      shadow-xl
-      flex
-      items-center
-      justify-center
-      hover:scale-105
-      transition
-    "
-  >
-    ←
-  </button>
-
-
-
-   {/* ======================================
-    SCRAPBOOK HERO PHOTO
-====================================== */}
-
-<div className="relative max-w-4xl mx-auto px-6">
-
-  <div className="relative">
-
-    {/* Watercolor Blob */}
-
-    <img
-      src={blob2}
-      alt=""
-      className="
-        absolute
-        -left-16
-        -top-14
-        w-72
-        opacity-40
-        pointer-events-none
-      "
-    />
-    <img
-  src={hotAirBalloon}
-  alt=""
-  className="
-    absolute
-    right-[80px]
-    top-[420px]
-    w-[120px]
-    rotate-[-5deg]
-    pointer-events-none
-    z-20
-    float-soft
-  "
-/>
-
-    {/* Butterfly */}
-
-    <img
-  src={butterfly}
-  alt=""
-  className="
-    absolute
-    left-[120px]
-    top-[420px]
-    w-[190px]
-    rotate-[-15deg]
-    pointer-events-none
-    z-30
-    float-soft
-  "
-/>
-
-    {/* Floating Leaves */}
-
-    
-
-    {/* Photo */}
-
-    <div
-      className="
-        relative
-        rounded-[40px]
-        overflow-hidden
-        bg-white
-        p-3
-        shadow-[0_18px_50px_rgba(0,0,0,0.12)]
-      "
-    >
-
-      {/* Photo Corners */}
-
-      <img
-        src={photoCorner}
-        alt=""
+  if (loading) {
+    return (
+      <main
         className="
-          absolute
-          top-3
-          left-3
-          w-10
-          z-20
-        "
-      />
-
-      <img
-        src={photoCorner}
-        alt=""
-        className="
-          absolute
-          top-3
-          right-3
-          w-10
-          rotate-90
-          z-20
-        "
-      />
-
-      <img
-        src={photoCorner}
-        alt=""
-        className="
-          absolute
-          bottom-3
-          left-3
-          w-10
-          -rotate-90
-          z-20
-        "
-      />
-
-      <img
-        src={photoCorner}
-        alt=""
-        className="
-          absolute
-          bottom-3
-          right-3
-          w-10
-          rotate-180
-          z-20
-        "
-      />
-
-      <img
-        src={memory.cover_image}
-        alt={memory.title}
-        className="
-          w-full
-          h-[420px]
-          object-cover
-          rounded-[28px]
-          object-[center_30%]
-        "
-      />
-
-    </div>
-
-  </div>
-
-</div>
-      {/* ======================================
-      SCRAPBOOK HEADER
-  ====================================== */}
-
-  <section className="max-w-4xl mx-auto px-6 -mt-24">
-
-    <img
-      src={cloud}
-      alt=""
-      className="
-        absolute
-        left-10
-        top-60
-        w-600
-        opacity-80
-        pointer-events-none
-        float-soft
-      "
-    />
-
-    
-    <img
-      src={butterfly}
-      alt=""
-      className="
-        absolute
-        right-[18%]
-        top-28
-        w-50
-        rotate-12
-        pointer-events-none
-        float-soft
-      "
-    />
-
-    <div className="max-w-5xl mx-auto px-6 text-center">
-
-      <img
-        src={headerDecoration}
-        alt=""
-        className="
-          w-[140px]
-          mx-auto
-          mb-2
-        "
-      />
-
-      <span
-        className="
-          inline-flex
-          items-center
-          rounded-full
-          bg-[#F4E7D2]
-          px-6
-          py-2
-          text-[#9A7146]
-          font-semibold
-          tracking-wide
-          shadow-sm
-        "
-      >
-        {memory.category}
-      </span>
-
-      <h1
-        className="
-          mt-0
-          mb-0
-          text-2xl
-          md:text-3xl
-          font-bold
-          text-[#5B4333]
-          leading-none
-        "
-        style={{
-          fontFamily:
-            "Cormorant Garamond, serif",
-        }}
-      >
-        {memory.title}
-      </h1>
-
-      <img
-        src={leafDivider}
-        alt=""
-        className="
-          w-32
-          mx-auto
-          mt-0
-          mb-0
-        "
-      />
-
-      <p
-        className="
-          text-[#8B7867]
-          text-xs
-          tracking-wide
-        "
-      >
-        {formattedDate}
-      </p>
-
-      {memory.age && (
-
-        <div className="mt-1">
-
-          <span
-            className="
-              inline-flex
-              items-center
-              gap-2
-              rounded-full
-              bg-[#EEF6E9]
-              px-6
-              py-3
-              text-[#6B8C59]
-              font-semibold
-              shadow-md
-            "
-          >
-            🍼 {memory.age}
-          </span>
-
-        </div>
-
-      )}
-
-    </div>
-
-  </section>
-
-    
-
-{/* ======================================
-    SCRAPBOOK STORY
-====================================== */}
-
-<div className="relative mt-2">
-
-  {/* Watercolor Background */}
-
-  <img
-    src={blob3}
-    alt=""
-    className="
-      absolute
-      -left-20
-      top-10
-      w-[500px]
-      opacity-40
-      pointer-events-none
-    "
-  />
-
-  {/* Story Paper */}
-
-  <div className="relative max-w-5xl mx-auto">
-
-    {/* Washi Tape */}
-
-    <img
-      src={washiCream}
-      alt=""
-      className="
-        absolute
-        top-2
-        left-14
-        w-36
-        -rotate-12
-        z-30
-      "
-    />
-
-    {/* Paper Clip */}
-
-    <img
-      src={goldClip}
-      alt=""
-      className="
-        absolute
-        top-4
-        right-14
-        w-14
-        rotate-12
-        z-30
-      "
-    />
-
-    {/* Decorative Leaf */}
-
-    
-
-    {/* Paper */}
-
-    <div className="relative">
-
-      <img
-        src={storyPaper}
-        alt=""
-        className="
-          w-[1020px]
-          h-[200px]
-          select-none
-          pointer-events-none
-        "
-      />
-
-      {/* Content */}
-
-      <div
-        className="
-          absolute
+          fixed
           inset-0
-          px-10
-          py-4
-          md:px-16
-          md:py-6
           flex
-          flex-col
+          items-center
+          justify-center
+          bg-[#D8B27C]
+          text-[#5A3D25]
         "
       >
-
-        <h2
+        <div
           className="
             text-3xl
-            text-[#5A4332]
             font-bold
           "
           style={{
@@ -803,783 +785,1207 @@ return (
               "Cormorant Garamond, serif",
           }}
         >
-          Our Story
-        </h2>
-
-        <img
-          src={leafDivider}
-          alt=""
-          className="
-            w-40
-            mt-2
-            mb-3
-          "
-        />
-
-        <div
-          className="
-            text-[#695A4E]
-            text-sm
-            leading-6
-            whitespace-pre-wrap
-            overflow-y-auto
-            pr-2
-            flex-1
-          "
-        >
-          {memory.story || memory.description}
+          Opening your memory...
         </div>
+      </main>
+    );
+  }
 
-      </div>
+  /*
+  =====================================================
+  MEMORY NOT FOUND
+  =====================================================
+  */
 
-    </div>
-
-  </div>
-
-</div>
-    {/* ======================================
-    SCRAPBOOK HIGHLIGHTS
-====================================== */}
-
-{highlights.length > 0 && (
-
-<div className="relative mt-4">
-
-    {/* Background Decoration */}
-
-    <img
-        src={blob1}
-        alt=""
+  if (!memory) {
+    return (
+      <main
         className="
-            absolute
-            -right-24
-            top-0
-            w-600
-            opacity-30
-            pointer-events-none
+          fixed
+          inset-0
+          flex
+          items-center
+          justify-center
+          bg-[#D8B27C]
+          text-[#5A3D25]
         "
-    />
-
-    <div className="text-center mb-12">
-
-        <h2
+      >
+        <div className="text-center">
+          <h1
             className="
-                text-5xl
-                font-bold
-                text-[#5A4332]
+              text-5xl
+              font-bold
             "
             style={{
-                fontFamily:
-                    "Cormorant Garamond, serif",
+              fontFamily:
+                "Cormorant Garamond, serif",
             }}
-        >
-            Little Highlights
-        </h2>
+          >
+            Memory not found
+          </h1>
 
-        <img
-            src={leafDivider}
-            alt=""
+          <button
+            type="button"
+            onClick={() =>
+              navigate(
+                "/timeline"
+              )
+            }
             className="
-                w-40
-                mx-auto
-                mt-4
+              mt-6
+              px-6
+              py-3
+              rounded-full
+              bg-[#8F653A]
+              text-white
+              font-semibold
             "
-        />
-
-    </div>
-
-    <div className="grid md:grid-cols-2 gap-10">
-
-        {highlights.map((highlight, index) => (
-
-            <div
-                key={index}
-                className={`
-                    relative
-                    rounded-[30px]
-                    p-8
-                    shadow-xl
-                    transition-all
-                    duration-300
-                    hover:-translate-y-2
-                    hover:shadow-2xl
-                    ${
-                        index % 2 === 0
-                            ? "bg-[#FFF8EF]"
-                            : "bg-[#F8F4EC]"
-                    }
-                `}
-            >
-
-                {/* Tape */}
-
-                <img
-                    src={tapes[index % tapes.length]}
-                    alt=""
-                    className="
-                        absolute
-                        -top-4
-                        left-8
-                        w-28
-                        rotate-[-8deg]
-                        pointer-events-none
-                    "
-                />
-
-                {/* Clip */}
-
-                <img
-                    src={clips[index % clips.length]}
-                    alt=""
-                    className="
-                        absolute
-                        top-5
-                        right-6
-                        w-10
-                        rotate-12
-                        pointer-events-none
-                    "
-                />
-
-                {/* Sparkles */}
-
-                <img
-                    src={sparkles}
-                    alt=""
-                    className="
-                        absolute
-                        bottom-4
-                        right-5
-                        w-100
-                        opacity-60
-                        pointer-events-none
-                    "
-                />
-
-                {/* Leaf */}
-
-                
-
-                <div className="flex items-start gap-4">
-
-                    <div
-                        className="
-                            w-12
-                            h-12
-                            rounded-full
-                            bg-[#F7E3B5]
-                            flex
-                            items-center
-                            justify-center
-                            text-xl
-                            shrink-0
-                        "
-                    >
-                        ✨
-                    </div>
-
-                    <p
-                        className="
-                            text-[#6A5A4C]
-                            leading-8
-                            text-lg
-                        "
-                    >
-                        {highlight}
-                    </p>
-
-                </div>
-
-            </div>
-
-        ))}
-
-    </div>
-
-</div>
-
-)}
-
-    {/* ======================================
-    SCRAPBOOK PHOTO GALLERY
-====================================== */}
-
-{gallery.length > 0 && (
-
-<div className="relative mt-6">
-
-
-    {/* Background decoration */}
-
-    <img
-        src={blob2}
-        alt=""
-        className="
-            absolute
-            -left-32
-            top-20
-            w-96
-            opacity-30
-            pointer-events-none
-        "
-    />
-
-    
-
-
-    <div className="text-center mb-0">
-
-
-        <h2
-            className="
-                text-2xl
-                font-bold
-                text-[#5A4332]
-            "
-            style={{
-                fontFamily:
-                    "Cormorant Garamond, serif",
-            }}
-        >
-            Precious Memories
-        </h2>
-
-
-        <img
-            src={leafDivider}
-            alt=""
-            className="
-                w-32
-                mx-auto
-                mt-1
-            "
-        />
-
-
-    </div>
-
-
-
-    {/* Clothes Line */}
-
-    <div
-        className="
-            relative
-            max-w-6xl
-            mx-auto
-            px-6
-            mt-2
-        "
-    >
-
-        <div
-            className="
-                absolute
-                top-12
-                left-6
-                right-6
-                h-[5px]
-                bg-[#D8C2A5]
-                rounded-full
-                z-0
-            "
-        />
-
-
-        <div
-            className="
-                grid
-                grid-cols-1
-                md:grid-cols-2
-                lg:grid-cols-3
-                gap-x-10
-                gap-y-4
-                relative
-                z-10
-            "
-        >
-
-
-        {gallery.map((image,index)=>(
-
-
-            <div
-                key={index}
-                className={`
-                    relative
-                    ${rotations[index % rotations.length]}
-                    transition-all
-                    duration-500
-                    hover:scale-105
-                    hover:-translate-y-3
-                    hover:z-20
-                `}
-            >
-
-
-                {/* Wooden Clip */}
-
-                <img
-                    src={
-                        clips[
-                            index % clips.length
-                        ]
-                    }
-                    alt=""
-                    className="
-                        absolute
-                        -top-3
-                        left-1/2
-                        -translate-x-1/2
-                        w-10
-                        z-30
-                        rotate-6
-                    "
-                />
-
-
-
-                {/* Washi Tape */}
-
-                {index % 2 === 0 && (
-
-                    <img
-                        src={
-                            tapes[
-                                index %
-                                tapes.length
-                            ]
-                        }
-                        alt=""
-                        className="
-                            absolute
-                            -top-5
-                            left-8
-                            w-20
-                            rotate-[-12deg]
-                            z-20
-                        "
-                    />
-
-                )}
-
-
-
-                {/* Photo Card */}
-
-
-                <div
-                    className="
-                        relative
-                        bg-white
-                        p-5
-                        rounded-xl
-                        shadow-xl
-                    "
-                >
-
-
-                    {/* Photo Corners */}
-
-                    <img
-                        src={photoCorner}
-                        alt=""
-                        className="
-                            absolute
-                            top-3
-                            left-3
-                            w-8
-                            z-10
-                        "
-                    />
-
-
-                    <img
-                        src={photoCorner}
-                        alt=""
-                        className="
-                            absolute
-                            bottom-3
-                            right-3
-                            w-8
-                            rotate-180
-                            z-10
-                        "
-                    />
-
-
-                    <img
-                        src={polaroidShadow}
-                        alt=""
-                        className="
-                            absolute
-                            inset-0
-                            w-full
-                            h-full
-                            opacity-30
-                            pointer-events-none
-                        "
-                    />
-
-
-                    <img
-                        src={image}
-                        loading="lazy"
-                        alt={`Memory ${index+1}`}
-                        onClick={() =>
-                            setLightboxIndex(index)
-                        }
-                        className="
-                            relative
-                            w-full
-                            aspect-square
-                            object-cover
-                            rounded-lg
-                            cursor-pointer
-                        "
-                    />
-
-
-                </div>
-
-
-
-            </div>
-
-
-        ))}
-
-
+          >
+            ← Back to Journey
+          </button>
         </div>
+      </main>
+    );
+  }
 
+  /*
+  =====================================================
+  MAIN PAGE
+  =====================================================
+  */
 
-    </div>
-
-
-</div>
-
-
-)}
-        {/* ======================================
-    SCRAPBOOK LIGHTBOX
-====================================== */}
-
-{lightboxIndex !== null && (
-
-<div
-    className="
+  return (
+    <main
+      className="
         fixed
         inset-0
-        z-[9999]
-        bg-[#3B3028]/90
-        backdrop-blur-md
-        flex
-        items-center
-        justify-center
-        p-6
-    "
-    onClick={() =>
-        setLightboxIndex(null)
-    }
->
-
-
-    {/* Close */}
-
-    <button
-        onClick={() =>
-            setLightboxIndex(null)
-        }
-        className="
-            absolute
-            top-8
-            right-10
-            text-white
-            text-5xl
-            hover:scale-110
-            transition
-        "
+        overflow-hidden
+        bg-[#D8B27C]
+      "
     >
-        ×
-    </button>
+      {/* =================================================
+          MASTER 1920 × 1080 SCENE
+          ================================================= */}
 
+      <div
+        style={{
+          position: "absolute",
 
+          width:
+            `${SCENE_WIDTH}px`,
 
-    {/* Previous */}
+          height:
+            `${SCENE_HEIGHT}px`,
 
-    {lightboxIndex > 0 && (
+          left: "50%",
+
+          top: "50%",
+
+          transform: `
+            translate(-50%, -50%)
+            scale(${sceneScale})
+          `,
+
+          transformOrigin:
+            "center center",
+
+          overflow:
+            "visible",
+        }}
+      >
+        {/* =================================================
+            DIARY BACKGROUND
+            ================================================= */}
+
+        <img
+          src={diaryBackground}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          style={{
+            position:
+              "absolute",
+
+            left: 0,
+            top: 0,
+
+            width:
+              `${SCENE_WIDTH}px`,
+
+            height:
+              `${SCENE_HEIGHT}px`,
+
+            objectFit:
+              "fill",
+
+            display:
+              "block",
+
+            userSelect:
+              "none",
+
+            pointerEvents:
+              "none",
+
+            zIndex: 0,
+          }}
+        />
+
+        {/* =================================================
+            BACK TO JOURNEY
+            ================================================= */}
 
         <button
-            onClick={(e)=>{
+          type="button"
+          onClick={() =>
+            navigate(
+              "/timeline"
+            )
+          }
+          aria-label="Back to Journey"
+          style={{
+            position:
+              "absolute",
 
-                e.stopPropagation();
+            left:
+              LAYOUT.backButton.left,
 
-                setLightboxIndex(
-                    lightboxIndex - 1
-                );
+            top:
+              LAYOUT.backButton.top,
 
-            }}
-            className="
-                absolute
-                left-8
-                text-white
-                text-7xl
-                hover:scale-110
-                transition
-            "
+            width:
+              LAYOUT.backButton.width,
+
+            height:
+              LAYOUT.backButton.height,
+
+            zIndex: 30,
+          }}
+          className="
+            rounded-full
+            bg-[#FFF7E8]/95
+            border
+            border-[#C9A16A]
+            shadow-lg
+            flex
+            items-center
+            justify-center
+            text-[#6C472A]
+            text-3xl
+            transition-transform
+            duration-200
+            hover:scale-105
+          "
         >
-            ‹
+          ←
         </button>
 
-    )}
+        {/* =================================================
+            MEMORY TITLE
+            ================================================= */}
 
+        <div
+          style={{
+            position:
+              "absolute",
 
+            left:
+              LAYOUT.title.left,
 
+            top:
+              LAYOUT.title.top,
 
-    {/* Image */}
+            width:
+              LAYOUT.title.width,
 
-    <div
-        className="
-            relative
-            bg-white
-            p-2
-            rounded-[30px]
-            shadow-2xl
-        "
-        onClick={(e)=>
-            e.stopPropagation()
-        }
-    >
+            height:
+              LAYOUT.title.height,
 
-        <img
-            src={
-                gallery[
-                    lightboxIndex
-                ]
+            zIndex: 10,
+
+            display:
+              "flex",
+
+            alignItems:
+              "center",
+
+            justifyContent:
+              "center",
+
+            textAlign:
+              "center",
+
+            padding:
+              "0 2%",
+          }}
+        >
+          <h1
+            className="
+              text-[42px]
+              leading-none
+              font-bold
+              text-[#5A3820]
+            "
+            style={{
+              fontFamily:
+                "Cormorant Garamond, serif",
+
+              textShadow:
+                "0 1px 1px rgba(255,255,255,0.35)",
+            }}
+          >
+            {memory.title}
+          </h1>
+        </div>
+
+        {/* =================================================
+            FLOOR DECORATIONS — ROCKING HORSE + TEDDY
+
+            These are decorative only and sit behind the
+            interactive diary content. They scale with the
+            same 1920 × 1080 master scene.
+            ================================================= */}
+
+        <style>
+          {`
+            @keyframes childPageRockingHorse {
+              0% {
+                transform: rotate(-4deg);
+              }
+
+              25% {
+                transform: rotate(0deg);
+              }
+
+              50% {
+                transform: rotate(4deg);
+              }
+
+              75% {
+                transform: rotate(0deg);
+              }
+
+              100% {
+                transform: rotate(-4deg);
+              }
             }
-            alt=""
-            className="
-                max-w-[85vw]
-                max-h-[80vh]
-                object-contain
-                rounded-2xl
-            "
-        />
+          `}
+        </style>
 
-
+        {/* ROCKING HORSE */}
         <img
-            src={sparkles}
-            alt=""
-            className="
-                absolute
-                -top-10
-                right-0
-                w-600
-            "
+          src={vintageRockingHorse}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          className="
+            absolute
+            pointer-events-none
+            select-none
+          "
+          style={{
+            left: LAYOUT.rockingHorse.left,
+            top: LAYOUT.rockingHorse.top,
+            width: LAYOUT.rockingHorse.width,
+            height: "auto",
+            transformOrigin: "50% 88%",
+            animation: "childPageRockingHorse 2.8s ease-in-out infinite",
+            zIndex: 2,
+          }}
         />
 
-    </div>
+        {/* TEDDY + PILLOW */}
+        <img
+          src={vintageTeddyPillow}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          className="
+            absolute
+            pointer-events-none
+            select-none
+          "
+          style={{
+            right: LAYOUT.teddy.right,
+            top: LAYOUT.teddy.top,
+            width: LAYOUT.teddy.width,
+            height: "auto",
+            zIndex: 2,
+          }}
+        />
 
+        {/* =================================================
+            COVER PHOTO
+            ================================================= */}
 
+        <div
+          style={{
+            position:
+              "absolute",
 
+            left:
+              LAYOUT.cover.left,
 
+            top:
+              LAYOUT.cover.top,
 
-    {/* Next */}
+            width:
+              LAYOUT.cover.width,
 
-    {lightboxIndex <
-        gallery.length - 1 && (
+            height:
+              LAYOUT.cover.height,
 
-        <button
-            onClick={(e)=>{
+            zIndex: 5,
 
-                e.stopPropagation();
+            overflow:
+              "hidden",
 
-                setLightboxIndex(
-                    lightboxIndex + 1
-                );
+            borderRadius:
+              "1%",
+          }}
+        >
+          <img
+            src={coverImage}
+            alt={
+              memory.title ||
+              "Memory cover"
+            }
+            draggable={false}
+            style={{
+              width: "100%",
 
+              height: "100%",
+
+              objectFit:
+                "cover",
+
+              objectPosition:
+                "center",
+
+              display:
+                "block",
+
+              userSelect:
+                "none",
+            }}
+          />
+
+          <div
+            style={{
+              position:
+                "absolute",
+
+              inset: 0,
+
+              pointerEvents:
+                "none",
+
+              boxShadow:
+                "inset 0 0 30px rgba(91, 58, 30, 0.10)",
+            }}
+          />
+        </div>
+
+        {/* =================================================
+            OUR STORY
+            ================================================= */}
+
+        <section
+          style={{
+            position:
+              "absolute",
+
+            left:
+              LAYOUT.story.left,
+
+            top:
+              LAYOUT.story.top,
+
+            width:
+              LAYOUT.story.width,
+
+            height:
+              LAYOUT.story.height,
+
+            zIndex: 6,
+
+            display:
+              "flex",
+
+            flexDirection:
+              "column",
+
+            alignItems:
+              "center",
+
+            textAlign:
+              "center",
+
+            padding:
+              "0 2%",
+          }}
+        >
+          <h2
+            className="
+              text-[25px]
+              leading-none
+              font-bold
+              text-[#633F24]
+            "
+            style={{
+              fontFamily:
+                "Cormorant Garamond, serif",
+            }}
+          >
+            Our Story
+          </h2>
+
+          {story && (
+            <p
+              className="
+                mt-5
+                text-[16px]
+                leading-6
+                text-[#6C513B]
+                whitespace-pre-wrap
+                overflow-y-auto
+              "
+              style={{
+                maxHeight:
+                  "72%",
+
+                width:
+                  "100%",
+
+                scrollbarWidth:
+                  "none",
+
+                fontFamily:
+                  "Cormorant Garamond, serif",
+              }}
+            >
+              {story}
+            </p>
+          )}
+        </section>
+
+        {/* =================================================
+            AGE
+            ================================================= */}
+
+        {memory.age && (
+          <section
+            style={{
+              position:
+                "absolute",
+
+              left:
+                LAYOUT.age.left,
+
+              top:
+                LAYOUT.age.top,
+
+              width:
+                LAYOUT.age.width,
+
+              height:
+                LAYOUT.age.height,
+
+              zIndex: 6,
+
+              display:
+                "flex",
+
+              alignItems:
+                "center",
+
+              justifyContent:
+                "center",
+            }}
+          >
+            <div
+              className="
+                flex
+                items-center
+                gap-4
+                text-[17px]
+                text-[#70492B]
+              "
+            >
+              <span
+                className="
+                  text-[24px]
+                "
+                aria-hidden="true"
+              >
+                ♡
+              </span>
+
+              <span>
+                {memory.age}
+              </span>
+            </div>
+          </section>
+        )}
+
+        {/* =================================================
+            SUPPORTING PHOTOS
+
+            ONLY 3 PHOTOS ARE DISPLAYED AT A TIME.
+
+            Clicking them opens the COMPLETE gallery.
+            ================================================= */}
+
+        <section
+          style={{
+            position:
+              "absolute",
+
+            left:
+              LAYOUT.supportingPhotos.left,
+
+            top:
+              LAYOUT.supportingPhotos.top,
+
+            width:
+              LAYOUT.supportingPhotos.width,
+
+            height:
+              LAYOUT.supportingPhotos.height,
+
+            zIndex: 7,
+          }}
+        >
+          {/* SECTION TITLE */}
+
+          <div
+            style={{
+              position:
+                "absolute",
+
+              left: 0,
+
+              right: 0,
+
+              top:
+                "-17%",
+
+              textAlign:
+                "center",
             }}
             className="
+              text-[24px]
+              font-semibold
+              text-[#633F24]
+            "
+          >
+            More moments from this chapter
+          </div>
+
+          {/* PHOTO ROW */}
+
+          <div
+            style={{
+              width:
+                "100%",
+
+              height:
+                "100%",
+
+              display:
+                "flex",
+
+              alignItems:
+                "flex-end",
+
+              justifyContent:
+                "center",
+
+              gap:
+                "3%",
+            }}
+          >
+            {visiblePhotos.length >
+            0 ? (
+              visiblePhotos.map(
+                (
+                  image,
+                  index
+                ) => (
+                  <button
+                    key={`${image}-${index}`}
+                    type="button"
+                    onClick={() =>
+                      openPhoto(
+                        index
+                      )
+                    }
+                    className="
+                      group
+                      relative
+                      rounded-[10px]
+                      bg-[#FFF9EC]
+                      border
+                      border-[#D6B986]
+                      shadow-md
+                      p-3
+                      transition-all
+                      duration-200
+                      hover:-translate-y-2
+                      hover:shadow-xl
+                      focus:outline-none
+                      focus:ring-2
+                      focus:ring-[#A8753F]
+                    "
+                    style={{
+                      width:
+                        "29%",
+
+                      height:
+                        "90%",
+
+                      transform:
+                        index === 0
+                          ? "rotate(-2deg)"
+                          : index === 1
+                          ? "rotate(1deg)"
+                          : "rotate(2deg)",
+                    }}
+                  >
+                    <img
+                      src={image}
+                      alt={`Memory photo ${
+                        (photoPage - 1) *
+                          SUPPORTING_PHOTOS_PER_PAGE +
+                        index +
+                        1
+                      }`}
+                      loading="lazy"
+                      draggable={false}
+                      style={{
+                        width:
+                          "100%",
+
+                        height:
+                          "82%",
+
+                        objectFit:
+                          "cover",
+
+                        borderRadius:
+                          "4px",
+
+                        display:
+                          "block",
+                      }}
+                    />
+                  </button>
+                )
+              )
+            ) : (
+              <div
+                className="
+                  flex
+                  items-center
+                  justify-center
+                  w-full
+                  h-full
+                  text-[#8A6847]
+                  text-lg
+                  text-center
+                "
+                style={{
+                  fontFamily:
+                    "Cormorant Garamond, serif",
+                }}
+              >
+                This chapter is still gathering
+                its little moments.
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* =================================================
+            PHOTO PAGINATION
+
+            This controls the photos displayed ON THE PAGE.
+
+            It does NOT restrict the lightbox.
+            ================================================= */}
+
+        {totalPhotoPages >
+          1 && (
+          <div
+            style={{
+              position:
+                "absolute",
+
+              left:
+                LAYOUT.photoPagination.left,
+
+              top:
+                LAYOUT.photoPagination.top,
+
+              width:
+                LAYOUT.photoPagination.width,
+
+              height:
+                LAYOUT.photoPagination.height,
+
+              zIndex: 15,
+
+              display:
+                "flex",
+
+              alignItems:
+                "center",
+
+              justifyContent:
+                "center",
+
+              gap:
+                "0.7%",
+            }}
+            aria-label="Memory photo pagination"
+          >
+            {/* PREVIOUS PAGE */}
+
+            <button
+              type="button"
+              disabled={
+                photoPage === 1
+              }
+              onClick={() =>
+                setPhotoPage(
+                  (page) =>
+                    Math.max(
+                      1,
+                      page - 1
+                    )
+                )
+              }
+              className="
+                rounded-full
+                border
+                border-[#C6A16C]
+                bg-[#F7E7C2]
+                text-[#6B482A]
+                shadow-sm
+                disabled:opacity-35
+                disabled:cursor-not-allowed
+                transition
+                hover:-translate-y-0.5
+              "
+              style={{
+                width:
+                  "6%",
+
+                aspectRatio:
+                  "1 / 1",
+
+                fontSize:
+                  "16px",
+              }}
+            >
+              ←
+            </button>
+
+            {/* PAGE NUMBERS */}
+
+            {Array.from(
+              {
+                length:
+                  totalPhotoPages,
+              },
+              (
+                _,
+                index
+              ) =>
+                index + 1
+            ).map(
+              (page) => (
+                <button
+                  key={page}
+                  type="button"
+                  onClick={() =>
+                    setPhotoPage(
+                      page
+                    )
+                  }
+                  aria-current={
+                    photoPage ===
+                    page
+                      ? "page"
+                      : undefined
+                  }
+                  className={`
+                    rounded-full
+                    border
+                    shadow-sm
+                    transition
+                    hover:-translate-y-0.5
+
+                    ${
+                      photoPage ===
+                      page
+                        ? "bg-[#A8733F] text-white border-[#A8733F] scale-105"
+                        : "bg-[#F7E7C2] text-[#6B482A] border-[#C6A16C]"
+                    }
+                  `}
+                  style={{
+                    width:
+                      "6%",
+
+                    aspectRatio:
+                      "1 / 1",
+
+                    fontSize:
+                      "15px",
+                  }}
+                >
+                  {page}
+                </button>
+              )
+            )}
+
+            {/* NEXT PAGE */}
+
+            <button
+              type="button"
+              disabled={
+                photoPage ===
+                totalPhotoPages
+              }
+              onClick={() =>
+                setPhotoPage(
+                  (page) =>
+                    Math.min(
+                      totalPhotoPages,
+                      page + 1
+                    )
+                )
+              }
+              className="
+                rounded-full
+                border
+                border-[#C6A16C]
+                bg-[#F7E7C2]
+                text-[#6B482A]
+                shadow-sm
+                disabled:opacity-35
+                disabled:cursor-not-allowed
+                transition
+                hover:-translate-y-0.5
+              "
+              style={{
+                width:
+                  "6%",
+
+                aspectRatio:
+                  "1 / 1",
+
+                fontSize:
+                  "16px",
+              }}
+            >
+              →
+            </button>
+          </div>
+        )}
+
+        {/* =================================================
+            PREVIOUS / NEXT MEMORY
+            ================================================= */}
+
+        <div
+          style={{
+            position:
+              "absolute",
+
+            left:
+              LAYOUT.memoryNavigation.left,
+
+            top:
+              LAYOUT.memoryNavigation.top,
+
+            width:
+              LAYOUT.memoryNavigation.width,
+
+            height:
+              LAYOUT.memoryNavigation.height,
+
+            zIndex: 20,
+
+            display:
+              "flex",
+
+            alignItems:
+              "center",
+
+            justifyContent:
+              "center",
+
+            gap:
+              "2%",
+          }}
+        >
+          {previousMemory && (
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  `/timeline/memory/${previousMemory.slug}`
+                )
+              }
+              className="
+                px-5
+                py-2
+                rounded-full
+                bg-[#FFF4DE]/95
+                border
+                border-[#C6A16C]
+                text-[#70492B]
+                shadow-md
+                text-sm
+                font-semibold
+                transition
+                hover:-translate-y-0.5
+              "
+            >
+              ← Previous
+            </button>
+          )}
+
+          {nextMemory && (
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  `/timeline/memory/${nextMemory.slug}`
+                )
+              }
+              className="
+                px-5
+                py-2
+                rounded-full
+                bg-[#9B6B3D]
+                border
+                border-[#82552F]
+                text-white
+                shadow-md
+                text-sm
+                font-semibold
+                transition
+                hover:-translate-y-0.5
+              "
+            >
+              Next →
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* =====================================================
+          COMPLETE PHOTO LIGHTBOX
+          =====================================================
+
+          IMPORTANT:
+
+          The diary displays only visiblePhotos.
+
+          The lightbox displays supportingPhotos.
+
+          Therefore the lightbox can move through the
+          COMPLETE gallery regardless of which diary
+          pagination page the user came from.
+          ===================================================== */}
+
+      {lightboxIndex !==
+        null &&
+        supportingPhotos[
+          lightboxIndex
+        ] && (
+          <div
+            className="
+              fixed
+              inset-0
+              z-[9999]
+              bg-[#2D2118]/85
+              backdrop-blur-sm
+              flex
+              items-center
+              justify-center
+              p-8
+            "
+            onClick={
+              closePhoto
+            }
+          >
+            {/* =================================================
+                CLOSE
+                ================================================= */}
+
+            <button
+              type="button"
+              onClick={
+                closePhoto
+              }
+              aria-label="Close photo"
+              className="
                 absolute
+                top-6
                 right-8
                 text-white
-                text-7xl
+                text-5xl
+                leading-none
                 hover:scale-110
                 transition
-            "
-        >
-            ›
-        </button>
+                z-10
+              "
+            >
+              ×
+            </button>
 
-    )}
+            {/* =================================================
+                PREVIOUS PHOTO
 
+                Goes through the COMPLETE gallery.
+                ================================================= */}
 
+            {lightboxIndex >
+              0 && (
+              <button
+                type="button"
+                onClick={(
+                  event
+                ) => {
+                  event.stopPropagation();
 
-    {/* Counter */}
+                  previousPhoto();
+                }}
+                aria-label="Previous photo"
+                className="
+                  absolute
+                  left-8
+                  text-white
+                  text-7xl
+                  hover:scale-110
+                  transition
+                  z-10
+                "
+              >
+                ‹
+              </button>
+            )}
 
-    <div
-        className="
-            absolute
-            bottom-8
-            bg-white/20
-            text-white
-            px-6
-            py-3
-            rounded-full
-            font-semibold
-        "
-    >
+            {/* =================================================
+                LIGHTBOX IMAGE
+                ================================================= */}
 
-        {lightboxIndex + 1}
-        {" / "}
-        {gallery.length}
+            <div
+              className="
+                relative
+                max-w-[82vw]
+                max-h-[82vh]
+                bg-[#FFF9ED]
+                p-4
+                rounded-[24px]
+                shadow-2xl
+              "
+              onClick={(
+                event
+              ) =>
+                event.stopPropagation()
+              }
+            >
+              <img
+                src={
+                  supportingPhotos[
+                    lightboxIndex
+                  ]
+                }
+                alt={`Memory photo ${
+                  lightboxIndex + 1
+                }`}
+                className="
+                  max-w-[78vw]
+                  max-h-[76vh]
+                  object-contain
+                  rounded-[12px]
+                "
+              />
 
-    </div>
+              {/* =================================================
+                  COMPLETE GALLERY COUNTER
 
+                  Example:
 
-</div>
+                      4 / 12
 
-)}
+                  NOT:
 
-    {/* ======================================
-    SCRAPBOOK NAVIGATION
-====================================== */}
+                      1 / 3
+                  ================================================= */}
 
-<div
-  className="
-    relative
-    mt-2
-    pt-2
-    border-t
-    border-[#E7D8C5]
-  "
->
+              <div
+                className="
+                  mt-2
+                  text-center
+                  text-[#70492B]
+                  text-sm
+                  font-semibold
+                "
+              >
+                {lightboxIndex +
+                  1}{" "}
+                /{" "}
+                {
+                  supportingPhotos.length
+                }
+              </div>
+            </div>
 
-  
+            {/* =================================================
+                NEXT PHOTO
 
-  <div
-    className="
-      flex
-      justify-between
-      items-center
-      gap-6
-    "
-  >
+                Goes through the COMPLETE gallery.
 
-    {previousMemory ? (
+                Example:
 
-      <button
-        onClick={() =>
-          navigate(
-            `/memory/${previousMemory.slug}`
-          )
-        }
-        className="
-          bg-white
-          px-6
-          py-3
-          rounded-full
-          shadow-lg
-          border
-          border-[#E9DED0]
-          text-[#5A4332]
-          font-semibold
-          hover:-translate-y-1
-          transition
-        "
-      >
-        ← Previous Memory
-      </button>
+                    Photo 3 → Photo 4
+                    Photo 6 → Photo 7
+                    Photo 9 → Photo 10
+                ================================================= */}
 
-    ) : (
+            {lightboxIndex <
+              supportingPhotos.length -
+                1 && (
+              <button
+                type="button"
+                onClick={(
+                  event
+                ) => {
+                  event.stopPropagation();
 
-      <div />
-
-    )}
-
-
-    {nextMemory && (
-
-      <button
-        onClick={() =>
-          navigate(
-            `/memory/${nextMemory.slug}`
-          )
-        }
-        className="
-          bg-[#B58A5A]
-          text-white
-          px-8
-          py-4
-          rounded-full
-          shadow-lg
-          font-semibold
-          hover:-translate-y-1
-          transition
-        "
-      >
-        Next Memory →
-      </button>
-
-    )}
-
-  </div>
-
-</div>
-
-
-{/* ======================================
-    FINAL FLOATING SCRAPBOOK DECOR
-====================================== */}
-
-
-<img
-  src={headphones}
-  alt=""
-  className="
-    absolute
-    left-[120px]
-    top-[520px]
-    w-[90px]
-    rotate-[-12deg]
-    pointer-events-none
-    z-20
-    float-soft
-  "
-/>
-<img
-  src={heart}
-  alt=""
-  className="
-    absolute
-    right-[260px]
-    top-[600px]
-    w-[100px]
-    rotate-[12deg]
-    opacity-90
-    pointer-events-none
-    z-20
-    float-soft
-  "
-/>
-
-
-<img
-  src={butterfly}
-  alt=""
-  className="
-    fixed
-    bottom-20
-    right-10
-    w-50
-    opacity-80
-    pointer-events-none
-  "
-/>
-
-
-
-</main>
-
-);
+                  nextPhoto();
+                }}
+                aria-label="Next photo"
+                className="
+                  absolute
+                  right-8
+                  text-white
+                  text-7xl
+                  hover:scale-110
+                  transition
+                  z-10
+                "
+              >
+                ›
+              </button>
+            )}
+          </div>
+        )}
+    </main>
+  );
 }
