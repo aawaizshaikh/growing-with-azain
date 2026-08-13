@@ -102,6 +102,12 @@ export default function TimelineDrawer({
               onClose={onClose}
             />
 
+            <DrawerItem
+              to="/letters"
+              title="Letters"
+              onClose={onClose}
+            />
+
           </nav>
 
         </div>

@@ -1152,7 +1152,7 @@ export default function Timeline() {
 
       <button
         onClick={() =>
-          navigate(-1)
+        navigate("/")
         }
         className="
           fixed

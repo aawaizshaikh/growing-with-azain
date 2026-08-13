@@ -1,5 +1,6 @@
 import { FaArrowLeft, FaMusic } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
 import SongTimeline from "../components/songs/SongTimeline";
 
@@ -121,6 +122,7 @@ const ILLUSTRATIONS = {
 
 export default function FavoriteSongs() {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <>
@@ -179,7 +181,7 @@ export default function FavoriteSongs() {
 
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/")}
             aria-label="Go back"
             className="
               absolute
@@ -217,41 +219,95 @@ export default function FavoriteSongs() {
               TOP RIGHT MUSIC BUTTON
               ====================================================== */}
 
-          <button
-            type="button"
-            onClick={() => navigate("/favorite-songs")}
-            aria-label="Favourite Songs"
-            className="
-              absolute
-              z-[100]
-              flex
-              items-center
-              justify-center
-              rounded-full
-              bg-[#FFF4DB]
-              border
-              border-[#E5C99D]
-              shadow-lg
-              text-[#5A4635]
-              hover:bg-white
-              hover:scale-105
-              active:scale-95
-              transition-all
-            "
+          <div
+            className="absolute z-[100]"
             style={{
               right: "2.2%",
               top: "2%",
-              width: "2.5%",
-              aspectRatio: "1",
             }}
           >
-            <FaMusic
+            <button
+              type="button"
+              onClick={() => setMenuOpen((open) => !open)}
+              aria-label="Open navigation menu"
+              aria-expanded={menuOpen}
+              className="
+                flex
+                items-center
+                justify-center
+                rounded-full
+                bg-[#FFF4DB]
+                border
+                border-[#E5C99D]
+                shadow-lg
+                text-[#5A4635]
+                hover:bg-white
+                hover:scale-105
+                active:scale-95
+                transition-all
+              "
               style={{
-                width: "38%",
-                height: "38%",
+                width: "2.5vw",
+                minWidth: "38px",
+                maxWidth: "48px",
+                aspectRatio: "1",
               }}
-            />
-          </button>
+            >
+              <FaMusic
+                style={{
+                  width: "38%",
+                  height: "38%",
+                }}
+              />
+            </button>
+
+            {menuOpen && (
+              <div
+                className="
+                  absolute
+                  right-0
+                  mt-3
+                  w-56
+                  rounded-2xl
+                  bg-[#FFFDF8]
+                  border
+                  border-[#E5C99D]
+                  shadow-2xl
+                  p-3
+                "
+              >
+                <nav className="flex flex-col gap-1">
+                  {[
+                    { title: "Home", path: "/" },
+                    { title: "Timeline", path: "/timeline" },
+                    { title: "Milestones", path: "/milestones" },
+                    { title: "Favourite Songs", path: "/favorite-songs" },
+                    { title: "Gallery", path: "/gallery" },
+                    { title: "Letters", path: "/letters" },
+                    { title: "About Azain", path: "/about" },
+                  ].map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setMenuOpen(false)}
+                      className="
+                        px-4
+                        py-3
+                        rounded-xl
+                        text-[#5A4635]
+                        font-semibold
+                        hover:bg-[#FFF4DB]
+                        hover:text-[#B58A5A]
+                        transition
+                      "
+                    >
+                      {item.title}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            )}
+          </div>
           {/* DISCO LIGHT FIXTURE */}
 
 <img

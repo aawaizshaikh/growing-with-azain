@@ -399,6 +399,7 @@ function RusticFrame({
 function MemoryCard({
   memory,
   title,
+  onOpen,
 }) {
   /*
   Empty slot
@@ -416,18 +417,30 @@ function MemoryCard({
   IMAGE
   */
 
-  if (
-    memory.type === "image"
-  ) {
+  if (memory.type === "image") {
     return (
-      <RusticFrame>
-        <img
-          src={memory.src}
-          alt={title || "Memory"}
-          className="block h-full w-full object-cover"
-          draggable="false"
-        />
-      </RusticFrame>
+      <div
+        className="h-full w-full cursor-pointer"
+        onClick={onOpen}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onOpen?.();
+          }
+        }}
+        aria-label="Open memory"
+      >
+        <RusticFrame>
+          <img
+            src={memory.src}
+            alt={title || "Memory"}
+            className="block h-full w-full object-cover"
+            draggable="false"
+          />
+        </RusticFrame>
+      </div>
     );
   }
 
@@ -435,22 +448,33 @@ function MemoryCard({
   YOUTUBE
   */
 
-  const youtube =
-    getYouTubeEmbed(
-      memory.src
-    );
+  const youtube = getYouTubeEmbed(memory.src);
 
   if (youtube) {
     return (
-      <RusticFrame>
-        <iframe
-          src={youtube}
-          title="Memory video"
-          className="h-full w-full border-0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        />
-      </RusticFrame>
+      <div
+        className="h-full w-full cursor-pointer"
+        onClick={onOpen}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onOpen?.();
+          }
+        }}
+        aria-label="Open video memory"
+      >
+        <RusticFrame>
+          <iframe
+            src={youtube}
+            title="Memory video"
+            className="pointer-events-none h-full w-full border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </RusticFrame>
+      </div>
     );
   }
 
@@ -458,22 +482,33 @@ function MemoryCard({
   VIMEO
   */
 
-  const vimeo =
-    getVimeoEmbed(
-      memory.src
-    );
+  const vimeo = getVimeoEmbed(memory.src);
 
   if (vimeo) {
     return (
-      <RusticFrame>
-        <iframe
-          src={vimeo}
-          title="Memory video"
-          className="h-full w-full border-0"
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowFullScreen
-        />
-      </RusticFrame>
+      <div
+        className="h-full w-full cursor-pointer"
+        onClick={onOpen}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onOpen?.();
+          }
+        }}
+        aria-label="Open video memory"
+      >
+        <RusticFrame>
+          <iframe
+            src={vimeo}
+            title="Memory video"
+            className="pointer-events-none h-full w-full border-0"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+          />
+        </RusticFrame>
+      </div>
     );
   }
 
@@ -481,20 +516,31 @@ function MemoryCard({
   DIRECT VIDEO
   */
 
-  if (
-    isDirectVideo(
-      memory.src
-    )
-  ) {
+  if (isDirectVideo(memory.src)) {
     return (
-      <RusticFrame>
-        <video
-          src={memory.src}
-          controls
-          playsInline
-          className="h-full w-full object-cover"
-        />
-      </RusticFrame>
+      <div
+        className="h-full w-full cursor-pointer"
+        onClick={onOpen}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onOpen?.();
+          }
+        }}
+        aria-label="Open video memory"
+      >
+        <RusticFrame>
+          <video
+            src={memory.src}
+            muted
+            playsInline
+            preload="metadata"
+            className="pointer-events-none h-full w-full object-cover"
+          />
+        </RusticFrame>
+      </div>
     );
   }
 
@@ -503,14 +549,28 @@ function MemoryCard({
   */
 
   return (
-    <RusticFrame>
-      <iframe
-        src={memory.src}
-        title="Memory"
-        className="h-full w-full border-0"
-        allowFullScreen
-      />
-    </RusticFrame>
+    <div
+      className="h-full w-full cursor-pointer"
+      onClick={onOpen}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onOpen?.();
+        }
+      }}
+      aria-label="Open memory"
+    >
+      <RusticFrame>
+        <iframe
+          src={memory.src}
+          title="Memory"
+          className="pointer-events-none h-full w-full border-0"
+          allowFullScreen
+        />
+      </RusticFrame>
+    </div>
   );
 }
 
@@ -533,6 +593,16 @@ export default function FavoriteSongMemory() {
 
   const [memoryPage, setMemoryPage] =
     useState(0);
+
+  /*
+  --------------------------------------------------------------------------
+  | FULL-SCREEN MEMORY LIGHTBOX
+  --------------------------------------------------------------------------
+  | Uses the complete memories array, including images and videos.
+  */
+
+  const [lightboxIndex, setLightboxIndex] =
+    useState(null);
 
   /*
   |--------------------------------------------------------------------------
@@ -799,6 +869,64 @@ export default function FavoriteSongMemory() {
     );
   }
 
+  function openMemory(index) {
+    if (index < 0 || index >= memories.length) {
+      return;
+    }
+
+    setLightboxIndex(index);
+  }
+
+  function closeLightbox() {
+    setLightboxIndex(null);
+  }
+
+  function previousLightboxMemory() {
+    setLightboxIndex((current) => {
+      if (current === null || memories.length <= 1) {
+        return current;
+      }
+
+      return current === 0
+        ? memories.length - 1
+        : current - 1;
+    });
+  }
+
+  function nextLightboxMemory() {
+    setLightboxIndex((current) => {
+      if (current === null || memories.length <= 1) {
+        return current;
+      }
+
+      return current === memories.length - 1
+        ? 0
+        : current + 1;
+    });
+  }
+
+  useEffect(() => {
+    if (lightboxIndex === null) {
+      return undefined;
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        closeLightbox();
+      } else if (event.key === "ArrowLeft") {
+        previousLightboxMemory();
+      } else if (event.key === "ArrowRight") {
+        nextLightboxMemory();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [lightboxIndex, memories.length]);
+
   /*
   |--------------------------------------------------------------------------
   | LOADING
@@ -1055,6 +1183,18 @@ export default function FavoriteSongMemory() {
               currentMemories[0]
             }
             title={song.title}
+            onOpen={() => {
+              const memory = currentMemories[0];
+              if (!memory) return;
+
+              const index = memories.findIndex(
+                (item) =>
+                  item.type === memory.type &&
+                  item.src === memory.src
+              );
+
+              openMemory(index);
+            }}
           />
 
         </div>
@@ -1077,6 +1217,18 @@ export default function FavoriteSongMemory() {
               currentMemories[1]
             }
             title={song.title}
+            onOpen={() => {
+              const memory = currentMemories[1];
+              if (!memory) return;
+
+              const index = memories.findIndex(
+                (item) =>
+                  item.type === memory.type &&
+                  item.src === memory.src
+              );
+
+              openMemory(index);
+            }}
           />
 
         </div>
@@ -1099,6 +1251,18 @@ export default function FavoriteSongMemory() {
               currentMemories[2]
             }
             title={song.title}
+            onOpen={() => {
+              const memory = currentMemories[2];
+              if (!memory) return;
+
+              const index = memories.findIndex(
+                (item) =>
+                  item.type === memory.type &&
+                  item.src === memory.src
+              );
+
+              openMemory(index);
+            }}
           />
 
         </div>
@@ -1235,7 +1399,96 @@ export default function FavoriteSongMemory() {
         </div>
 
       </div>
+      
 
+      {lightboxIndex !== null && memories[lightboxIndex] && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#2D2118]/85 p-6 backdrop-blur-sm"
+          onClick={closeLightbox}
+        >
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              closeLightbox();
+            }}
+            aria-label="Close memory"
+            className="absolute right-6 top-4 z-[10001] text-5xl leading-none text-white transition hover:scale-110"
+          >
+            ×
+          </button>
+
+          {memories.length > 1 && (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                previousLightboxMemory();
+              }}
+              aria-label="Previous memory"
+              className="absolute left-4 z-[10001] text-6xl text-white transition hover:scale-110 md:left-8 md:text-7xl"
+            >
+              ‹
+            </button>
+          )}
+
+          <div
+            className="relative flex max-h-[90vh] max-w-[92vw] items-center justify-center rounded-[24px] bg-[#FFF9ED] p-3 shadow-2xl md:p-4"
+            onClick={(event) => event.stopPropagation()}
+          >
+            {memories[lightboxIndex].type === "image" ? (
+              <img
+                src={memories[lightboxIndex].src}
+                alt={`Memory ${lightboxIndex + 1}`}
+                className="max-h-[84vh] max-w-[88vw] rounded-[12px] object-contain"
+              />
+            ) : getYouTubeEmbed(memories[lightboxIndex].src) ? (
+              <iframe
+                src={getYouTubeEmbed(memories[lightboxIndex].src)}
+                title="Memory video"
+                className="h-[70vh] w-[82vw] max-h-[84vh] max-w-[88vw] rounded-[12px] border-0 bg-black"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            ) : getVimeoEmbed(memories[lightboxIndex].src) ? (
+              <iframe
+                src={getVimeoEmbed(memories[lightboxIndex].src)}
+                title="Memory video"
+                className="h-[70vh] w-[82vw] max-h-[84vh] max-w-[88vw] rounded-[12px] border-0 bg-black"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <video
+                key={memories[lightboxIndex].src}
+                src={memories[lightboxIndex].src}
+                controls
+                autoPlay
+                playsInline
+                className="max-h-[84vh] max-w-[88vw] rounded-[12px] bg-black object-contain"
+              />
+            )}
+          </div>
+
+          {memories.length > 1 && (
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                nextLightboxMemory();
+              }}
+              aria-label="Next memory"
+              className="absolute right-4 z-[10001] text-6xl text-white transition hover:scale-110 md:right-8 md:text-7xl"
+            >
+              ›
+            </button>
+          )}
+
+          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-black/45 px-4 py-2 text-sm font-semibold text-white">
+            {lightboxIndex + 1} / {memories.length}
+          </div>
+        </div>
+      )}
     </main>
   );
 }

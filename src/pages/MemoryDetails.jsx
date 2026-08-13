@@ -226,8 +226,15 @@ function parseArray(value) {
       if (Array.isArray(parsed)) {
         return parsed.filter(Boolean);
       }
+
+      if (typeof parsed === "string" && parsed.trim()) {
+        return [parsed.trim()];
+      }
     } catch {
-      return [];
+      // A normal URL is also a valid single media value.
+      if (value.trim()) {
+        return [value.trim()];
+      }
     }
   }
 
@@ -426,10 +433,10 @@ export default function MemoryDetails() {
 
   /*
   =====================================================
-  ALL SUPPORTING PHOTOS
+  ALL SUPPORTING MEDIA
   =====================================================
 
-  THIS IS THE COMPLETE PHOTO COLLECTION.
+  THIS IS THE COMPLETE IMAGE + VIDEO COLLECTION.
 
   Pagination only controls what is displayed.
 
@@ -443,14 +450,59 @@ export default function MemoryDetails() {
         return [];
       }
 
-      const gallery =
-        parseArray(
-          memory.gallery_images
-        );
+      /*
+      -----------------------------------------------------
+      SUPPORTING MEDIA
 
-      return gallery.filter(
-        (image) =>
-          image !== coverImage
+      Keep the existing gallery_images behaviour, while
+      also accepting videos stored in the separate video
+      fields used by Timeline memories.
+
+      This is intentionally additive and does not change
+      how existing image/video gallery data is handled.
+      -----------------------------------------------------
+      */
+
+      const galleryImages = parseArray(
+        memory.gallery_images
+      );
+
+      const gallery = parseArray(
+        memory.gallery
+      );
+
+      const videoUrl = parseArray(
+        memory.video_url
+      );
+
+      const videos = parseArray(
+        memory.videos
+      );
+
+      const videoUrls = [
+        ...parseArray(memory.videoUrls),
+        ...parseArray(memory.video_urls),
+      ];
+
+      const combined = [
+        ...galleryImages,
+        ...gallery,
+        ...videoUrl,
+        ...videos,
+        ...videoUrls,
+      ];
+
+      /*
+      Remove duplicates while preserving the original
+      order, and keep the cover out of supporting media.
+      */
+
+      return Array.from(
+        new Set(combined)
+      ).filter(
+        (media) =>
+          media &&
+          media !== coverImage
       );
     }, [
       memory,
@@ -459,24 +511,15 @@ export default function MemoryDetails() {
 
   /*
   =====================================================
-  LIGHTBOX PHOTOS
+  LIGHTBOX MEDIA
   =====================================================
 
-  The page can contain both images and videos, but
-  the existing lightbox is intentionally image-only.
-  Videos play directly in their gallery frame.
+  The lightbox uses the COMPLETE supportingPhotos
+  collection, including both images and videos.
   =====================================================
   */
 
-  const lightboxPhotos =
-    useMemo(
-      () =>
-        supportingPhotos.filter(
-          (item) =>
-            !isVideoMedia(item)
-        ),
-      [supportingPhotos]
-    );
+  const lightboxPhotos = supportingPhotos;
 
   /*
   =====================================================
@@ -495,7 +538,7 @@ export default function MemoryDetails() {
 
   /*
   =====================================================
-  ONLY THESE PHOTOS APPEAR ON THE CURRENT DIARY PAGE
+  ONLY THESE MEDIA ITEMS APPEAR ON THE CURRENT DIARY PAGE
   =====================================================
   */
 
@@ -651,22 +694,14 @@ export default function MemoryDetails() {
           globalIndex
         ];
 
-      if (
-        isVideoMedia(
-          selectedMedia
-        )
-      ) {
-        return;
-      }
-
-      const imageIndex =
+      const mediaIndex =
         lightboxPhotos.indexOf(
           selectedMedia
         );
 
-      if (imageIndex >= 0) {
+      if (mediaIndex >= 0) {
         setLightboxIndex(
-          imageIndex
+          mediaIndex
         );
       }
     }
@@ -1371,9 +1406,9 @@ export default function MemoryDetails() {
         )}
 
         {/* =================================================
-            SUPPORTING PHOTOS
+            SUPPORTING MEDIA
 
-            ONLY 3 PHOTOS ARE DISPLAYED AT A TIME.
+            ONLY 3 MEDIA ITEMS ARE DISPLAYED AT A TIME.
 
             Clicking them opens the COMPLETE gallery.
             ================================================= */}
@@ -1505,8 +1540,8 @@ export default function MemoryDetails() {
                           src={media}
                           controls
                           playsInline
-                          onClick={(event) =>
-                            event.stopPropagation()
+                          onClick={() =>
+                            openPhoto(index)
                           }
                           style={{
                             width:
@@ -1956,7 +1991,7 @@ export default function MemoryDetails() {
             )}
 
             {/* =================================================
-                LIGHTBOX IMAGE
+                LIGHTBOX MEDIA
                 ================================================= */}
 
             <div
@@ -1975,33 +2010,55 @@ export default function MemoryDetails() {
                 event.stopPropagation()
               }
             >
-              <img
-                src={
-                  lightboxPhotos[
-                    lightboxIndex
-                  ]
-                }
-                alt={`Memory photo ${
-                  lightboxIndex + 1
-                }`}
-                className="
-                  max-w-[78vw]
-                  max-h-[76vh]
-                  object-contain
-                  rounded-[12px]
-                "
-              />
+              {isVideoMedia(
+                lightboxPhotos[
+                  lightboxIndex
+                ]
+              ) ? (
+                <video
+                  src={
+                    lightboxPhotos[
+                      lightboxIndex
+                    ]
+                  }
+                  controls
+                  autoPlay
+                  playsInline
+                  className="
+                    max-w-[78vw]
+                    max-h-[76vh]
+                    object-contain
+                    rounded-[12px]
+                    bg-black
+                  "
+                />
+              ) : (
+                <img
+                  src={
+                    lightboxPhotos[
+                      lightboxIndex
+                    ]
+                  }
+                  alt={`Memory photo ${
+                    lightboxIndex + 1
+                  }`}
+                  className="
+                    max-w-[78vw]
+                    max-h-[76vh]
+                    object-contain
+                    rounded-[12px]
+                  "
+                />
+              )}
 
               {/* =================================================
                   COMPLETE GALLERY COUNTER
 
+                  Images and videos are counted together.
+
                   Example:
 
                       4 / 12
-
-                  NOT:
-
-                      1 / 3
                   ================================================= */}
 
               <div

@@ -17,6 +17,14 @@ import hedgehog from "../assets/illustrations/animals/hedgehog.png";
 import turtle from "../assets/illustrations/animals/turtle.png";
 import butterfly from "../assets/illustrations/animals/butterfly.png";
 
+import flockBirdUp from "../assets/illustrations/animals/flock-bird-up.png";
+import flockBirdLevel from "../assets/illustrations/animals/flock-bird-level.png";
+import flockBirdDown from "../assets/illustrations/animals/flock-bird-down.png";
+import parrotblue from "../assets/illustrations/animals/parrot-blue.png";
+import redButterfly from "../assets/illustrations/animals/red-butterfly.png";
+import yellowbird from "../assets/illustrations/animals/yellow-bird.png";
+import greenbird from "../assets/illustrations/animals/green-bird.png";
+
 import lion1 from "../assets/illustrations/animals/lion/1.png";
 import lion2 from "../assets/illustrations/animals/lion/2.png";
 import lion3 from "../assets/illustrations/animals/lion/3.png";
@@ -39,12 +47,172 @@ import elephant6 from "../assets/illustrations/animals/elephant/6.png";
 import elephant7 from "../assets/illustrations/animals/elephant/7.png";
 import elephant8 from "../assets/illustrations/animals/elephant/8.png";
 
+import redBirdLevel from "../assets/illustrations/animals/red-bird-level.png";
+
 import giraffe from "../assets/illustrations/animals/giraffe.png";
 import vine from "../assets/illustrations/animals/vine.png";
 
 const DESIGN_WIDTH = 1440;
 const DESIGN_HEIGHT = 900;
 
+/*
+  FLYING BIRD FLOCK
+
+  The three PNGs are reused as wing positions:
+  - flock-bird-up.png
+  - flock-bird-level.png
+  - flock-bird-down.png
+
+  The flock itself is a separate layer over the existing 1440 × 900 scene.
+  It does not change the background, signposts, animals, or Admin data.
+
+  30 tiny birds travel from outside the left edge to outside the right edge,
+  then remain off-screen for 2 seconds before repeating.
+*/
+const FLOCK_BIRDS = [
+  { top: 105, width: 60, delay: 0.00, duration: 25.0, opacity: 0.92 },
+  { top: 75, width: 60, delay: 0.10, duration: 25.0, opacity: 0.92 },
+  { top: 128, width: 65, delay: 6.50, duration: 25.2, opacity: 0.88 },
+  
+  
+];
+
+function FlyingBirdFlock() {
+  return (
+    <>
+      <style>
+        {`
+          @keyframes growingWithAzainBirdFlock {
+            0% {
+              transform: translateX(-190px);
+            }
+            88.888% {
+              transform: translateX(1630px);
+            }
+            100% {
+              transform: translateX(1630px);
+            }
+          }
+
+          @keyframes growingWithAzainBirdUp {
+            0%,
+            32.999% {
+              opacity: 1;
+            }
+            33%,
+            100% {
+              opacity: 0;
+            }
+          }
+
+          @keyframes growingWithAzainBirdLevel {
+            0%,
+            32.999% {
+              opacity: 0;
+            }
+            33%,
+            65.999% {
+              opacity: 1;
+            }
+            66%,
+            100% {
+              opacity: 0;
+            }
+          }
+
+          @keyframes growingWithAzainBirdDown {
+            0%,
+            65.999% {
+              opacity: 0;
+            }
+            66%,
+            100% {
+              opacity: 1;
+            }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .growing-with-azain-bird {
+              animation: none !important;
+              opacity: 0 !important;
+            }
+          }
+        `}
+      </style>
+
+      <div
+        className="absolute inset-0 pointer-events-none overflow-visible"
+        style={{
+          zIndex: 18,
+        }}
+        aria-hidden="true"
+      >
+        {FLOCK_BIRDS.map((bird, index) => {
+          const wingCycleOffset = (index % 3) * -0.55;
+
+          return (
+            <div
+              key={`flock-bird-${index}`}
+              className="growing-with-azain-bird absolute"
+              style={{
+                left: 0,
+                top: bird.top,
+                width: bird.width,
+                height: "auto",
+                opacity: bird.opacity,
+                animationName: "growingWithAzainBirdFlock",
+                animationDuration: `${bird.duration}s`,
+                animationTimingFunction: "linear",
+                animationIterationCount: "infinite",
+                animationDelay: `${bird.delay}s`,
+                animationFillMode: "both",
+                willChange: "transform",
+              }}
+            >
+              <img
+                src={flockBirdLevel}
+                alt=""
+                draggable={false}
+                className="absolute inset-0 w-full h-auto"
+                style={{
+                  opacity: 0,
+                  animation:
+                    "growingWithAzainBirdLevel 0.9s steps(1,end) infinite",
+                  animationDelay: `${wingCycleOffset}s`,
+                }}
+              />
+
+              <img
+                src={flockBirdDown}
+                alt=""
+                draggable={false}
+                className="absolute inset-0 w-full h-auto"
+                style={{
+                  opacity: 0,
+                  animation:
+                    "growingWithAzainBirdDown 0.9s steps(1,end) infinite",
+                  animationDelay: `${wingCycleOffset}s`,
+                }}
+              />
+
+              <img
+                src={flockBirdUp}
+                alt=""
+                draggable={false}
+                className="relative block w-full h-auto"
+                style={{
+                  animation:
+                    "growingWithAzainBirdUp 0.9s steps(1,end) infinite",
+                  animationDelay: `${wingCycleOffset}s`,
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
 /*
   All coordinates belong to the same 1440 × 900 design space.
 */
@@ -126,6 +294,60 @@ const ANIMALS = [
     rotate: -4,
   },
   {
+  id: "parrotblue",
+  src: parrotblue,
+  left: 1015,
+  top: 680,
+  width: 115,
+  zIndex: 26,
+  rotate: 4,
+},
+{
+  id: "red-bird",
+  src: redBirdLevel,
+  left: 310,
+  top: 175,
+  width: 90,
+  zIndex: 26,
+  rotate: 0,
+},
+{
+  id: "yellow-bird",
+  src: yellowbird,
+  left: 375,
+  top: 275,
+  width: 80,
+  zIndex: 26,
+  rotate: 0,
+},
+{
+  id: "green-bird",
+  src: greenbird,
+  left: 550,
+  top: 275,
+  width: 70,
+  zIndex: 26,
+  rotate: 0,
+},
+{
+  id: "red-butterfly",
+  src: redButterfly,
+  left: 745,
+  top: 450,
+  width: 62,
+  zIndex: 21,
+  rotate: -8,
+},
+{
+  id: "red-butterfly2",
+  src: redButterfly,
+  left: 1075,
+  top: 650,
+  width: 62,
+  zIndex: 21,
+  rotate: -8,
+},
+  {
     id: "bluebird",
     src: bluebird,
     left: 470,
@@ -155,8 +377,8 @@ const ANIMALS = [
   {
     id: "owl",
     src: owl,
-    left: 1055,
-    top: 700,
+    left: 1200,
+    top: 105,
     width: 88,
     zIndex: 19,
     rotate: 1,
@@ -168,7 +390,7 @@ const ANIMALS = [
     left: 1100,
     top: 90,
     width: 165,
-    zIndex: 12,
+    zIndex: 25,
     rotate: 5,
   },
   {
@@ -749,6 +971,11 @@ export default function Milestones() {
         />
 
         {/* =====================================================
+            FLYING BIRD FLOCK
+        ===================================================== */}
+
+        <FlyingBirdFlock />
+        {/* =====================================================
             INDEPENDENT ANIMAL LAYERS
         ===================================================== */}
 
@@ -1035,7 +1262,7 @@ export default function Milestones() {
         }}
       >
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/")}
           aria-label="Go back"
           className="
             flex
