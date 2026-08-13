@@ -76,7 +76,9 @@ export default function MemoryForm({
     );
 
     setExistingGallery(
-      initialData.gallery_images || []
+      initialData.gallery_images ||
+        initialData.gallery ||
+        []
     );
   }, [initialData]);
 
@@ -315,11 +317,12 @@ export default function MemoryForm({
       />
 
       <FileUploader
-        label="Gallery Images"
-        multiple={true}
-        existingFiles={existingGallery}
-        onChange={setGalleryImages}
-      />
+  label="Gallery Images & Videos"
+  multiple={true}
+  accept="image/*,video/*,.mp4,.mov,.m4v,.webm,.ogg"
+  existingFiles={existingGallery}
+  onChange={setGalleryImages}
+/>
 
       {/* ======================================
           HIGHLIGHTS

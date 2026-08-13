@@ -173,23 +173,6 @@ export default function FavoriteSongForm({
         />
 
       </div>
-
-      <div className="mt-6">
-
-        <label className="block mb-2 font-semibold">
-          Video URL
-        </label>
-
-        <input
-          name="videoUrl"
-          value={form.videoUrl}
-          onChange={handleChange}
-          placeholder="YouTube / Vimeo / MP4 URL"
-          className="w-full border rounded-xl px-4 py-3"
-        />
-
-      </div>
-
       <div className="mt-6">
 
         <label className="block mb-2 font-semibold">
@@ -230,11 +213,12 @@ export default function FavoriteSongForm({
       />
 
       <FileUploader
-        label="Gallery Images"
-        multiple={true}
-        existingFiles={existingGallery}
-        onChange={setGalleryImages}
-      />
+  label="Gallery Images & Videos"
+  multiple={true}
+  accept="image/*,video/*,.mp4,.mov,.m4v,.webm,.ogg"
+  existingFiles={existingGallery}
+  onChange={setGalleryImages}
+/>
 
       <HighlightsInput
         initialHighlights={highlights}

@@ -9,6 +9,11 @@ import {
   updateMilestone,
 } from "../../services/milestoneService";
 
+import {
+  uploadFile,
+  uploadMultiple,
+} from "../../services/storageService";
+
 export default function EditMilestone() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -38,6 +43,31 @@ export default function EditMilestone() {
     try {
       setSaving(true);
 
+      let coverImage = milestone.cover_image || "";
+      let gallery = milestone.gallery || milestone.gallery_images || [];
+
+      if (formData.coverImage) {
+        coverImage = await uploadFile(
+          formData.coverImage,
+          formData.slug || milestone.slug || "milestones"
+        );
+      }
+
+      if (
+        formData.galleryImages &&
+        formData.galleryImages.length > 0
+      ) {
+        const uploaded = await uploadMultiple(
+          formData.galleryImages,
+          formData.slug || milestone.slug || "milestones"
+        );
+
+        gallery = [
+          ...gallery,
+          ...uploaded,
+        ];
+      }
+
       await updateMilestone(id, {
         title: formData.title,
         slug: formData.slug,
@@ -46,6 +76,11 @@ export default function EditMilestone() {
         category: formData.category,
         description: formData.description,
         story: formData.story,
+
+        cover_image: coverImage,
+
+        gallery: gallery,
+
         highlights: formData.highlights,
         favorite: formData.favorite,
         published: formData.published,

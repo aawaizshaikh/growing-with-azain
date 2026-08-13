@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { isVideoMedia } from "../../utils/mediaHelpers";
 
 export default function FileUploader({
   label = "Upload",
@@ -6,7 +7,7 @@ export default function FileUploader({
   accept = "image/*",
   onChange,
 
-  // NEW
+  // Existing uploaded files
   existingFiles = [],
 }) {
   const inputRef = useRef(null);
@@ -34,6 +35,7 @@ export default function FileUploader({
     const previews = selected.map((file) => ({
       file,
       preview: URL.createObjectURL(file),
+      isVideo: file.type.startsWith("video/"),
     }));
 
     if (multiple) {
@@ -41,28 +43,47 @@ export default function FileUploader({
 
       setFiles(updated);
 
-      onChange?.(updated.map((f) => f.file));
+      onChange?.(
+        updated.map((item) => item.file)
+      );
     } else {
       setFiles(previews);
 
       onChange?.(selected[0]);
     }
+
+    /*
+    Allow selecting the same file again later.
+    */
+    e.target.value = "";
   }
 
   function removeNewImage(index) {
-    const updated = files.filter((_, i) => i !== index);
+    const item = files[index];
+
+    if (item?.preview) {
+      URL.revokeObjectURL(item.preview);
+    }
+
+    const updated = files.filter(
+      (_, i) => i !== index
+    );
 
     setFiles(updated);
 
     if (multiple) {
-      onChange?.(updated.map((f) => f.file));
+      onChange?.(
+        updated.map((item) => item.file)
+      );
     } else {
       onChange?.(null);
     }
   }
 
   function removeExistingImage(index) {
-    const updated = existing.filter((_, i) => i !== index);
+    const updated = existing.filter(
+      (_, i) => i !== index
+    );
 
     setExisting(updated);
   }
@@ -75,13 +96,17 @@ export default function FileUploader({
       </label>
 
       <div
-        onClick={() => inputRef.current.click()}
+        onClick={() =>
+          inputRef.current?.click()
+        }
         className="border-2 border-dashed border-[#8FAE7A] rounded-3xl p-8 cursor-pointer hover:bg-[#F9F7F2] transition"
       >
         <div className="text-center">
 
           <div className="text-6xl mb-3">
-            📷
+            {accept.includes("video")
+              ? "📷 🎥"
+              : "📷"}
           </div>
 
           <h3 className="text-xl font-semibold">
@@ -89,7 +114,9 @@ export default function FileUploader({
           </h3>
 
           <p className="text-gray-500 mt-2">
-            JPG • PNG • WEBP
+            {accept.includes("video")
+              ? "JPG • PNG • WEBP • MP4 • MOV • WEBM"
+              : "JPG • PNG • WEBP"}
           </p>
 
         </div>
@@ -104,81 +131,102 @@ export default function FileUploader({
         className="hidden"
       />
 
-      {/* Existing Images */}
+      {/* Existing Files */}
 
       {existing.length > 0 && (
         <>
           <h4 className="mt-6 mb-3 font-semibold">
-            Existing Images
+            Existing Files
           </h4>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 
-            {existing.map((image, index) => (
-
-              <div
-                key={index}
-                className="relative"
-              >
-
-                <img
-                  src={image}
-                  className="rounded-xl h-36 w-full object-cover"
-                />
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    removeExistingImage(index)
-                  }
-                  className="absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full"
+            {existing.map(
+              (file, index) => (
+                <div
+                  key={index}
+                  className="relative"
                 >
-                  ×
-                </button>
 
-              </div>
+                  {isVideoMedia(file) ? (
+                    <video
+                      src={file}
+                      className="rounded-xl h-36 w-full object-cover"
+                      muted
+                      playsInline
+                    />
+                  ) : (
+                    <img
+                      src={file}
+                      alt=""
+                      className="rounded-xl h-36 w-full object-cover"
+                    />
+                  )}
 
-            ))}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      removeExistingImage(index)
+                    }
+                    className="absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full"
+                  >
+                    ×
+                  </button>
+
+                </div>
+              )
+            )}
 
           </div>
         </>
       )}
 
-      {/* New Images */}
+      {/* New Files */}
 
       {files.length > 0 && (
         <>
           <h4 className="mt-6 mb-3 font-semibold">
-            New Images
+            New Files
           </h4>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 
-            {files.map((item, index) => (
-
-              <div
-                key={index}
-                className="relative"
-              >
-
-                <img
-                  src={item.preview}
-                  className="rounded-xl h-36 w-full object-cover"
-                />
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    removeNewImage(index)
-                  }
-                  className="absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full"
+            {files.map(
+              (item, index) => (
+                <div
+                  key={index}
+                  className="relative"
                 >
-                  ×
-                </button>
 
-              </div>
+                  {item.isVideo ? (
+                    <video
+                      src={item.preview}
+                      className="rounded-xl h-36 w-full object-cover"
+                      muted
+                      playsInline
+                      controls
+                    />
+                  ) : (
+                    <img
+                      src={item.preview}
+                      alt=""
+                      className="rounded-xl h-36 w-full object-cover"
+                    />
+                  )}
 
-            ))}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      removeNewImage(index)
+                    }
+                    className="absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full"
+                  >
+                    ×
+                  </button>
+
+                </div>
+              )
+            )}
 
           </div>
         </>

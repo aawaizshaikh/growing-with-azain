@@ -17,6 +17,7 @@ import {
 import diaryBackground from "../assets/illustrations/timeline-memory-diary.png";
 import vintageRockingHorse from "../assets/illustrations/timeline-vintage-rocking-horse.png";
 import vintageTeddyPillow from "../assets/illustrations/timeline-vintage-teddy-pillow.png";
+import { isVideoMedia } from "../utils/mediaHelpers";
 
 
 /*
@@ -458,6 +459,27 @@ export default function MemoryDetails() {
 
   /*
   =====================================================
+  LIGHTBOX PHOTOS
+  =====================================================
+
+  The page can contain both images and videos, but
+  the existing lightbox is intentionally image-only.
+  Videos play directly in their gallery frame.
+  =====================================================
+  */
+
+  const lightboxPhotos =
+    useMemo(
+      () =>
+        supportingPhotos.filter(
+          (item) =>
+            !isVideoMedia(item)
+        ),
+      [supportingPhotos]
+    );
+
+  /*
+  =====================================================
   PHOTO PAGINATION
   =====================================================
   */
@@ -466,7 +488,7 @@ export default function MemoryDetails() {
     Math.max(
       1,
       Math.ceil(
-        supportingPhotos.length /
+        lightboxPhotos.length /
           SUPPORTING_PHOTOS_PER_PAGE
       )
     );
@@ -622,11 +644,31 @@ export default function MemoryDetails() {
     if (
       globalIndex >= 0 &&
       globalIndex <
-        supportingPhotos.length
+        lightboxPhotos.length
     ) {
-      setLightboxIndex(
-        globalIndex
-      );
+      const selectedMedia =
+        supportingPhotos[
+          globalIndex
+        ];
+
+      if (
+        isVideoMedia(
+          selectedMedia
+        )
+      ) {
+        return;
+      }
+
+      const imageIndex =
+        lightboxPhotos.indexOf(
+          selectedMedia
+        );
+
+      if (imageIndex >= 0) {
+        setLightboxIndex(
+          imageIndex
+        );
+      }
     }
   }
 
@@ -695,7 +737,7 @@ export default function MemoryDetails() {
         }
 
         return Math.min(
-          supportingPhotos.length - 1,
+          lightboxPhotos.length - 1,
           index + 1
         );
       }
@@ -753,7 +795,7 @@ export default function MemoryDetails() {
     };
   }, [
     lightboxIndex,
-    supportingPhotos.length,
+    lightboxPhotos.length,
   ]);
 
   /*
@@ -1409,78 +1451,112 @@ export default function MemoryDetails() {
             0 ? (
               visiblePhotos.map(
                 (
-                  image,
+                  media,
                   index
-                ) => (
-                  <button
-                    key={`${image}-${index}`}
-                    type="button"
-                    onClick={() =>
-                      openPhoto(
-                        index
-                      )
-                    }
-                    className="
-                      group
-                      relative
-                      rounded-[10px]
-                      bg-[#FFF9EC]
-                      border
-                      border-[#D6B986]
-                      shadow-md
-                      p-3
-                      transition-all
-                      duration-200
-                      hover:-translate-y-2
-                      hover:shadow-xl
-                      focus:outline-none
-                      focus:ring-2
-                      focus:ring-[#A8753F]
-                    "
-                    style={{
-                      width:
-                        "29%",
+                ) => {
+                  const video =
+                    isVideoMedia(
+                      media
+                    );
 
-                      height:
-                        "90%",
-
-                      transform:
-                        index === 0
-                          ? "rotate(-2deg)"
-                          : index === 1
-                          ? "rotate(1deg)"
-                          : "rotate(2deg)",
-                    }}
-                  >
-                    <img
-                      src={image}
-                      alt={`Memory photo ${
-                        (photoPage - 1) *
-                          SUPPORTING_PHOTOS_PER_PAGE +
-                        index +
-                        1
-                      }`}
-                      loading="lazy"
-                      draggable={false}
+                  return (
+                    <button
+                      key={`${media}-${index}`}
+                      type="button"
+                      onClick={() =>
+                        openPhoto(
+                          index
+                        )
+                      }
+                      className="
+                        group
+                        relative
+                        rounded-[10px]
+                        bg-[#FFF9EC]
+                        border
+                        border-[#D6B986]
+                        shadow-md
+                        p-3
+                        transition-all
+                        duration-200
+                        hover:-translate-y-2
+                        hover:shadow-xl
+                        focus:outline-none
+                        focus:ring-2
+                        focus:ring-[#A8753F]
+                      "
                       style={{
                         width:
-                          "100%",
+                          "29%",
 
                         height:
-                          "82%",
+                          "90%",
 
-                        objectFit:
-                          "cover",
-
-                        borderRadius:
-                          "4px",
-
-                        display:
-                          "block",
+                        transform:
+                          index === 0
+                            ? "rotate(-2deg)"
+                            : index === 1
+                            ? "rotate(1deg)"
+                            : "rotate(2deg)",
                       }}
-                    />
-                  </button>
-                )
+                    >
+                      {video ? (
+                        <video
+                          src={media}
+                          controls
+                          playsInline
+                          onClick={(event) =>
+                            event.stopPropagation()
+                          }
+                          style={{
+                            width:
+                              "100%",
+
+                            height:
+                              "82%",
+
+                            objectFit:
+                              "cover",
+
+                            borderRadius:
+                              "4px",
+
+                            display:
+                              "block",
+                          }}
+                        />
+                      ) : (
+                        <img
+                          src={media}
+                          alt={`Memory photo ${
+                            (photoPage - 1) *
+                              SUPPORTING_PHOTOS_PER_PAGE +
+                            index +
+                            1
+                          }`}
+                          loading="lazy"
+                          draggable={false}
+                          style={{
+                            width:
+                              "100%",
+
+                            height:
+                              "82%",
+
+                            objectFit:
+                              "cover",
+
+                            borderRadius:
+                              "4px",
+
+                            display:
+                              "block",
+                          }}
+                        />
+                      )}
+                    </button>
+                  );
+                }
               )
             ) : (
               <div
@@ -1803,7 +1879,7 @@ export default function MemoryDetails() {
 
       {lightboxIndex !==
         null &&
-        supportingPhotos[
+        lightboxPhotos[
           lightboxIndex
         ] && (
           <div
@@ -1901,7 +1977,7 @@ export default function MemoryDetails() {
             >
               <img
                 src={
-                  supportingPhotos[
+                  lightboxPhotos[
                     lightboxIndex
                   ]
                 }
@@ -1941,7 +2017,7 @@ export default function MemoryDetails() {
                   1}{" "}
                 /{" "}
                 {
-                  supportingPhotos.length
+                  lightboxPhotos.length
                 }
               </div>
             </div>
@@ -1959,7 +2035,7 @@ export default function MemoryDetails() {
                 ================================================= */}
 
             {lightboxIndex <
-              supportingPhotos.length -
+              lightboxPhotos.length -
                 1 && (
               <button
                 type="button"

@@ -8,6 +8,7 @@ import Lightbox from "../components/memory/Lightbox";
 
 import { getMilestones } from "../services/milestoneService";
 import mapMilestone from "../utils/mapMilestone";
+import { isVideoMedia } from "../utils/mediaHelpers";
 
 export default function MilestoneMemory() {
   const navigate = useNavigate();
@@ -89,6 +90,10 @@ export default function MilestoneMemory() {
       </>
     );
   }
+
+  const galleryImages = (memory.gallery || []).filter(
+    (item) => !isVideoMedia(item)
+  );
 
   return (
     <>
@@ -174,26 +179,39 @@ export default function MilestoneMemory() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-              {(memory.gallery || []).map((photo, index) => (
+              {(memory.gallery || []).map((photo, index) => {
 
-                <div
-                  key={index}
-                  className="overflow-hidden rounded-[28px] shadow-lg"
-                >
+                const video = isVideoMedia(photo);
+                const imageIndex = galleryImages.indexOf(photo);
 
-                  <img
-                    src={photo}
-                    alt=""
-                    onClick={() => {
-                      setCurrentIndex(index);
-                      setIsOpen(true);
-                    }}
-                    className="w-full h-[300px] object-cover cursor-pointer hover:scale-105 transition"
-                  />
+                return (
+                  <div
+                    key={index}
+                    className="overflow-hidden rounded-[28px] shadow-lg"
+                  >
 
-                </div>
+                    {video ? (
+                      <video
+                        src={photo}
+                        controls
+                        playsInline
+                        className="w-full h-[300px] object-cover"
+                      />
+                    ) : (
+                      <img
+                        src={photo}
+                        alt=""
+                        onClick={() => {
+                          setCurrentIndex(imageIndex);
+                          setIsOpen(true);
+                        }}
+                        className="w-full h-[300px] object-cover cursor-pointer hover:scale-105 transition"
+                      />
+                    )}
 
-              ))}
+                  </div>
+                );
+              })}
 
             </div>
 
@@ -231,7 +249,7 @@ export default function MilestoneMemory() {
       </section>
 
       <Lightbox
-        images={memory.gallery || []}
+        images={galleryImages}
         currentIndex={currentIndex}
         setCurrentIndex={setCurrentIndex}
         isOpen={isOpen}
