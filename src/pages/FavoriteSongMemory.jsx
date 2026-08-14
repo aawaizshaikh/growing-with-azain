@@ -584,6 +584,35 @@ export default function FavoriteSongMemory() {
   const navigate = useNavigate();
   const { slug } = useParams();
 
+  // Timeline-style COVER scene scaling.
+  // The artwork stays in one fixed coordinate system and scales to
+  // completely cover the viewport, cropping only when needed.
+  const [viewport, setViewport] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewport({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const sceneScale = Math.max(
+    viewport.width / SCENE_WIDTH,
+    viewport.height / SCENE_HEIGHT
+  );
+
   const [song, setSong] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -995,13 +1024,12 @@ export default function FavoriteSongMemory() {
       */}
 
       <div
-        className="absolute left-1/2 top-1/2"
+        className="absolute left-1/2 top-1/2 overflow-hidden"
         style={{
-          width: "100vw",
-          aspectRatio:
-            `${SCENE_WIDTH} / ${SCENE_HEIGHT}`,
-          transform:
-            "translate(-50%, -50%)",
+          width: `${SCENE_WIDTH}px`,
+          height: `${SCENE_HEIGHT}px`,
+          transform: `translate(-50%, -50%) scale(${sceneScale})`,
+          transformOrigin: "center center",
         }}
       >
 

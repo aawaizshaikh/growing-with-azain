@@ -769,6 +769,38 @@ export default function Letters() {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  // Timeline-style COVER scene scaling.
+  // The entire artwork lives in one fixed 16:9 coordinate system and
+  // scales to COVER the viewport, cropping only when the viewport ratio differs.
+  const [viewport, setViewport] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewport({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const SCENE_WIDTH = 1920;
+  const SCENE_HEIGHT = 1080;
+
+  const sceneScale = Math.max(
+    viewport.width / SCENE_WIDTH,
+    viewport.height / SCENE_HEIGHT
+  );
+
   const [
     letters,
     setLetters,
@@ -1013,18 +1045,13 @@ export default function Letters() {
           absolute
           left-1/2
           top-1/2
-          -translate-x-1/2
-          -translate-y-1/2
           overflow-hidden
         "
         style={{
-          width:
-            "min(100vw, 177.7777778vh)",
-
-          height:
-            "min(100vh, 56.25vw)",
-
-          aspectRatio: "16 / 9",
+          width: `${SCENE_WIDTH}px`,
+          height: `${SCENE_HEIGHT}px`,
+          transform: `translate(-50%, -50%) scale(${sceneScale})`,
+          transformOrigin: "center center",
         }}
       >
         {/* ==================================================================

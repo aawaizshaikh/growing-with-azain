@@ -577,6 +577,36 @@ export default function LetterMemory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Timeline-style COVER scene scaling.
+  const [viewport, setViewport] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewport({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const SCENE_WIDTH = 1920;
+  const SCENE_HEIGHT = 1080;
+
+  const sceneScale = Math.max(
+    viewport.width / SCENE_WIDTH,
+    viewport.height / SCENE_HEIGHT
+  );
+
 
   // ==========================================================================
   // LOAD LETTER
@@ -672,16 +702,13 @@ export default function LetterMemory() {
           absolute
           left-1/2
           top-1/2
-          -translate-x-1/2
-          -translate-y-1/2
           overflow-hidden
         "
         style={{
-          width:
-            "min(100vw, 177.7777778vh)",
-          height:
-            "min(100vh, 56.25vw)",
-          aspectRatio: "16 / 9",
+          width: `${SCENE_WIDTH}px`,
+          height: `${SCENE_HEIGHT}px`,
+          transform: `translate(-50%, -50%) scale(${sceneScale})`,
+          transformOrigin: "center center",
         }}
       >
 

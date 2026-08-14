@@ -1,5 +1,5 @@
 import { FaArrowLeft, FaMusic } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 import SongTimeline from "../components/songs/SongTimeline";
@@ -124,6 +124,45 @@ export default function FavoriteSongs() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  /* ==========================================================
+     TIMELINE-STYLE COVER SCENE SCALING
+
+     The entire Favourite Songs page uses one fixed artwork
+     coordinate system. The scene scales to COVER the viewport,
+     exactly like the Timeline main page.
+
+     All illustrations inside the scene remain positioned using
+     their existing percentage coordinates.
+     ========================================================== */
+
+  const [viewport, setViewport] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : SCENE_WIDTH,
+    height:
+      typeof window !== "undefined" ? window.innerHeight : SCENE_HEIGHT,
+  });
+
+  useEffect(() => {
+    const updateViewport = () => {
+      setViewport({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    updateViewport();
+
+    window.addEventListener("resize", updateViewport);
+
+    return () => {
+      window.removeEventListener("resize", updateViewport);
+    };
+  }, []);
+
+  const sceneScale = Math.max(
+    viewport.width / SCENE_WIDTH,
+    viewport.height / SCENE_HEIGHT
+  );
+
   return (
     <>
       {/* ==========================================================
@@ -134,9 +173,13 @@ export default function FavoriteSongs() {
           No Navbar.
           No Footer.
           No SongHeader.
+
+          The scene now behaves exactly like Timeline:
+          the fixed artwork is scaled using COVER logic so it
+          always fills the complete viewport.
           ========================================================== */}
 
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className="fixed inset-0 overflow-hidden">
         {/* ========================================================
             MASTER SCENE
 
@@ -144,16 +187,18 @@ export default function FavoriteSongs() {
             1672 × 941
 
             Everything inside this container is positioned relative
-            to this scene using percentages.
+            to this same fixed scene using percentages.
             ======================================================== */}
 
         <div
-          className="relative overflow-hidden shrink-0"
+          className="absolute overflow-hidden"
           style={{
-            width: `min(100%, calc(100dvh * ${
-              SCENE_WIDTH / SCENE_HEIGHT
-            }))`,
-            aspectRatio: `${SCENE_WIDTH} / ${SCENE_HEIGHT}`,
+            width: `${SCENE_WIDTH}px`,
+            height: `${SCENE_HEIGHT}px`,
+            left: "50%",
+            top: "50%",
+            transform: `translate(-50%, -50%) scale(${sceneScale})`,
+            transformOrigin: "center center",
           }}
         >
           {/* ======================================================
