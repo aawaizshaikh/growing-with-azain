@@ -6,56 +6,56 @@ import TimelineDrawer from "../components/timeline/TimelineDrawer";
 import { getMilestones } from "../services/milestoneService";
 import mapMilestone from "../utils/mapMilestone";
 
-import background from "../assets/illustrations/animals/background.png";
-import milestoneSignpost from "../assets/illustrations/animals/milestone-signpost.png";
+import background from "../assets/illustrations/animals/background.webp";
+import milestoneSignpost from "../assets/illustrations/animals/milestone-signpost.webp";
 
-import parrot from "../assets/illustrations/animals/parrot.png";
-import bluebird from "../assets/illustrations/animals/bluebird.png";
-import deer1 from "../assets/illustrations/animals/deer-1.png";
-import monkey from "../assets/illustrations/animals/moneky.png";
-import hedgehog from "../assets/illustrations/animals/hedgehog.png";
-import turtle from "../assets/illustrations/animals/turtle.png";
-import butterfly from "../assets/illustrations/animals/butterfly.png";
+import parrot from "../assets/illustrations/animals/parrot.webp";
+import bluebird from "../assets/illustrations/animals/bluebird.webp";
+import deer1 from "../assets/illustrations/animals/deer-1.webp";
+import monkey from "../assets/illustrations/animals/moneky.webp";
+import hedgehog from "../assets/illustrations/animals/hedgehog.webp";
+import turtle from "../assets/illustrations/animals/turtle.webp";
+import butterfly from "../assets/illustrations/animals/butterfly.webp";
 
-import flockBirdUp from "../assets/illustrations/animals/flock-bird-up.png";
-import flockBirdLevel from "../assets/illustrations/animals/flock-bird-level.png";
-import flockBirdDown from "../assets/illustrations/animals/flock-bird-down.png";
-import parrotBlue1 from "../assets/illustrations/animals/parrot-blue-1.png";
-import parrotBlue2 from "../assets/illustrations/animals/parrot-blue-2.png";
-import parrotBlue3 from "../assets/illustrations/animals/parrot-blue-3.png";
-import redButterfly from "../assets/illustrations/animals/red-butterfly.png";
-import yellowbird from "../assets/illustrations/animals/yellow-bird.png";
-import greenbird from "../assets/illustrations/animals/green-bird.png";
-import peacock from "../assets/illustrations/animals/peacock.png";
-import rabbit from "../assets/illustrations/animals/rabbit.png";
+import flockBirdUp from "../assets/illustrations/animals/flock-bird-up.webp";
+import flockBirdLevel from "../assets/illustrations/animals/flock-bird-level.webp";
+import flockBirdDown from "../assets/illustrations/animals/flock-bird-down.webp";
+import parrotBlue1 from "../assets/illustrations/animals/parrot-blue-1.webp";
+import parrotBlue2 from "../assets/illustrations/animals/parrot-blue-2.webp";
+import parrotBlue3 from "../assets/illustrations/animals/parrot-blue-3.webp";
+import redButterfly from "../assets/illustrations/animals/red-butterfly.webp";
+import yellowbird from "../assets/illustrations/animals/yellow-bird.webp";
+import greenbird from "../assets/illustrations/animals/green-bird.webp";
+import peacock from "../assets/illustrations/animals/peacock.webp";
+import rabbit from "../assets/illustrations/animals/rabbit.webp";
 
-import lion1 from "../assets/illustrations/animals/lion/1.png";
-import lion2 from "../assets/illustrations/animals/lion/2.png";
-import lion3 from "../assets/illustrations/animals/lion/3.png";
-import lion4 from "../assets/illustrations/animals/lion/4.png";
-import lion5 from "../assets/illustrations/animals/lion/5.png";
-import lion6 from "../assets/illustrations/animals/lion/6.png";
-import lion7 from "../assets/illustrations/animals/lion/7.png";
-import lion8 from "../assets/illustrations/animals/lion/8.png";
+import lion1 from "../assets/illustrations/animals/lion/1.webp";
+import lion2 from "../assets/illustrations/animals/lion/2.webp";
+import lion3 from "../assets/illustrations/animals/lion/3.webp";
+import lion4 from "../assets/illustrations/animals/lion/4.webp";
+import lion5 from "../assets/illustrations/animals/lion/5.webp";
+import lion6 from "../assets/illustrations/animals/lion/6.webp";
+import lion7 from "../assets/illustrations/animals/lion/7.webp";
+import lion8 from "../assets/illustrations/animals/lion/8.webp";
 
-import squirrel from "../assets/illustrations/animals/squirrel.png";
-import deer2 from "../assets/illustrations/animals/deer-2.png";
-import owl from "../assets/illustrations/animals/owl.png";
+import squirrel from "../assets/illustrations/animals/squirrel.webp";
+import deer2 from "../assets/illustrations/animals/deer-2.webp";
+import owl from "../assets/illustrations/animals/owl.webp";
 
-import elephant1 from "../assets/illustrations/animals/elephant/1.png";
-import elephant2 from "../assets/illustrations/animals/elephant/2.png";
-import elephant3 from "../assets/illustrations/animals/elephant/3.png";
-import elephant4 from "../assets/illustrations/animals/elephant/4.png";
-import elephant5 from "../assets/illustrations/animals/elephant/5.png";
-import elephant6 from "../assets/illustrations/animals/elephant/6.png";
-import elephant7 from "../assets/illustrations/animals/elephant/7.png";
-import elephant8 from "../assets/illustrations/animals/elephant/8.png";
+import elephant1 from "../assets/illustrations/animals/elephant/1.webp";
+import elephant2 from "../assets/illustrations/animals/elephant/2.webp";
+import elephant3 from "../assets/illustrations/animals/elephant/3.webp";
+import elephant4 from "../assets/illustrations/animals/elephant/4.webp";
+import elephant5 from "../assets/illustrations/animals/elephant/5.webp";
+import elephant6 from "../assets/illustrations/animals/elephant/6.webp";
+import elephant7 from "../assets/illustrations/animals/elephant/7.webp";
+import elephant8 from "../assets/illustrations/animals/elephant/8.webp";
 
 
-import redBirddown from "../assets/illustrations/animals/red-bird-down.png";
+import redBirddown from "../assets/illustrations/animals/red-bird-down.webp";
 
-import giraffe from "../assets/illustrations/animals/giraffe.png";
-import vine from "../assets/illustrations/animals/vine.png";
+import giraffe from "../assets/illustrations/animals/giraffe.webp";
+import vine from "../assets/illustrations/animals/vine.webp";
 
 const DESIGN_WIDTH = 1440;
 const DESIGN_HEIGHT = 900;

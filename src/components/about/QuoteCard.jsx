@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import { FaHeart } from "react-icons/fa";
 
-import glassHighlight from "../../assets/illustrations/glass-highlight.png";
-import paperTexture from "../../assets/illustrations/paper-note.png";
-import sparkles from "../../assets/illustrations/sparkles.png";
+import glassHighlight from "../../assets/illustrations/glass-highlight.webp";
+import paperTexture from "../../assets/illustrations/paper-note.webp";
+import sparkles from "../../assets/illustrations/sparkles.webp";
 
 export default function QuoteCard() {
   return (

@@ -11,47 +11,47 @@ import Footer from "../components/Footer";
 
 import azainPhoto from "../assets/images/azain.jpg";
 
-import nurseryRoom from "../assets/illustrations/about-nursery-room-background.png";
-import nurseryBed from "../assets/illustrations/about-nursery-bed.png";
-import nurseryRug from "../assets/illustrations/about-nursery-rug.png";
+import nurseryRoom from "../assets/illustrations/about-nursery-room-background.webp";
+import nurseryBed from "../assets/illustrations/about-nursery-bed.webp";
+import nurseryRug from "../assets/illustrations/about-nursery-rug.webp";
 
-import memoryWall from "../assets/illustrations/about-memory-wall.png";
-import woodenFrame from "../assets/illustrations/about-wooden-frame.png";
+import memoryWall from "../assets/illustrations/about-memory-wall.webp";
+import woodenFrame from "../assets/illustrations/about-wooden-frame.webp";
 
-import growthChart from "../assets/illustrations/about-growth-chart.png";
-import babyScale from "../assets/illustrations/about-baby-scale.png";
+import growthChart from "../assets/illustrations/about-growth-chart.webp";
+import babyScale from "../assets/illustrations/about-baby-scale.webp";
 
-import toyShelf from "../assets/illustrations/about-toy-shelf.png";
-import toyTrain from "../assets/illustrations/toy-train.png";
-import halwaBowl from "../assets/illustrations/about-halwa-bowl.png";
-import blueToy from "../assets/illustrations/about-blue-toy.png";
-import musicBox from "../assets/illustrations/about-music-box.png";
-import dog from "../assets/illustrations/about-dog.png";
+import toyShelf from "../assets/illustrations/about-toy-shelf.webp";
+import toyTrain from "../assets/illustrations/toy-train.webp";
+import halwaBowl from "../assets/illustrations/about-halwa-bowl.webp";
+import blueToy from "../assets/illustrations/about-blue-toy.webp";
+import musicBox from "../assets/illustrations/about-music-box.webp";
+import dog from "../assets/illustrations/about-dog.webp";
 
-import tractor from "../assets/illustrations/about-tractor.png";
-import papad from "../assets/illustrations/about-papad.png";
-import toothbrush from "../assets/illustrations/about-brush.png";
-import roti from "../assets/illustrations/about-roti.png";
-import fries from "../assets/illustrations/about-fries.png";
-import pancakes from "../assets/illustrations/about-pancakes.png";
-import truck from "../assets/illustrations/about-truck.png";
-import car from "../assets/illustrations/about-car.png";
-import teletubies from "../assets/illustrations/about-teletubies.png";
-import guitar from "../assets/illustrations/about-guitar.png";
-import airplane from "../assets/illustrations/about-airplane.png";
-import tricycle from "../assets/illustrations/about-tricycle.png";
+import tractor from "../assets/illustrations/about-tractor.webp";
+import papad from "../assets/illustrations/about-papad.webp";
+import toothbrush from "../assets/illustrations/about-brush.webp";
+import roti from "../assets/illustrations/about-roti.webp";
+import fries from "../assets/illustrations/about-fries.webp";
+import pancakes from "../assets/illustrations/about-pancakes.webp";
+import truck from "../assets/illustrations/about-truck.webp";
+import car from "../assets/illustrations/about-car.webp";
+import teletubies from "../assets/illustrations/about-teletubies.webp";
+import guitar from "../assets/illustrations/about-guitar.webp";
+import airplane from "../assets/illustrations/about-airplane.webp";
+import tricycle from "../assets/illustrations/about-tricycle.webp";
 
-import nightRoom from "../assets/illustrations/about-bedroom-night-background.png";
-import bedsideLamp from "../assets/illustrations/about-bedside-lamp.png";
-import moon from "../assets/illustrations/about-moon.png";
-import goodnightWindow from "../assets/illustrations/about-goodnight-window.png";
+import nightRoom from "../assets/illustrations/about-bedroom-night-background.webp";
+import bedsideLamp from "../assets/illustrations/about-bedside-lamp.webp";
+import moon from "../assets/illustrations/about-moon.webp";
+import goodnightWindow from "../assets/illustrations/about-goodnight-window.webp";
 
-import star from "../assets/illustrations/star.png";
-import hearts from "../assets/illustrations/floating-hearts.png";
-import particles from "../assets/illustrations/floating-particles.png";
-import paperTexture from "../assets/illustrations/paper-note.png";
-import glassHighlight from "../assets/illustrations/glass-highlight.png";
-import polaroidShadow from "../assets/illustrations/polaroid-shadow.png";
+import star from "../assets/illustrations/star.webp";
+import hearts from "../assets/illustrations/floating-hearts.webp";
+import particles from "../assets/illustrations/floating-particles.webp";
+import paperTexture from "../assets/illustrations/paper-note.webp";
+import glassHighlight from "../assets/illustrations/glass-highlight.webp";
+import polaroidShadow from "../assets/illustrations/polaroid-shadow.webp";
 
 /* =========================================================
    MEMORY BOARD DETAILS

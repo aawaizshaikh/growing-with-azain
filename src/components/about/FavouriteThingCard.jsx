@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 
-import glassHighlight from "../../assets/illustrations/glass-highlight.png";
-import paperTexture from "../../assets/illustrations/paper-note.png";
-import sparkles from "../../assets/illustrations/sparkles.png";
-import musicNotes from "../../assets/illustrations/music-notes.png";
-import steam from "../../assets/illustrations/steam.png";
+import glassHighlight from "../../assets/illustrations/glass-highlight.webp";
+import paperTexture from "../../assets/illustrations/paper-note.webp";
+import sparkles from "../../assets/illustrations/sparkles.webp";
+import musicNotes from "../../assets/illustrations/music-notes.webp";
+import steam from "../../assets/illustrations/steam.webp";
 
 const animations = {
   float: {

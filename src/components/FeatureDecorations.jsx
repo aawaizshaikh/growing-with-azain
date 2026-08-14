@@ -1,21 +1,21 @@
 import { motion } from "framer-motion";
 
 
-import paper from "../assets/illustrations/paper-note.png";
-import paper1 from "../assets/illustrations/paper-note1.png";
+import paper from "../assets/illustrations/paper-note.webp";
+import paper1 from "../assets/illustrations/paper-note1.webp";
 
-import leaf from "../assets/illustrations/tiny-leaves.png.png";
+import leaf from "../assets/illustrations/tiny-leaves.png.webp";
 
-import stars from "../assets/illustrations/stars.png";
-import sparkles from "../assets/illustrations/sparkles.png";
+import stars from "../assets/illustrations/stars.webp";
+import sparkles from "../assets/illustrations/sparkles.webp";
 
-import music from "../assets/illustrations/music-notes.png";
+import music from "../assets/illustrations/music-notes.webp";
 
-import polaroid from "../assets/illustrations/polaroid-shadow.png";
+import polaroid from "../assets/illustrations/polaroid-shadow.webp";
 
-import hearts from "../assets/illustrations/floating-hearts.png";
+import hearts from "../assets/illustrations/floating-hearts.webp";
 
-import heart from "../assets/illustrations/heart.png";
+import heart from "../assets/illustrations/heart.webp";
 
 
 

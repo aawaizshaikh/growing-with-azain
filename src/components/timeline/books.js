@@ -1,9 +1,9 @@
-import newbornBook from "../../assets/illustrations/timeline-book-newborn-trim.png";
-import infantBook from "../../assets/illustrations/timeline-book-infant-trim.png";
-import toddlerBook from "../../assets/illustrations/timeline-book-toddler-trim.png";
-import preschoolBook from "../../assets/illustrations/timeline-book-preschool-trim.png";
-import schoolBook from "../../assets/illustrations/timeline-book-school-trim.png";
-import teenBook from "../../assets/illustrations/timeline-book-teen-trim.png";
+import newbornBook from "../../assets/illustrations/timeline-book-newborn-trim.webp";
+import infantBook from "../../assets/illustrations/timeline-book-infant-trim.webp";
+import toddlerBook from "../../assets/illustrations/timeline-book-toddler-trim.webp";
+import preschoolBook from "../../assets/illustrations/timeline-book-preschool-trim.webp";
+import schoolBook from "../../assets/illustrations/timeline-book-school-trim.webp";
+import teenBook from "../../assets/illustrations/timeline-book-teen-trim.webp";
 
 const books = [
   {

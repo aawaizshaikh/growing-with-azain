@@ -3,15 +3,15 @@ import { useEffect } from "react";
 
 import hero from "../../assets/images/azain.jpg";
 
-import teddy from "../../assets/illustrations/teddy.png";
-import train from "../../assets/illustrations/toy-train.png";
-import wheel from "../../assets/illustrations/train-wheel.png";
+import teddy from "../../assets/illustrations/teddy.webp";
+import train from "../../assets/illustrations/toy-train.webp";
+import wheel from "../../assets/illustrations/train-wheel.webp";
 
-import leaves from "../../assets/illustrations/leaf.png";
-import heart from "../../assets/illustrations/heart-new.png";
+import leaves from "../../assets/illustrations/leaf.webp";
+import heart from "../../assets/illustrations/heart-new.webp";
 
-import paperTexture from "../../assets/illustrations/paper-note.png";
-import glassHighlight from "../../assets/illustrations/glass-highlight.png";
+import paperTexture from "../../assets/illustrations/paper-note.webp";
+import glassHighlight from "../../assets/illustrations/glass-highlight.webp";
 
 export default function HeroPhoto() {
   const mouseX = useMotionValue(0);

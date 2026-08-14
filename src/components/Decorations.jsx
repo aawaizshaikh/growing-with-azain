@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 
-import teddy from "../assets/illustrations/teddy.png";
-import balloon from "../assets/illustrations/balloon.png";
-import cloud from "../assets/illustrations/cloud.png";
-import leaf from "../assets/illustrations/Leaf.png";
-import star from "../assets/illustrations/star.png";
+import teddy from "../assets/illustrations/teddy.webp";
+import balloon from "../assets/illustrations/balloon.webp";
+import cloud from "../assets/illustrations/cloud.webp";
+import leaf from "../assets/illustrations/Leaf.webp";
+import star from "../assets/illustrations/star.webp";
 
 export default function Decorations() {
   const floating = {

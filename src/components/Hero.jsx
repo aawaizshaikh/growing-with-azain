@@ -6,16 +6,16 @@ import { useNavigate } from "react-router-dom";
 
 import azain from "../assets/images/azain.jpg";
 
-import balloon from "../assets/illustrations/balloon.png";
-import teddy from "../assets/illustrations/teddy.png";
-import cloud from "../assets/illustrations/cloud.png";
-import leaf from "../assets/illustrations/leaf.png";
-import star from "../assets/illustrations/star.png";
-import heart from "../assets/illustrations/heart.png";
+import balloon from "../assets/illustrations/balloon.webp";
+import teddy from "../assets/illustrations/teddy.webp";
+import cloud from "../assets/illustrations/cloud.webp";
+import leaf from "../assets/illustrations/leaf.webp";
+import star from "../assets/illustrations/star.webp";
+import heart from "../assets/illustrations/heart.webp";
 
-import birdFlock1 from "../assets/illustrations/bird-flock-1.png";
-import birdFlock2 from "../assets/illustrations/bird-flock-2.png";
-import birdFlock3 from "../assets/illustrations/bird-flock-3.png";
+import birdFlock1 from "../assets/illustrations/bird-flock-1.webp";
+import birdFlock2 from "../assets/illustrations/bird-flock-2.webp";
+import birdFlock3 from "../assets/illustrations/bird-flock-3.webp";
 
 
 

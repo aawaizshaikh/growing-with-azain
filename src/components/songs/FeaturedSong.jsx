@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { FaPlay, FaCalendarAlt } from "react-icons/fa";
 
-import heart from "../../assets/illustrations/dancing-heart.png";
-import note1 from "../../assets/illustrations/music-note-1.png";
-import note2 from "../../assets/illustrations/music-note-2.png";
-import note3 from "../../assets/illustrations/music-note-3.png";
-import cloud from "../../assets/illustrations/cloud.png";
+import heart from "../../assets/illustrations/dancing-heart.webp";
+import note1 from "../../assets/illustrations/music-note-1.webp";
+import note2 from "../../assets/illustrations/music-note-2.webp";
+import note3 from "../../assets/illustrations/music-note-3.webp";
+import cloud from "../../assets/illustrations/cloud.webp";
 
 export default function FeaturedSong() {
   return (

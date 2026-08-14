@@ -13,17 +13,17 @@ import JourneyHeader from "../components/timeline/JourneyHeader";
 import TimelineBookshelf from "../components/timeline/TimelineBookshelf";
 import ChapterSection from "../components/timeline/ChapterSection";
 
-import vintageWall from "../assets/illustrations/background-new.png";
-import vintageLamp from "../assets/illustrations/timeline-vintage-lamp-new.png";
-import vintageCarpet from "../assets/illustrations/timeline-vintage-carpet-new.png";
-import vintageTeddyPillow from "../assets/illustrations/timeline-vintage-teddy-pillow.png";
-import vintageRockingHorse from "../assets/illustrations/timeline-vintage-rocking-horse.png";
-import vintageAlphabetBlocks1 from "../assets/illustrations/timeline-vintage-alphabet-blocks-1.png";
-import vintageAlphabetBlocks2 from "../assets/illustrations/timeline-vintage-alphabet-blocks-2.png";
-import vintagefootball from "../assets/illustrations/timeline-vintage-football.png";
-import vintageunicorn from "../assets/illustrations/timeline-vintage-unicorn.png";
-import vintagecars from "../assets/illustrations/timeline-vintage-random-cars.png";
-import vintagetoytrain from "../assets/illustrations/timeline-vintage-toytrain.png";
+import vintageWall from "../assets/illustrations/background-new.webp";
+import vintageLamp from "../assets/illustrations/timeline-vintage-lamp-new.webp";
+import vintageCarpet from "../assets/illustrations/timeline-vintage-carpet-new.webp";
+import vintageTeddyPillow from "../assets/illustrations/timeline-vintage-teddy-pillow.webp";
+import vintageRockingHorse from "../assets/illustrations/timeline-vintage-rocking-horse.webp";
+import vintageAlphabetBlocks1 from "../assets/illustrations/timeline-vintage-alphabet-blocks-1.webp";
+import vintageAlphabetBlocks2 from "../assets/illustrations/timeline-vintage-alphabet-blocks-2.webp";
+import vintagefootball from "../assets/illustrations/timeline-vintage-football.webp";
+import vintageunicorn from "../assets/illustrations/timeline-vintage-unicorn.webp";
+import vintagecars from "../assets/illustrations/timeline-vintage-random-cars.webp";
+import vintagetoytrain from "../assets/illustrations/timeline-vintage-toytrain.webp";
 
 import { getTimelineMemories } from "../services/timelineService";
 

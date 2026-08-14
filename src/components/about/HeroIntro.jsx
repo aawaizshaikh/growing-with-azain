@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-import divider from "../../assets/illustrations/leaf-divider.png";
+import divider from "../../assets/illustrations/leaf-divider.webp";
 import QuoteCard from "./QuoteCard";
 
 export default function HeroIntro() {

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-import vinyl from "../../assets/illustrations/favsongs/vinyl.png";
+import vinyl from "../../assets/illustrations/favsongs/vinyl.webp";
 
 function createSlug(value) {
   return String(value || "")

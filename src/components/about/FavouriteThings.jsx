@@ -1,14 +1,14 @@
 import FavouriteThingCard from "./FavouriteThingCard";
 
-import train from "../../assets/illustrations/toy-train.png";
-import heart from "../../assets/illustrations/heart-new.png";
-import rainbow from "../../assets/illustrations/rainbow.png";
-import balloon from "../../assets/illustrations/hot-air-baloon.png";
-import dog from "../../assets/illustrations/dog.png";
+import train from "../../assets/illustrations/toy-train.webp";
+import heart from "../../assets/illustrations/heart-new.webp";
+import rainbow from "../../assets/illustrations/rainbow.webp";
+import balloon from "../../assets/illustrations/hot-air-baloon.webp";
+import dog from "../../assets/illustrations/dog.webp";
 
-import sparkles from "../../assets/illustrations/sparkles.png";
-import blob1 from "../../assets/illustrations/blob-1.png";
-import blob2 from "../../assets/illustrations/blob-2.png";
+import sparkles from "../../assets/illustrations/sparkles.webp";
+import blob1 from "../../assets/illustrations/blob-1.webp";
+import blob2 from "../../assets/illustrations/blob-2.webp";
 
 import { motion } from "framer-motion";
 

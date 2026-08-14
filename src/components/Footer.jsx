@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 
-import leaf from "../assets/illustrations/leaf.png";
-import hearts from "../assets/illustrations/floating-hearts.png";
-import sparkles from "../assets/illustrations/sparkles.png";
+import leaf from "../assets/illustrations/leaf.webp";
+import hearts from "../assets/illustrations/floating-hearts.webp";
+import sparkles from "../assets/illustrations/sparkles.webp";
 
 
 export default function Footer() {

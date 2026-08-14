@@ -9,11 +9,11 @@ import {
 } from "react-icons/fa";
 
 import Azain from "../../assets/images/azain.jpg";
-import Balloon from "../../assets/illustrations/balloon.png";
-import Cloud from "../../assets/illustrations/cloud.png";
-import Leaf from "../../assets/illustrations/leaf.png";
-import Star from "../../assets/illustrations/star.png";
-import Heart from "../../assets/illustrations/heart.png";
+import Balloon from "../../assets/illustrations/balloon.webp";
+import Cloud from "../../assets/illustrations/cloud.webp";
+import Leaf from "../../assets/illustrations/leaf.webp";
+import Star from "../../assets/illustrations/star.webp";
+import Heart from "../../assets/illustrations/heart.webp";
 
 const filters = [
   { icon: <FaBaby />, title: "Birth", color: "bg-[#FFF2D9]" },

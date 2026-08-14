@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
-import train from "../../assets/illustrations/home-train.png";
-import trainTrack from "../../assets/illustrations/home-train-track.png";
+import train from "../../assets/illustrations/home-train.webp";
+import trainTrack from "../../assets/illustrations/home-train-track.webp";
 
 
 const trainMotion = {

@@ -1,16 +1,16 @@
 import { motion } from "framer-motion";
 
-import bunny from "../../assets/illustrations/bunny-heart.png";
-import frame from "../../assets/illustrations/blank-frame.png";
-import divider from "../../assets/illustrations/leaf-divider.png";
-import heart from "../../assets/illustrations/heart-new.png";
-import stars from "../../assets/illustrations/stars.png";
+import bunny from "../../assets/illustrations/bunny-heart.webp";
+import frame from "../../assets/illustrations/blank-frame.webp";
+import divider from "../../assets/illustrations/leaf-divider.webp";
+import heart from "../../assets/illustrations/heart-new.webp";
+import stars from "../../assets/illustrations/stars.webp";
 
-import paperTexture from "../../assets/illustrations/paper-note.png";
-import glassHighlight from "../../assets/illustrations/glass-highlight.png";
-import floatingHearts from "../../assets/illustrations/floating-hearts.png";
-import polaroidShadow from "../../assets/illustrations/polaroid-shadow.png";
-import blob1 from "../../assets/illustrations/blob-1.png";
+import paperTexture from "../../assets/illustrations/paper-note.webp";
+import glassHighlight from "../../assets/illustrations/glass-highlight.webp";
+import floatingHearts from "../../assets/illustrations/floating-hearts.webp";
+import polaroidShadow from "../../assets/illustrations/polaroid-shadow.webp";
+import blob1 from "../../assets/illustrations/blob-1.webp";
 
 import hero from "../../assets/images/azain.jpg";
 

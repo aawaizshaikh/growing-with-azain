@@ -15,7 +15,7 @@ import {
 import mapFavoriteSong from "../utils/mapFavoriteSong";
 import { isVideoMedia } from "../utils/mediaHelpers";
 
-import background from "../assets/illustrations/favsongs/favorite-song-memory-background.png";
+import background from "../assets/illustrations/favsongs/favorite-song-memory-background.webp";
 
 /*
 |--------------------------------------------------------------------------

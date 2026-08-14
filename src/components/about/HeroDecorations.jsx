@@ -1,18 +1,18 @@
 import { motion } from "framer-motion";
 
-import sun from "../../assets/illustrations/sun.png";
-import rainbow from "../../assets/illustrations/rainbow.png";
-import balloon from "../../assets/illustrations/hot-air-baloon.png";
+import sun from "../../assets/illustrations/sun.webp";
+import rainbow from "../../assets/illustrations/rainbow.webp";
+import balloon from "../../assets/illustrations/hot-air-baloon.webp";
 
-import cloud from "../../assets/illustrations/cloud.png";
+import cloud from "../../assets/illustrations/cloud.webp";
 
-import stars from "../../assets/illustrations/stars.png";
-import sparkles from "../../assets/illustrations/sparkles.png";
+import stars from "../../assets/illustrations/stars.webp";
+import sparkles from "../../assets/illustrations/sparkles.webp";
 
-import blob1 from "../../assets/illustrations/blob-1.png";
-import blob2 from "../../assets/illustrations/blob-2.png";
-import blob3 from "../../assets/illustrations/blob-3.png";
-import blob4 from "../../assets/illustrations/blob-4.png";
+import blob1 from "../../assets/illustrations/blob-1.webp";
+import blob2 from "../../assets/illustrations/blob-2.webp";
+import blob3 from "../../assets/illustrations/blob-3.webp";
+import blob4 from "../../assets/illustrations/blob-4.webp";
 
 export default function HeroDecorations() {
   return (

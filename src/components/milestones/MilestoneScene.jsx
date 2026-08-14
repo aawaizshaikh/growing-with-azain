@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import background from "../../assets/illustrations/animals/background.png";
+import background from "../../assets/illustrations/animals/background.webp";
 
 import {
   ANIMALS,

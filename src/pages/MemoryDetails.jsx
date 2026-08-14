@@ -14,9 +14,9 @@ import {
   getTimelineMemories,
 } from "../services/timelineService";
 
-import diaryBackground from "../assets/illustrations/timeline-memory-diary.png";
-import vintageRockingHorse from "../assets/illustrations/timeline-vintage-rocking-horse.png";
-import vintageTeddyPillow from "../assets/illustrations/timeline-vintage-teddy-pillow.png";
+import diaryBackground from "../assets/illustrations/timeline-memory-diary.webp";
+import vintageRockingHorse from "../assets/illustrations/timeline-vintage-rocking-horse.webp";
+import vintageTeddyPillow from "../assets/illustrations/timeline-vintage-teddy-pillow.webp";
 import { isVideoMedia } from "../utils/mediaHelpers";
 
 

@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 
-import Leaf from "../../assets/illustrations/leaf.png";
-import Star from "../../assets/illustrations/star.png";
-import Heart from "../../assets/illustrations/heart.png";
+import Leaf from "../../assets/illustrations/leaf.webp";
+import Star from "../../assets/illustrations/star.webp";
+import Heart from "../../assets/illustrations/heart.webp";
 
 export default function TimelineIntro() {
   return (

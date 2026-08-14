@@ -9,16 +9,16 @@ import { getPublishedLetters } from "../services/letterService";
 // LETTER ARTWORK
 // ============================================================================
 
-import background from "../assets/illustrations/letters/background.png";
+import background from "../assets/illustrations/letters/background.webp";
 
-import caveBoy from "../assets/illustrations/letters/cave-boy.png";
-import caveDad from "../assets/illustrations/letters/cave-dad.png";
-import caveFire from "../assets/illustrations/letters/cave-fire.png";
-import caveMom from "../assets/illustrations/letters/cave-mom.png";
-import caveGirl from "../assets/illustrations/letters/cave-girl.png";
-import letterChildBackground from "../assets/illustrations/letters/letter-child-background.png";
-import tigerRug from "../assets/illustrations/letters/tiger-rug.png";
-import caveStone from "../assets/illustrations/letters/cave-stone.png";
+import caveBoy from "../assets/illustrations/letters/cave-boy.webp";
+import caveDad from "../assets/illustrations/letters/cave-dad.webp";
+import caveFire from "../assets/illustrations/letters/cave-fire.webp";
+import caveMom from "../assets/illustrations/letters/cave-mom.webp";
+import caveGirl from "../assets/illustrations/letters/cave-girl.webp";
+import letterChildBackground from "../assets/illustrations/letters/letter-child-background.webp";
+import tigerRug from "../assets/illustrations/letters/tiger-rug.webp";
+import caveStone from "../assets/illustrations/letters/cave-stone.webp";
 
 // ============================================================================
 // PAGINATION

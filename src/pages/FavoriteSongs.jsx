@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 import SongTimeline from "../components/songs/SongTimeline";
 
-import background from "../assets/illustrations/favsongs/background.png";
+import background from "../assets/illustrations/favsongs/background.webp";
 
 import AnimatedGuitarBoy from "../components/songs/AnimatedGuitarBoy";
 import AnimatedDancingGirl from "../components/songs/AnimatedDancingGirl";
@@ -12,14 +12,14 @@ import AnimatedGirlWithMic from "../components/songs/AnimatedGirlWithMic";
 import AnimatedDancingBoy from "../components/songs/AnimatedDancingBoy";
 import AnimatedBoyDj from "../components/songs/AnimatedBoyDj";
 
-import boyDancing from "../assets/illustrations/favsongs/boy-dancing.png";
-import boyDj from "../assets/illustrations/favsongs/boy-dj.png";
-import girlDancing from "../assets/illustrations/favsongs/girl-dancing.png";
+import boyDancing from "../assets/illustrations/favsongs/boy-dancing.webp";
+import boyDj from "../assets/illustrations/favsongs/boy-dj.webp";
+import girlDancing from "../assets/illustrations/favsongs/girl-dancing.webp";
 
-import table from "../assets/illustrations/favsongs/table.png";
-import bluestool from "../assets/illustrations/favsongs/blue-stool.png";
-import greenstool from "../assets/illustrations/favsongs/green-stool.png";
-import discoLight from "../assets/illustrations/favsongs/disco-light.png";
+import table from "../assets/illustrations/favsongs/table.webp";
+import bluestool from "../assets/illustrations/favsongs/blue-stool.webp";
+import greenstool from "../assets/illustrations/favsongs/green-stool.webp";
+import discoLight from "../assets/illustrations/favsongs/disco-light.webp";
 
 
 const SCENE_WIDTH = 1672;

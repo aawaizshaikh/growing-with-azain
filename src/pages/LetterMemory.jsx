@@ -3,8 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { getLetterBySlug } from "../services/letterService";
 
-import letterChildBackground from "../assets/illustrations/letters/letter-child-background.png";
-import tigerRug from "../assets/illustrations/letters/tiger-rug.png";
+import letterChildBackground from "../assets/illustrations/letters/letter-child-background.webp";
+import tigerRug from "../assets/illustrations/letters/tiger-rug.webp";
 
 
 // ============================================================================

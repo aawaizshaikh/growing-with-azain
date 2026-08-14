@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
-import logoStar from "../assets/illustrations/star.png";
+import logoStar from "../assets/illustrations/star.webp";
 
 import {
   HiOutlineHome,

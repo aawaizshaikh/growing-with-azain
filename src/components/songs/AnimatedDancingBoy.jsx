@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-import boyDancing1 from "../../assets/illustrations/favsongs/boy-dancing-1.png";
-import boyDancing2 from "../../assets/illustrations/favsongs/boy-dancing-2.png";
-import boyDancing3 from "../../assets/illustrations/favsongs/boy-dancing-3.png";
-import boyDancing4 from "../../assets/illustrations/favsongs/boy-dancing-4.png";
+import boyDancing1 from "../../assets/illustrations/favsongs/boy-dancing-1.webp";
+import boyDancing2 from "../../assets/illustrations/favsongs/boy-dancing-2.webp";
+import boyDancing3 from "../../assets/illustrations/favsongs/boy-dancing-3.webp";
+import boyDancing4 from "../../assets/illustrations/favsongs/boy-dancing-4.webp";
 
 /*
 ===========================================================

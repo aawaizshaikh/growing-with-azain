@@ -1,6 +1,6 @@
 import React from "react";
 
-import decoration from "../../assets/illustrations/timeline-header-decoration.png";
+import decoration from "../../assets/illustrations/timeline-header-decoration.webp";
 
 export default function JourneyHeader() {
   return (

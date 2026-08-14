@@ -1,13 +1,13 @@
 import DetailCard from "./DetailCard";
 
-import sun from "../../assets/illustrations/sun.png";
-import heart from "../../assets/illustrations/heart-new.png";
-import balloon from "../../assets/illustrations/hot-air-baloon.png";
-import cloud from "../../assets/illustrations/cloud.png";
-import teddy from "../../assets/illustrations/teddy.png";
-import rainbow from "../../assets/illustrations/rainbow.png";
-import star from "../../assets/illustrations/star.png";
-import leaf from "../../assets/illustrations/leaf.png";
+import sun from "../../assets/illustrations/sun.webp";
+import heart from "../../assets/illustrations/heart-new.webp";
+import balloon from "../../assets/illustrations/hot-air-baloon.webp";
+import cloud from "../../assets/illustrations/cloud.webp";
+import teddy from "../../assets/illustrations/teddy.webp";
+import rainbow from "../../assets/illustrations/rainbow.webp";
+import star from "../../assets/illustrations/star.webp";
+import leaf from "../../assets/illustrations/leaf.webp";
 
 const details = [
   {

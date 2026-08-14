@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-import djBoy1 from "../../assets/illustrations/favsongs/dj-boy-1.png";
-import djBoy2 from "../../assets/illustrations/favsongs/dj-boy-2.png";
-import djBoy3 from "../../assets/illustrations/favsongs/dj-boy-3.png";
-import djBoy4 from "../../assets/illustrations/favsongs/dj-boy-4.png";
+import djBoy1 from "../../assets/illustrations/favsongs/dj-boy-1.webp";
+import djBoy2 from "../../assets/illustrations/favsongs/dj-boy-2.webp";
+import djBoy3 from "../../assets/illustrations/favsongs/dj-boy-3.webp";
+import djBoy4 from "../../assets/illustrations/favsongs/dj-boy-4.webp";
 
 /*
 ===========================================================

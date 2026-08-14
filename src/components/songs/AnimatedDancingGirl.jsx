@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-import frame1 from "../../assets/illustrations/favsongs/girl-dancing-1.png";
-import frame2 from "../../assets/illustrations/favsongs/girl-dancing-2.png";
-import frame3 from "../../assets/illustrations/favsongs/girl-dancing-3.png";
-import frame4 from "../../assets/illustrations/favsongs/girl-dancing-4.png";
+import frame1 from "../../assets/illustrations/favsongs/girl-dancing-1.webp";
+import frame2 from "../../assets/illustrations/favsongs/girl-dancing-2.webp";
+import frame3 from "../../assets/illustrations/favsongs/girl-dancing-3.webp";
+import frame4 from "../../assets/illustrations/favsongs/girl-dancing-4.webp";
 
 /*
   Dancing sequence:

@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 import { FaSortAmountDownAlt } from "react-icons/fa";
 
-import Balloon from "../../assets/illustrations/balloon.png";
-import Cloud from "../../assets/illustrations/cloud.png";
-import Leaf from "../../assets/illustrations/leaf.png";
-import Star from "../../assets/illustrations/star.png";
+import Balloon from "../../assets/illustrations/balloon.webp";
+import Cloud from "../../assets/illustrations/cloud.webp";
+import Leaf from "../../assets/illustrations/leaf.webp";
+import Star from "../../assets/illustrations/star.webp";
 
 export default function TimelineHeader() {
   return (

@@ -1,9 +1,9 @@
 import React from "react";
 
-import shelfImg from "../../assets/illustrations/timeline-shelf.png";
-import plantLeft from "../../assets/illustrations/timeline-plant-left.png";
-import vineRight from "../../assets/illustrations/timeline-vine-right.png";
-import teddy from "../../assets/illustrations/teddy.png";
+import shelfImg from "../../assets/illustrations/timeline-shelf.webp";
+import plantLeft from "../../assets/illustrations/timeline-plant-left.webp";
+import vineRight from "../../assets/illustrations/timeline-vine-right.webp";
+import teddy from "../../assets/illustrations/teddy.webp";
 
 export default function TimelineBookshelf({
   books,

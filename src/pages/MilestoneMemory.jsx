@@ -7,12 +7,12 @@ import { getMilestones } from "../services/milestoneService";
 import mapMilestone from "../utils/mapMilestone";
 import { isVideoMedia } from "../utils/mediaHelpers";
 
-import lionIllustration from "../assets/illustrations/animals/lion.png";
-import parrotIllustration from "../assets/illustrations/animals/parrot.png";
-import butterflyIllustration from "../assets/illustrations/animals/butterfly.png";
-import deerIllustration from "../assets/illustrations/animals/deer-1.png";
+import lionIllustration from "../assets/illustrations/animals/lion.webp";
+import parrotIllustration from "../assets/illustrations/animals/parrot.webp";
+import butterflyIllustration from "../assets/illustrations/animals/butterfly.webp";
+import deerIllustration from "../assets/illustrations/animals/deer-1.webp";
 
-import milestoneBackground from "../assets/illustrations/milestone/milestone-child-forest-background.png";
+import milestoneBackground from "../assets/illustrations/milestone/milestone-child-forest-background.webp";
 
 /*
   ============================================================

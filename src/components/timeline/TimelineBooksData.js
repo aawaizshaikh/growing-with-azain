@@ -1,9 +1,9 @@
-import newbornImg from "../../assets/illustrations/timeline-book-newborn-trim.png";
-import infantImg from "../../assets/illustrations/timeline-book-infant-trim.png";
-import toddlerImg from "../../assets/illustrations/timeline-book-toddler-trim.png";
-import preschoolImg from "../../assets/illustrations/timeline-book-preschool-trim.png";
-import schoolImg from "../../assets/illustrations/timeline-book-school-trim.png";
-import teenImg from "../../assets/illustrations/timeline-book-teen-trim.png";
+import newbornImg from "../../assets/illustrations/timeline-book-newborn-trim.webp";
+import infantImg from "../../assets/illustrations/timeline-book-infant-trim.webp";
+import toddlerImg from "../../assets/illustrations/timeline-book-toddler-trim.webp";
+import preschoolImg from "../../assets/illustrations/timeline-book-preschool-trim.webp";
+import schoolImg from "../../assets/illustrations/timeline-book-school-trim.webp";
+import teenImg from "../../assets/illustrations/timeline-book-teen-trim.webp";
 
 const TimelineBooksData = [
   {

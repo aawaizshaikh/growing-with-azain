@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
-import steam from "../../assets/illustrations/train-steam.png";
-import stars from "../../assets/illustrations/train-stars.png";
+import steam from "../../assets/illustrations/train-steam.webp";
+import stars from "../../assets/illustrations/train-stars.webp";
 
 export default function TrainEffects() {
   return (
