@@ -35,20 +35,7 @@ export default function Footer() {
       >
 
 
-        <img
-
-          src={leaf}
-
-          alt=""
-
-          className="
-            w-16
-            rotate-180
-            opacity-80
-          "
-
-        />
-
+        
 
 
         <p
@@ -96,19 +83,7 @@ export default function Footer() {
 
 
 
-        <img
-
-          src={leaf}
-
-          alt=""
-
-          className="
-            w-16
-            opacity-80
-          "
-
-        />
-
+       
 
       </div>
 

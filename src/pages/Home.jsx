@@ -4,7 +4,7 @@ import FeatureCards from "../components/FeatureCards";
 import Footer from "../components/Footer";
 
 import StoryTrain from "../components/common/StoryTrain";
-import StoryTransition from "../components/common/StoryTransition";
+
 
 
 export default function Home() {
@@ -61,7 +61,7 @@ export default function Home() {
 
           <StoryTrain />
 
-          <StoryTransition />
+          
 
         </div>
 

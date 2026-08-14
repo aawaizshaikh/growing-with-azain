@@ -1,14 +1,7 @@
 import { motion } from "framer-motion";
 
-import engine from "../../assets/illustrations/engine.png";
-import heart from "../../assets/illustrations/wagon-heart.png";
-import bunny from "../../assets/illustrations/wagon-bunny.png";
-import teddy from "../../assets/illustrations/wagon-teddy.png";
-
-import shadow from "../../assets/illustrations/invisible-track-shadow.png";
-
-import TrainCar from "./TrainCar";
-import TrainEffects from "./TrainEffects";
+import train from "../../assets/illustrations/home-train.png";
+import trainTrack from "../../assets/illustrations/home-train-track.png";
 
 
 const trainMotion = {
@@ -29,7 +22,7 @@ const trainMotion = {
 
     repeat:Infinity,
 
-    repeatDelay:3,
+    repeatDelay:1,
 
   },
 
@@ -46,8 +39,8 @@ export default function StoryTrain() {
 
       className="
         relative
-        h-[180px]
-        sm:h-[220px]
+        h-[400px]
+        sm:h-[320px]
         overflow-hidden
         pointer-events-none
         select-none
@@ -57,25 +50,29 @@ export default function StoryTrain() {
 
 
 
-      {/* Track Shadow */}
+      {/* Track */}
 
 
       <img
 
-        src={shadow}
+        src={trainTrack}
 
         alt=""
 
         draggable={false}
 
         className="
-          absolute
-          bottom-8
-          sm:bottom-10
-          left-0
-          w-full
-          opacity-55
-        "
+  absolute
+  bottom-10
+  left-0
+  w-full
+  h-[250px]
+  object-fill
+  translate-y-[95px]
+  select-none
+  pointer-events-none
+  z-10
+"
 
       />
 
@@ -94,274 +91,49 @@ export default function StoryTrain() {
         transition={trainMotion.transition}
 
 
-        className="
-          absolute
-          bottom-2
-          sm:bottom-8
-          flex
-          items-end
-          scale-[0.45]
-          sm:scale-[0.65]
-          lg:scale-100
-          origin-bottom-left
-        "
+         className="
+  absolute
+  bottom-[-40px]
+  sm:bottom-[-40px]
+  flex
+  items-end
+  scale-[0.30]
+  sm:scale-[0.40]
+  lg:scale-[0.62]
+  origin-bottom-left
+  z-30
+"
 
 
       >
 
 
-
-        {/* Engine */}
-
+        <img
 
 
-        <motion.div
+          src={train}
 
 
-          animate={{
-
-            y:[
-              0,
-              -3,
-              0
-            ],
-
-            rotate:[
-              -0.5,
-              0.5,
-              -0.5
-            ],
-
-          }}
+          alt=""
 
 
-          transition={{
-
-            duration:1.6,
-
-            repeat:Infinity,
-
-            ease:"easeInOut",
-
-          }}
+          draggable={false}
 
 
           className="
-            relative
-            shrink-0
-            z-30
+            w-[1000px]
+sm:w-[1950px]
+lg:w-[1900px]
+            max-w-none
+            select-none
+            pointer-events-none
           "
 
 
-        >
-
-
-
-          <img
-
-
-            src={engine}
-
-
-            alt=""
-
-
-            draggable={false}
-
-
-            className="
-              w-[235px]
-              select-none
-            "
-
-
-            style={{
-
-              transform:"scaleX(-1)",
-
-            }}
-
-
-          />
-
-
-
-          <TrainEffects />
-
-
-
-        </motion.div>
-
-
-
-
-
-        {/* Heart Wagon */}
-
-
-
-        <motion.div
-
-
-          animate={{
-
-            x:[
-              -1,
-              1,
-              -1
-            ],
-
-          }}
-
-
-          transition={{
-
-            duration:2.1,
-
-            repeat:Infinity,
-
-            ease:"easeInOut",
-
-            delay:0.08,
-
-          }}
-
-
-          className="-ml-6"
-
-
-        >
-
-
-          <TrainCar
-
-            image={heart}
-
-            animation="heart"
-
-          />
-
-
-        </motion.div>
-
-
-
-
-
-
-
-        {/* Bunny Wagon */}
-
-
-
-        <motion.div
-
-
-          animate={{
-
-            x:[
-              -2,
-              2,
-              -2
-            ],
-
-          }}
-
-
-          transition={{
-
-            duration:2.2,
-
-            repeat:Infinity,
-
-            ease:"easeInOut",
-
-            delay:0.16,
-
-          }}
-
-
-          className="-ml-8"
-
-
-        >
-
-
-
-          <TrainCar
-
-            image={bunny}
-
-            animation="sway"
-
-          />
-
-
-
-        </motion.div>
-
-
-
-
-
-
-
-        {/* Teddy Wagon */}
-
-
-
-        <motion.div
-
-
-          animate={{
-
-            x:[
-              -3,
-              3,
-              -3
-            ],
-
-          }}
-
-
-          transition={{
-
-            duration:2.4,
-
-            repeat:Infinity,
-
-            ease:"easeInOut",
-
-            delay:0.24,
-
-          }}
-
-
-          className="-ml-8"
-
-
-        >
-
-
-
-          <TrainCar
-
-            image={teddy}
-
-            animation="bounce"
-
-          />
-
-
-
-        </motion.div>
-
-
+        />
 
 
       </motion.div>
-
-
 
 
 
@@ -376,17 +148,26 @@ export default function StoryTrain() {
 
         animate={{
 
+
           opacity:[
+
             0.15,
+
             0.3,
+
             0.15
+
           ],
 
 
           scaleX:[
+
             1,
+
             1.03,
+
             1
+
           ],
 
 
@@ -395,11 +176,15 @@ export default function StoryTrain() {
 
         transition={{
 
+
           duration:4,
+
 
           repeat:Infinity,
 
+
           ease:"easeInOut",
+
 
         }}
 
@@ -428,11 +213,6 @@ export default function StoryTrain() {
       />
 
 
-
-
-
-
-
       {/* Ambient Motion Layer */}
 
 
@@ -442,22 +222,32 @@ export default function StoryTrain() {
 
         animate={{
 
+
           opacity:[
+
             0.08,
+
             0.16,
+
             0.08
+
           ],
+
 
         }}
 
 
         transition={{
 
+
           duration:6,
+
 
           repeat:Infinity,
 
+
           ease:"easeInOut",
+
 
         }}
 
@@ -472,7 +262,6 @@ export default function StoryTrain() {
 
 
       />
-
 
 
     </section>

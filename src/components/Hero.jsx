@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import HeroDecorations from "./HeroDecorations";
+
 
 import azain from "../assets/images/azain.jpg";
 
@@ -92,7 +92,7 @@ export default function Hero() {
 
 
 
-      <HeroDecorations />
+      
 
 
 
@@ -244,10 +244,10 @@ export default function Hero() {
 
         className="
           absolute
-          left-0
+          left-10
           top-20
           w-24
-          lg:w-32
+          lg:w-58
           opacity-80
         "
 
@@ -272,10 +272,10 @@ export default function Hero() {
 
         className="
           absolute
-          left-[34%]
+          left-[44%]
           top-4
           w-24
-          lg:w-36
+          lg:w-58
           opacity-80
         "
 
@@ -303,7 +303,7 @@ export default function Hero() {
           right-10
           top-24
           w-24
-          lg:w-32
+          lg:w-58
           opacity-70
         "
 
@@ -491,7 +491,7 @@ export default function Hero() {
 
               alt=""
 
-              className="w-44 lg:w-60"
+              className="w-84 lg:w-60"
 
             />
 

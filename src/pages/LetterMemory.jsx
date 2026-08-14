@@ -239,7 +239,7 @@ function LetterBody({ content }) {
         className="
           text-center
           italic
-          text-[#80624A]
+          text-[#2F2118]
         "
         style={{
           fontFamily:
@@ -260,7 +260,7 @@ function LetterBody({ content }) {
   return (
     <div
       className="
-        text-[#4F3827]
+        text-[#2F2118]
         text-left
         font-semibold
       "
@@ -333,7 +333,7 @@ function LetterContent({ letter }) {
           text-center
           font-bold
           leading-[0.95]
-          text-[#4A3020]
+          text-[#2F2118]
         "
         style={{
           left: "27%",

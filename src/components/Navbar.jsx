@@ -127,6 +127,7 @@ export default function Navbar() {
               items-center
               gap-3
               sm:gap-5
+              -ml-4
             "
           >
 
@@ -138,11 +139,13 @@ export default function Navbar() {
                 h-10
                 sm:w-14
                 sm:h-14
+                translate-x-50
+                translate-y-6
               "
             />
 
 
-            <div>
+            <div className="-translate-x-20">
 
               <h1
                 className="

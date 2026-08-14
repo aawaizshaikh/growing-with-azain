@@ -20,10 +20,14 @@ import butterfly from "../assets/illustrations/animals/butterfly.png";
 import flockBirdUp from "../assets/illustrations/animals/flock-bird-up.png";
 import flockBirdLevel from "../assets/illustrations/animals/flock-bird-level.png";
 import flockBirdDown from "../assets/illustrations/animals/flock-bird-down.png";
-import parrotblue from "../assets/illustrations/animals/parrot-blue.png";
+import parrotBlue1 from "../assets/illustrations/animals/parrot-blue-1.png";
+import parrotBlue2 from "../assets/illustrations/animals/parrot-blue-2.png";
+import parrotBlue3 from "../assets/illustrations/animals/parrot-blue-3.png";
 import redButterfly from "../assets/illustrations/animals/red-butterfly.png";
 import yellowbird from "../assets/illustrations/animals/yellow-bird.png";
 import greenbird from "../assets/illustrations/animals/green-bird.png";
+import peacock from "../assets/illustrations/animals/peacock.png";
+import rabbit from "../assets/illustrations/animals/rabbit.png";
 
 import lion1 from "../assets/illustrations/animals/lion/1.png";
 import lion2 from "../assets/illustrations/animals/lion/2.png";
@@ -47,13 +51,23 @@ import elephant6 from "../assets/illustrations/animals/elephant/6.png";
 import elephant7 from "../assets/illustrations/animals/elephant/7.png";
 import elephant8 from "../assets/illustrations/animals/elephant/8.png";
 
-import redBirdLevel from "../assets/illustrations/animals/red-bird-level.png";
+
+import redBirddown from "../assets/illustrations/animals/red-bird-down.png";
 
 import giraffe from "../assets/illustrations/animals/giraffe.png";
 import vine from "../assets/illustrations/animals/vine.png";
 
 const DESIGN_WIDTH = 1440;
 const DESIGN_HEIGHT = 900;
+
+const PARROT_BLUE_FRAMES = [
+  parrotBlue1,
+  parrotBlue2,
+  parrotBlue3,
+  parrotBlue2,
+];
+
+const PARROT_BLUE_FRAME_DURATION = 250;
 
 /*
   FLYING BIRD FLOCK
@@ -295,7 +309,7 @@ const ANIMALS = [
   },
   {
   id: "parrotblue",
-  src: parrotblue,
+  src: parrotBlue1,
   left: 1015,
   top: 680,
   width: 115,
@@ -304,9 +318,9 @@ const ANIMALS = [
 },
 {
   id: "red-bird",
-  src: redBirdLevel,
+  src: redBirddown,
   left: 310,
-  top: 175,
+  top: 490,
   width: 90,
   zIndex: 26,
   rotate: 0,
@@ -314,10 +328,10 @@ const ANIMALS = [
 {
   id: "yellow-bird",
   src: yellowbird,
-  left: 375,
-  top: 275,
+  left: 820,
+  top: 450,
   width: 80,
-  zIndex: 26,
+  zIndex: 50,
   rotate: 0,
 },
 {
@@ -424,20 +438,39 @@ const ANIMALS = [
   {
     id: "lion",
     src: lion1,
-    left: 590,
+    left: 530,
     top: 490,
     width: 200,
-    zIndex: 24,
+    zIndex: 50,
     rotate: -2,
     flip: true,
   },
   {
     id: "elephant",
     src: elephant1,
-    left: 895,
-    top: 400,
+    left: 875,
+    top: 330,
     width: 175,
-    zIndex: 23,
+    zIndex: 50,
+    rotate: 2,
+  },
+   {
+    id: "peacock",
+    src: peacock,
+    left: 915,
+    top: 480,
+    width: 175,
+    zIndex: 50,
+    rotate: 2,
+    flip: true,
+  },
+  {
+    id: "rabbit",
+    src: rabbit,
+    left: 715,
+    top: 580,
+    width: 75,
+    zIndex: 50,
     rotate: 2,
   },
   {
@@ -503,6 +536,7 @@ function AnimalLayer({
   animal,
   lionFrame,
   elephantFrame,
+  parrotBlueFrame,
 }) {
   let src = animal.src;
 
@@ -514,6 +548,10 @@ function AnimalLayer({
     src = ELEPHANT_FRAMES[elephantFrame];
   }
 
+  if (animal.id === "parrotblue") {
+    src = PARROT_BLUE_FRAMES[parrotBlueFrame];
+  }
+
   return (
     <img
       src={src}
@@ -522,7 +560,10 @@ function AnimalLayer({
       draggable={false}
       className="absolute pointer-events-none select-none"
       style={{
-        left: animal.left,
+        left:
+  animal.id === "parrotblue" && parrotBlueFrame === 2
+    ? animal.left - 6
+    : animal.left,
         top: animal.top,
         width: animal.width,
         height: "auto",
@@ -703,6 +744,7 @@ export default function Milestones() {
 
   const [lionFrame, setLionFrame] = useState(0);
   const [elephantFrame, setElephantFrame] = useState(0);
+  const [parrotBlueFrame, setParrotBlueFrame] = useState(0);
 
   /*
     Load milestones from the existing Admin/data system.
@@ -746,26 +788,91 @@ export default function Milestones() {
 
     The lion animation remains exactly as previously implemented.
   */
-  useEffect(() => {
-    let timeoutId;
+ /*
+  LION ANIMATION
 
-    const scheduleNextFrame = (currentFrame) => {
-      timeoutId = window.setTimeout(() => {
-        const nextFrame =
-          (currentFrame + 1) % LION_FRAMES.length;
+  Uses the existing lion frame sequence and durations.
+*/
+useEffect(() => {
+  let timeoutId;
 
-        setLionFrame(nextFrame);
-        scheduleNextFrame(nextFrame);
-      }, LION_FRAME_DURATIONS[currentFrame]);
-    };
+  const scheduleNextFrame = (currentFrame) => {
+    timeoutId = window.setTimeout(() => {
+      const nextFrame =
+        (currentFrame + 1) % LION_FRAMES.length;
 
-    setLionFrame(0);
-    scheduleNextFrame(0);
+      setLionFrame(nextFrame);
+      scheduleNextFrame(nextFrame);
+    }, LION_FRAME_DURATIONS[currentFrame]);
+  };
 
-    return () => {
+  setLionFrame(0);
+  scheduleNextFrame(0);
+
+  return () => {
+    window.clearTimeout(timeoutId);
+  };
+}, []);
+
+/*
+  BLUE PARROT FEATHER-BRUSHING ANIMATION
+
+  The parrot stays still for 3 seconds,
+  performs one complete feather-brushing animation,
+  returns to the resting frame,
+  then stays still for another 3 seconds.
+*/
+useEffect(() => {
+  let timeoutIds = [];
+
+  const wait = (callback, delay) => {
+    const timeoutId = window.setTimeout(callback, delay);
+    timeoutIds.push(timeoutId);
+  };
+
+  const playAnimation = () => {
+    // Start from resting position
+    setParrotBlueFrame(0);
+
+    // REST FOR 3 SECONDS
+    wait(() => {
+      // Frame 1 → Frame 2
+      setParrotBlueFrame(1);
+
+      wait(() => {
+        // Frame 2 → Frame 3
+        setParrotBlueFrame(2);
+
+        wait(() => {
+          // Frame 3 → Frame 2
+          setParrotBlueFrame(3);
+
+          wait(() => {
+            // Frame 2 → Frame 1
+            setParrotBlueFrame(0);
+
+            // NOW REST FOR 3 SECONDS
+            wait(() => {
+              playAnimation();
+            }, 3000);
+
+          }, PARROT_BLUE_FRAME_DURATION);
+
+        }, PARROT_BLUE_FRAME_DURATION);
+
+      }, PARROT_BLUE_FRAME_DURATION);
+
+    }, 3000);
+  };
+
+  playAnimation();
+
+  return () => {
+    timeoutIds.forEach((timeoutId) => {
       window.clearTimeout(timeoutId);
-    };
-  }, []);
+    });
+  };
+}, []);
 
   /*
     ELEPHANT ANIMATION
@@ -985,6 +1092,7 @@ export default function Milestones() {
             animal={animal}
             lionFrame={lionFrame}
             elephantFrame={elephantFrame}
+            parrotBlueFrame={parrotBlueFrame}
           />
         ))}
 
