@@ -19,6 +19,12 @@ import FavoriteSongs from "./pages/FavoriteSongs";
 import FavoriteSongMemory from "./pages/FavoriteSongMemory";
 
 
+// ================= FAMILY MEMORIES =================
+
+import FamilyMemories from "./pages/FamilyMemories";
+import FamilyMemberMemories from "./pages/FamilyMemberMemories";
+
+
 // ================= LETTERS =================
 
 import Letters from "./pages/Letters";
@@ -48,6 +54,10 @@ import EditFavoriteSong from "./pages/admin/EditFavoriteSong";
 import LetterManager from "./pages/admin/LetterManager";
 import NewLetter from "./pages/admin/NewLetter";
 import EditLetter from "./pages/admin/EditLetter";
+
+import FamilyMemoryManager from "./pages/admin/FamilyMemoryManager";
+import NewFamilyMemory from "./pages/admin/NewFamilyMemory";
+import EditFamilyMemory from "./pages/admin/EditFamilyMemory";
 
 
 // ================= AUTH =================
@@ -143,6 +153,43 @@ export default function App() {
         <Route
           path="/about"
           element={<AboutAzain />}
+        />
+
+
+        {/* ==================================================================
+            FAMILY MEMORIES
+            ==================================================================
+
+            Main Family Suitcase:
+
+                /family
+
+            Individual family member:
+
+                /family/dada
+                /family/dadi
+                /family/nana
+                /family/nani
+                /family/mumma
+                /family/papa
+                /family/chachu
+                /family/mamu
+                /family/yaaya
+                /family/ansha
+
+            Family members are hardcoded.
+            Memories are loaded from Supabase.
+
+            ================================================================== */}
+
+        <Route
+          path="/family"
+          element={<FamilyMemories />}
+        />
+
+        <Route
+          path="/family/:memberKey"
+          element={<FamilyMemberMemories />}
         />
 
 
@@ -331,6 +378,42 @@ export default function App() {
             Visual positioning of stones, background artwork and the
             illustrated world remains hardcoded in the public pages.
 
+            ================================================================== */}
+
+        {/* ==================================================================
+            FAMILY MEMORIES CMS
+            ================================================================== */}
+
+        <Route
+          path="/admin/family-memories"
+          element={
+            <ProtectedRoute>
+              <FamilyMemoryManager />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/family-memories/new"
+          element={
+            <ProtectedRoute>
+              <NewFamilyMemory />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/family-memories/edit/:id"
+          element={
+            <ProtectedRoute>
+              <EditFamilyMemory />
+            </ProtectedRoute>
+          }
+        />
+
+
+        {/* ==================================================================
+            LETTERS CMS
             ================================================================== */}
 
         <Route

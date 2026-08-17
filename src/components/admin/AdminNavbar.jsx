@@ -17,7 +17,7 @@ export default function AdminNavbar() {
   return (
     <header className="bg-white shadow-sm border-b border-[#ECE7DF]">
       <div className="max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
-        
+
         {/* Logo */}
         <h1
           className="text-3xl"
@@ -54,6 +54,13 @@ export default function AdminNavbar() {
 
           <NavLink to="/admin/letters" className={linkClass}>
             Letters
+          </NavLink>
+
+          <NavLink
+            to="/admin/family-memories"
+            className={linkClass}
+          >
+            Family Memories
           </NavLink>
 
           {/* Logout */}

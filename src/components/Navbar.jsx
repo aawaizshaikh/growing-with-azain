@@ -68,6 +68,11 @@ export default function Navbar() {
       path: "/about",
       icon: <HiOutlineHeart size={20} />,
     },
+    {
+      name: "Family Memories",
+      path: "/family",
+      icon: <FaRegStar size={17} />,
+    },
   ];
 
   /* ============================================================
