@@ -49,7 +49,7 @@ export default function Navbar() {
       icon: <FaRegStar size={17} />,
     },
     {
-      name: "Favourite Songs",
+      name: "Fav Songs",
       path: "/favorite-songs",
       icon: <HiOutlineMusicalNote size={20} />,
     },
@@ -64,15 +64,16 @@ export default function Navbar() {
       icon: <HiOutlineEnvelope size={20} />,
     },
     {
+      name: "My People",
+      path: "/family",
+      icon: <FaRegStar size={17} />,
+    },
+    {
       name: "About Azain",
       path: "/about",
       icon: <HiOutlineHeart size={20} />,
     },
-    {
-      name: "Family Memories",
-      path: "/family",
-      icon: <FaRegStar size={17} />,
-    },
+    
   ];
 
   /* ============================================================
@@ -281,8 +282,8 @@ export default function Navbar() {
                 hidden
                 lg:flex
                 items-center
-                gap-8
-                xl:gap-10
+                gap-5
+                xl:gap-6
               "
             >
               {menu.map((item) => (

@@ -14,7 +14,10 @@ import {
 
 import {
   uploadMultiple,
+  deleteFile,
 } from "../../services/storageService";
+
+import { supabase } from "../../lib/supabase";
 
 /*
 ===============================================================================
@@ -28,37 +31,19 @@ Admin route:
 IMPORTANT BEHAVIOUR
 -------------------
 
-This page edits ONE existing family-memory record.
+This page edits an existing family-memory record while also allowing the
+admin to manage ALL media belonging to the selected family member.
 
-The existing memory is NEVER replaced just because the admin selects new
-files.
+Existing media is shown together under the family member's name.
 
-Instead:
+The admin can:
+    - See all photos/videos for the family member
+    - Keep any media
+    - Mark any media for removal
+    - Save all removals together
+    - Add multiple new photos/videos at the same time
 
-    Existing memory
-          +
-    Additional selected files
-          ↓
-    Existing memory remains
-          +
-    Each new file becomes a NEW family_memories row
-
-Example:
-
-    Existing Dada photo
-    Select 5 additional photos
-
-Result:
-
-    Existing Dada photo      → remains
-    New photo 1              → new memory
-    New photo 2              → new memory
-    New photo 3              → new memory
-    New photo 4              → new memory
-    New photo 5              → new memory
-
-This is intentional because the database stores each family memory as its
-own row.
+The database still stores each family memory as its own row.
 
 The existing family member identities remain hardcoded in:
 
@@ -75,26 +60,22 @@ export default function EditFamilyMemory() {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const [memory, setMemory] =
-    useState(null);
+  const [memory, setMemory] = useState(null);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [familyMedia, setFamilyMedia] = useState([]);
+  const [removedMediaIds, setRemovedMediaIds] = useState([]);
 
-  const [saving, setSaving] =
-    useState(false);
+  const [loading, setLoading] = useState(true);
+  const [mediaLoading, setMediaLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const [memberKey, setMemberKey] =
-    useState("");
+  const [memberKey, setMemberKey] = useState("");
 
-  const [caption, setCaption] =
-    useState("");
+  const [caption, setCaption] = useState("");
 
-  const [displayOrder, setDisplayOrder] =
-    useState(1);
+  const [displayOrder, setDisplayOrder] = useState(1);
 
-  const [published, setPublished] =
-    useState(true);
+  const [published, setPublished] = useState(true);
 
   /*
   ============================================================================
@@ -103,14 +84,60 @@ export default function EditFamilyMemory() {
 
   This is deliberately an ARRAY.
 
-  The existing media is not put into this state.
-
-  Only NEW files selected by the admin are stored here.
+  New files selected by the admin are uploaded as NEW family_memories rows.
   ============================================================================
   */
 
-  const [additionalFiles, setAdditionalFiles] =
-    useState([]);
+  const [additionalFiles, setAdditionalFiles] = useState([]);
+
+  /*
+  ============================================================================
+  LOAD ALL MEDIA FOR FAMILY MEMBER
+  ============================================================================
+  */
+
+  async function loadFamilyMedia(selectedMemberKey) {
+    if (!selectedMemberKey) {
+      setFamilyMedia([]);
+      return;
+    }
+
+    try {
+      setMediaLoading(true);
+
+      const { data, error } = await supabase
+        .from("family_memories")
+        .select("*")
+        .eq("member_key", selectedMemberKey)
+        .order("display_order", {
+          ascending: true,
+        })
+        .order("created_at", {
+          ascending: true,
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      setFamilyMedia(data || []);
+      setRemovedMediaIds([]);
+    } catch (err) {
+      console.error(
+        "Unable to load family member media:",
+        err
+      );
+
+      alert(
+        err?.message ||
+          "Unable to load all family member media."
+      );
+
+      setFamilyMedia([]);
+    } finally {
+      setMediaLoading(false);
+    }
+  }
 
   /*
   ============================================================================
@@ -161,6 +188,10 @@ export default function EditFamilyMemory() {
         setPublished(
           data.published ?? true
         );
+
+        await loadFamilyMedia(
+          data.member_key || ""
+        );
       } catch (err) {
         console.error(
           "Unable to load family memory:",
@@ -190,6 +221,46 @@ export default function EditFamilyMemory() {
       mounted = false;
     };
   }, [id, navigate]);
+
+  /*
+  ============================================================================
+  MEMBER CHANGE
+  ============================================================================
+
+  If the admin changes the family member, refresh the media shown below so
+  the page always shows the complete media collection for that member.
+  ============================================================================
+  */
+
+  async function handleMemberChange(event) {
+    const nextMemberKey = event.target.value;
+
+    setMemberKey(nextMemberKey);
+    setRemovedMediaIds([]);
+
+    await loadFamilyMedia(nextMemberKey);
+  }
+
+  /*
+  ============================================================================
+  MARK / UNMARK MEDIA FOR REMOVAL
+  ============================================================================
+  */
+
+  function toggleMediaRemoval(mediaId) {
+    setRemovedMediaIds((current) => {
+      if (current.includes(mediaId)) {
+        return current.filter(
+          (idValue) => idValue !== mediaId
+        );
+      }
+
+      return [
+        ...current,
+        mediaId,
+      ];
+    });
+  }
 
   /*
   ============================================================================
@@ -223,12 +294,7 @@ export default function EditFamilyMemory() {
 
       /*
       ------------------------------------------------------------------------
-      UPDATE EXISTING MEMORY
-      ------------------------------------------------------------------------
-
-      The original media_url is intentionally preserved.
-
-      Selecting additional files does NOT replace it.
+      UPDATE THE ORIGINAL MEMORY
       ------------------------------------------------------------------------
       */
 
@@ -256,6 +322,51 @@ export default function EditFamilyMemory() {
           }
         );
 
+      if (updatedMemory) {
+        setMemory(updatedMemory);
+      }
+
+      /*
+      ------------------------------------------------------------------------
+      DELETE ALL MEDIA MARKED FOR REMOVAL
+      ------------------------------------------------------------------------
+
+      Each selected item is removed from storage and then from the
+      family_memories table.
+
+      This happens only when the admin clicks Save Changes.
+      ------------------------------------------------------------------------
+      */
+
+      const mediaToRemove =
+        familyMedia.filter((item) =>
+          removedMediaIds.includes(item.id)
+        );
+
+      for (const media of mediaToRemove) {
+        try {
+          await deleteFile(
+            media.media_url
+          );
+        } catch (storageError) {
+          console.error(
+            "Unable to delete media file:",
+            storageError
+          );
+        }
+
+        const {
+          error: deleteError,
+        } = await supabase
+          .from("family_memories")
+          .delete()
+          .eq("id", media.id);
+
+        if (deleteError) {
+          throw deleteError;
+        }
+      }
+
       /*
       ------------------------------------------------------------------------
       ADDITIONAL MEDIA
@@ -263,7 +374,7 @@ export default function EditFamilyMemory() {
 
       Every selected file becomes a NEW family memory.
 
-      The first new memory starts after the existing memory's display order.
+      This preserves the existing multi-file upload behaviour.
       ------------------------------------------------------------------------
       */
 
@@ -280,8 +391,30 @@ export default function EditFamilyMemory() {
             folderName
           );
 
+        const remainingOrders =
+          familyMedia
+            .filter(
+              (item) =>
+                !removedMediaIds.includes(
+                  item.id
+                )
+            )
+            .map(
+              (item) =>
+                Number(
+                  item.display_order
+                ) || 0
+            );
+
+        const highestExistingOrder =
+          remainingOrders.length > 0
+            ? Math.max(
+                ...remainingOrders
+              )
+            : Number(displayOrder) || 1;
+
         const startingOrder =
-          (Number(displayOrder) || 1) + 1;
+          highestExistingOrder + 1;
 
         for (
           let index = 0;
@@ -332,24 +465,48 @@ export default function EditFamilyMemory() {
       ------------------------------------------------------------------------
       */
 
+      const removedCount =
+        mediaToRemove.length;
+
       const addedCount =
         Array.isArray(additionalFiles)
           ? additionalFiles.length
           : 0;
 
-      if (addedCount > 0) {
-        alert(
-          `Memory updated and ${addedCount} additional ${
+      let successMessage =
+        "Family memory changes saved successfully!";
+
+      if (
+        removedCount > 0 &&
+        addedCount > 0
+      ) {
+        successMessage =
+          `${removedCount} ${
+            removedCount === 1
+              ? "media item was"
+              : "media items were"
+          } removed and ${addedCount} ${
             addedCount === 1
-              ? "memory was"
-              : "memories were"
-          } added successfully!`
-        );
-      } else {
-        alert(
-          "Family memory updated successfully!"
-        );
+              ? "new memory was"
+              : "new memories were"
+          } added successfully!`;
+      } else if (removedCount > 0) {
+        successMessage =
+          `${removedCount} ${
+            removedCount === 1
+              ? "media item was"
+              : "media items were"
+          } removed successfully!`;
+      } else if (addedCount > 0) {
+        successMessage =
+          `${addedCount} ${
+            addedCount === 1
+              ? "new memory was"
+              : "new memories were"
+          } added successfully!`;
       }
+
+      alert(successMessage);
 
       navigate(
         "/admin/family-memories"
@@ -408,7 +565,6 @@ export default function EditFamilyMemory() {
   if (loading) {
     return (
       <AdminLayout>
-
         <div
           className="
             max-w-5xl
@@ -429,7 +585,6 @@ export default function EditFamilyMemory() {
             Loading family memory...
           </div>
         </div>
-
       </AdminLayout>
     );
   }
@@ -442,7 +597,6 @@ export default function EditFamilyMemory() {
 
   return (
     <AdminLayout>
-
       <div
         className="
           max-w-5xl
@@ -482,7 +636,6 @@ export default function EditFamilyMemory() {
           style={{
             fontFamily:
               "Baloo 2",
-
             color:
               "#5A5148",
           }}
@@ -496,9 +649,10 @@ export default function EditFamilyMemory() {
             mb-10
           "
         >
-          Update this memory or add more
-          photos and videos without replacing
-          the existing memory.
+          Manage all photos and videos
+          belonging to one family member.
+          Choose what to keep, remove,
+          or add new memories.
         </p>
 
         {/* ================================================================
@@ -552,7 +706,7 @@ export default function EditFamilyMemory() {
                 "Baloo 2",
             }}
           >
-            Memory Details
+            {memberName}'s Memories
           </h2>
 
           {/* ============================================================
@@ -560,7 +714,6 @@ export default function EditFamilyMemory() {
               ============================================================ */}
 
           <div>
-
             <label
               htmlFor="family-member"
               className="
@@ -575,11 +728,7 @@ export default function EditFamilyMemory() {
             <select
               id="family-member"
               value={memberKey}
-              onChange={(event) =>
-                setMemberKey(
-                  event.target.value
-                )
-              }
+              onChange={handleMemberChange}
               disabled={saving}
               required
               className="
@@ -614,88 +763,303 @@ export default function EditFamilyMemory() {
                 text-gray-400
               "
             >
-              This memory currently belongs
-              to {memberName}.
+              Showing all photos and
+              videos currently saved for{" "}
+              <strong>
+                {memberName}
+              </strong>.
             </p>
-
           </div>
 
           {/* ============================================================
-              CURRENT MEDIA
+              ALL FAMILY MEDIA
               ============================================================ */}
 
           <div className="mt-8">
 
-            <label
-              className="
-                block
-                mb-3
-                text-lg
-                font-semibold
-              "
-            >
-              Current Media
-            </label>
+            <div className="
+              flex
+              items-center
+              justify-between
+              gap-4
+              mb-4
+            ">
+              <label
+                className="
+                  block
+                  text-lg
+                  font-semibold
+                "
+              >
+                All Photos & Videos
+              </label>
 
-            <div
-              className="
-                rounded-2xl
-                overflow-hidden
-                border
-                border-[#E5DED1]
-                bg-[#F3EEE6]
-              "
-            >
-
-              {memory?.media_type ===
-              "video" ? (
-                <video
-                  src={
-                    memory.media_url
-                  }
-                  controls
-                  playsInline
-                  preload="metadata"
+              {familyMedia.length > 0 && (
+                <span
                   className="
-                    block
-                    w-full
-                    max-h-[520px]
-                    object-contain
-                    bg-[#24180F]
+                    text-sm
+                    text-gray-400
                   "
-                />
-              ) : (
-                <img
-                  src={
-                    memory?.media_url
-                  }
-                  alt={
-                    memory?.caption ||
-                    `${memberName} memory`
-                  }
-                  className="
-                    block
-                    w-full
-                    max-h-[520px]
-                    object-contain
-                  "
-                />
+                >
+                  {familyMedia.length}{" "}
+                  {familyMedia.length === 1
+                    ? "item"
+                    : "items"}
+                </span>
               )}
-
             </div>
 
-            <p
-              className="
-                mt-3
-                text-sm
-                text-gray-400
-              "
-            >
-              This existing media will remain
-              unchanged unless you explicitly
-              edit this memory's record.
-            </p>
+            {mediaLoading ? (
+              <div
+                className="
+                  rounded-2xl
+                  border
+                  border-[#E5DED1]
+                  bg-[#F7F5EF]
+                  p-10
+                  text-center
+                  text-gray-500
+                "
+              >
+                Loading {memberName}'s
+                photos and videos...
+              </div>
+            ) : familyMedia.length === 0 ? (
+              <div
+                className="
+                  rounded-2xl
+                  border
+                  border-dashed
+                  border-[#D8D0C3]
+                  bg-[#F7F5EF]
+                  p-10
+                  text-center
+                  text-gray-500
+                "
+              >
+                No photos or videos found
+                for {memberName}.
+              </div>
+            ) : (
+              <div
+                className="
+                  grid
+                  grid-cols-1
+                  sm:grid-cols-2
+                  lg:grid-cols-3
+                  gap-5
+                "
+              >
+                {familyMedia.map(
+                  (media, index) => {
+                    const isRemoved =
+                      removedMediaIds.includes(
+                        media.id
+                      );
 
+                    return (
+                      <div
+                        key={media.id}
+                        className={`
+                          rounded-2xl
+                          overflow-hidden
+                          border
+                          ${
+                            isRemoved
+                              ? "border-red-400 bg-red-50"
+                              : "border-[#E5DED1] bg-[#F7F5EF]"
+                          }
+                        `}
+                      >
+
+                        <div
+                          className="
+                            relative
+                            aspect-[4/3]
+                            bg-[#24180F]
+                          "
+                        >
+                          {media.media_type ===
+                          "video" ? (
+                            <video
+                              src={
+                                media.media_url
+                              }
+                              controls
+                              playsInline
+                              preload="metadata"
+                              className="
+                                block
+                                w-full
+                                h-full
+                                object-cover
+                              "
+                            />
+                          ) : (
+                            <img
+                              src={
+                                media.media_url
+                              }
+                              alt={
+                                media.caption ||
+                                `${memberName} memory ${
+                                  index + 1
+                                }`
+                              }
+                              className="
+                                block
+                                w-full
+                                h-full
+                                object-cover
+                              "
+                            />
+                          )}
+
+                          {isRemoved && (
+                            <div
+                              className="
+                                absolute
+                                inset-0
+                                bg-black/50
+                                flex
+                                items-center
+                                justify-center
+                              "
+                            >
+                              <span
+                                className="
+                                  bg-red-600
+                                  text-white
+                                  px-4
+                                  py-2
+                                  rounded-full
+                                  font-semibold
+                                "
+                              >
+                                Marked for removal
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div
+                          className="
+                            p-4
+                          "
+                        >
+                          <div
+                            className="
+                              flex
+                              items-center
+                              justify-between
+                              gap-3
+                              mb-3
+                            "
+                          >
+                            <span
+                              className="
+                                text-xs
+                                font-semibold
+                                uppercase
+                                tracking-wide
+                                text-gray-400
+                              "
+                            >
+                              {media.media_type ===
+                              "video"
+                                ? "Video"
+                                : "Photo"}{" "}
+                              #{index + 1}
+                            </span>
+
+                            <span
+                              className="
+                                text-xs
+                                text-gray-400
+                              "
+                            >
+                              Order{" "}
+                              {Number(
+                                media.display_order
+                              ) || 1}
+                            </span>
+                          </div>
+
+                          {media.caption && (
+                            <p
+                              className="
+                                text-sm
+                                text-[#5A5148]
+                                mb-4
+                                line-clamp-2
+                              "
+                            >
+                              {media.caption}
+                            </p>
+                          )}
+
+                          <button
+                            type="button"
+                            disabled={saving}
+                            onClick={() =>
+                              toggleMediaRemoval(
+                                media.id
+                              )
+                            }
+                            className={`
+                              w-full
+                              py-2.5
+                              rounded-xl
+                              font-semibold
+                              transition
+                              ${
+                                isRemoved
+                                  ? "bg-[#8FAE7A] hover:bg-[#789961] text-white"
+                                  : "bg-red-100 hover:bg-red-200 text-red-700"
+                              }
+                              disabled:opacity-50
+                            `}
+                          >
+                            {isRemoved
+                              ? "Keep This Media"
+                              : "Remove This Media"}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+                )}
+              </div>
+            )}
+
+            {removedMediaIds.length > 0 && (
+              <div
+                className="
+                  mt-4
+                  rounded-xl
+                  bg-red-50
+                  border
+                  border-red-100
+                  p-4
+                  text-sm
+                  text-red-700
+                "
+              >
+                <strong>
+                  {removedMediaIds.length}
+                </strong>{" "}
+                {removedMediaIds.length === 1
+                  ? "item is"
+                  : "items are"}{" "}
+                marked for removal.
+                They will be permanently
+                removed when you click{" "}
+                <strong>
+                  Save Changes
+                </strong>
+                .
+              </div>
+            )}
           </div>
 
           {/* ============================================================
@@ -734,12 +1098,13 @@ export default function EditFamilyMemory() {
               <strong>
                 Important:
               </strong>{" "}
-              Selecting files here will
+              Selected files will be added
+              as new memories for{" "}
               <strong>
-                {" "}add new memories
+                {memberName}
               </strong>
-              . It will not replace the
-              current photo/video above.
+              . They will not replace the
+              existing media.
             </div>
 
           </div>
@@ -841,8 +1206,9 @@ export default function EditFamilyMemory() {
                 text-gray-400
               "
             >
-              Additional files automatically
-              start after this memory's order.
+              New files automatically
+              continue after the highest
+              existing display order.
             </p>
 
           </div>
@@ -926,19 +1292,23 @@ export default function EditFamilyMemory() {
           >
             {saving
               ? "Saving..."
-              : additionalFiles.length > 0
-                ? `Save Changes + Add ${additionalFiles.length} ${
-                    additionalFiles.length === 1
-                      ? "Memory"
-                      : "Memories"
-                  }`
-                : "Save Changes"}
+              : removedMediaIds.length > 0 &&
+                additionalFiles.length > 0
+                ? `Save Changes — Remove ${removedMediaIds.length} + Add ${additionalFiles.length}`
+                : removedMediaIds.length > 0
+                  ? `Save Changes — Remove ${removedMediaIds.length}`
+                  : additionalFiles.length > 0
+                    ? `Save Changes + Add ${additionalFiles.length} ${
+                        additionalFiles.length === 1
+                          ? "Memory"
+                          : "Memories"
+                      }`
+                    : "Save Changes"}
           </button>
 
         </form>
 
       </div>
-
     </AdminLayout>
   );
 }

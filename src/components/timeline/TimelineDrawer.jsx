@@ -71,6 +71,11 @@ export default function TimelineDrawer({
               title="Home"
               onClose={onClose}
             />
+            <DrawerItem
+  to="/family"
+  title="My People"
+  onClose={onClose}
+/>
 
             <DrawerItem
               to="/about"

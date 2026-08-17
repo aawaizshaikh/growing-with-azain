@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../components/admin/AdminLayout";
 
 import {
-  deleteFamilyMemory,
   getAllFamilyMemories,
 } from "../../services/familyMemoryService";
 
@@ -70,64 +69,6 @@ export default function FamilyMemoryManager() {
 
   /*
   ============================================================================
-  DELETE
-  ============================================================================
-  */
-
-  async function handleDelete(memory) {
-    const memberName =
-      getMemberName(
-        memory.member_key
-      );
-
-    const confirmed =
-      window.confirm(
-        `Delete this memory from ${memberName}?`
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      await deleteFamilyMemory(
-        memory.id
-      );
-
-      setMemories((prev) =>
-        prev.filter(
-          (item) =>
-            item.id !== memory.id
-        )
-      );
-
-      alert(
-        "Family memory deleted."
-      );
-    } catch (err) {
-      console.error(err);
-
-      alert(
-        err.message ||
-          "Unable to delete family memory."
-      );
-    }
-  }
-
-  /*
-  ============================================================================
-  EDIT
-  ============================================================================
-  */
-
-  function handleEdit(memory) {
-    navigate(
-      `/admin/family-memories/edit/${memory.id}`
-    );
-  }
-
-  /*
-  ============================================================================
   SEARCH
   ============================================================================
   */
@@ -176,6 +117,209 @@ export default function FamilyMemoryManager() {
 
   /*
   ============================================================================
+  GROUP MEMORIES BY FAMILY MEMBER
+  ============================================================================
+  */
+
+  const groupedMembers =
+    useMemo(() => {
+      const groups = {};
+
+      filtered.forEach(
+        (memory) => {
+          const key =
+            memory.member_key;
+
+          if (!groups[key]) {
+            groups[key] = [];
+          }
+
+          groups[key].push(memory);
+        }
+      );
+
+      return Object.entries(groups)
+        .map(
+          ([
+            memberKey,
+            memberMemories,
+          ]) => ({
+            memberKey,
+            memberName:
+              getMemberName(
+                memberKey
+              ),
+            memories:
+              memberMemories,
+          })
+        )
+        .sort(
+          (a, b) =>
+            a.memberName.localeCompare(
+              b.memberName
+            )
+        );
+    }, [
+      filtered,
+    ]);
+
+  /*
+  ============================================================================
+  OPEN FAMILY MEMBER EDITOR
+  ============================================================================
+  
+  The database currently stores each memory as its own row.
+
+  Therefore the existing edit route still requires an ID.
+
+  We open the editor using the first memory belonging to this family member.
+  The next file we change will make that edit page load ALL memories for
+  this family member rather than only this one row.
+  ============================================================================
+  */
+
+  function handleEditFamilyMember(
+    memberMemories
+  ) {
+    if (
+      !memberMemories ||
+      memberMemories.length === 0
+    ) {
+      return;
+    }
+
+    const firstMemory =
+      memberMemories[0];
+
+    navigate(
+      `/admin/family-memories/edit/${firstMemory.id}`
+    );
+  }
+
+  /*
+  ============================================================================
+  RENDER MEDIA PREVIEW
+  ============================================================================
+  */
+
+  function renderMedia(memory) {
+    const isVideo =
+      memory.media_type ===
+      "video";
+
+    return (
+      <div
+        key={memory.id}
+        className="
+          relative
+          aspect-square
+          overflow-hidden
+          rounded-2xl
+          bg-[#F3EEE6]
+          border-4
+          border-[#E5D4B8]
+          shadow-sm
+        "
+      >
+        {isVideo ? (
+          <>
+            <video
+              src={memory.media_url}
+              muted
+              preload="metadata"
+              className="
+                block
+                w-full
+                h-full
+                object-cover
+              "
+            />
+
+            <div
+              className="
+                absolute
+                inset-0
+                flex
+                items-center
+                justify-center
+                bg-black/10
+              "
+            >
+              <div
+                className="
+                  w-12
+                  h-12
+                  rounded-full
+                  bg-white/90
+                  flex
+                  items-center
+                  justify-center
+                  shadow-lg
+                  text-xl
+                "
+              >
+                ▶
+              </div>
+            </div>
+
+            <div
+              className="
+                absolute
+                left-3
+                bottom-3
+                rounded-full
+                bg-[#5A5148]
+                text-white
+                px-3
+                py-1
+                text-xs
+                font-semibold
+              "
+            >
+              Video
+            </div>
+          </>
+        ) : (
+          <img
+            src={memory.media_url}
+            alt={
+              memory.caption ||
+              "Family memory"
+            }
+            className="
+              block
+              w-full
+              h-full
+              object-cover
+            "
+          />
+        )}
+
+        {!memory.published && (
+          <div
+            className="
+              absolute
+              top-3
+              right-3
+              rounded-full
+              bg-white/95
+              text-[#9A5050]
+              px-3
+              py-1
+              text-xs
+              font-semibold
+              shadow-sm
+            "
+          >
+            Draft
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /*
+  ============================================================================
   RENDER
   ============================================================================
   */
@@ -214,10 +358,15 @@ export default function FamilyMemoryManager() {
             </h1>
 
             <p className="text-gray-500 mt-2">
-              {filtered.length}{" "}
-              {filtered.length === 1
+              {memories.length}{" "}
+              {memories.length === 1
                 ? "Memory"
-                : "Memories"}
+                : "Memories"}{" "}
+              across{" "}
+              {groupedMembers.length}{" "}
+              {groupedMembers.length === 1
+                ? "family member"
+                : "family members"}
             </p>
 
           </div>
@@ -282,7 +431,7 @@ export default function FamilyMemoryManager() {
             Loading family memories...
           </div>
 
-        ) : filtered.length === 0 ? (
+        ) : groupedMembers.length === 0 ? (
 
           <div
             className="
@@ -354,22 +503,27 @@ export default function FamilyMemoryManager() {
             "
           >
 
-            {filtered.map(
-              (memory) => {
+            {groupedMembers.map(
+              (group) => {
 
-                const memberName =
-                  getMemberName(
-                    memory.member_key
-                  );
+                const photoCount =
+                  group.memories.filter(
+                    (memory) =>
+                      memory.media_type !==
+                      "video"
+                  ).length;
 
-                const isVideo =
-                  memory.media_type ===
-                  "video";
+                const videoCount =
+                  group.memories.filter(
+                    (memory) =>
+                      memory.media_type ===
+                      "video"
+                  ).length;
 
                 return (
                   <div
                     key={
-                      memory.id
+                      group.memberKey
                     }
                     className="
                       bg-white
@@ -380,121 +534,15 @@ export default function FamilyMemoryManager() {
                   >
 
                     {/* ==================================================
-                        MEDIA PREVIEW
+                        FAMILY MEMBER HEADER
                         ================================================== */}
 
                     <div
                       className="
-                        relative
-                        h-72
-                        bg-[#F3EEE6]
+                        p-7
+                        pb-5
                       "
                     >
-
-                      {isVideo ? (
-
-                        <video
-                          src={
-                            memory.media_url
-                          }
-                          muted
-                          controls
-                          preload="metadata"
-                          className="
-                            block
-                            w-full
-                            h-full
-                            object-cover
-                          "
-                        />
-
-                      ) : (
-
-                        <img
-                          src={
-                            memory.media_url
-                          }
-                          alt={
-                            memory.caption ||
-                            `${memberName} memory`
-                          }
-                          className="
-                            block
-                            w-full
-                            h-full
-                            object-cover
-                          "
-                        />
-
-                      )}
-
-                      {/* MEDIA TYPE */}
-
-                      <div
-                        className="
-                          absolute
-                          top-4
-                          left-4
-                          rounded-full
-                          px-4
-                          py-2
-                          text-xs
-                          font-bold
-                          uppercase
-                          tracking-wide
-                        "
-                        style={{
-                          background:
-                            isVideo
-                              ? "#5A5148"
-                              : "#8FAE7A",
-
-                          color:
-                            "#FFFFFF",
-                        }}
-                      >
-                        {isVideo
-                          ? "Video"
-                          : "Photo"}
-                      </div>
-
-                      {/* PUBLISHED */}
-
-                      <div
-                        className="
-                          absolute
-                          top-4
-                          right-4
-                          rounded-full
-                          px-4
-                          py-2
-                          text-xs
-                          font-semibold
-                        "
-                        style={{
-                          background:
-                            memory.published
-                              ? "rgba(238,247,232,0.96)"
-                              : "rgba(255,241,241,0.96)",
-
-                          color:
-                            memory.published
-                              ? "#527044"
-                              : "#9A5050",
-                        }}
-                      >
-                        {memory.published
-                          ? "Published"
-                          : "Draft"}
-                      </div>
-
-                    </div>
-
-                    {/* ==================================================
-                        DETAILS
-                        ================================================== */}
-
-                    <div className="p-7">
 
                       <div
                         className="
@@ -502,7 +550,6 @@ export default function FamilyMemoryManager() {
                           items-center
                           justify-between
                           gap-4
-                          mb-4
                         "
                       >
 
@@ -524,7 +571,7 @@ export default function FamilyMemoryManager() {
                           </p>
 
                           <h2
-                            className="text-3xl"
+                            className="text-4xl"
                             style={{
                               fontFamily:
                                 "Baloo 2",
@@ -533,7 +580,7 @@ export default function FamilyMemoryManager() {
                                 "#5A5148",
                             }}
                           >
-                            {memberName}
+                            {group.memberName}
                           </h2>
 
                         </div>
@@ -544,13 +591,9 @@ export default function FamilyMemoryManager() {
                           "
                         >
 
-                          <p className="text-xs text-gray-400">
-                            Order
-                          </p>
-
                           <p
                             className="
-                              text-xl
+                              text-2xl
                               font-bold
                             "
                             style={{
@@ -558,94 +601,144 @@ export default function FamilyMemoryManager() {
                                 "#5A5148",
                             }}
                           >
-                            {memory.display_order ??
-                              0}
+                            {
+                              group.memories.length
+                            }
+                          </p>
+
+                          <p
+                            className="
+                              text-xs
+                              text-gray-400
+                            "
+                          >
+                            {group.memories.length ===
+                            1
+                              ? "Memory"
+                              : "Memories"}
                           </p>
 
                         </div>
 
                       </div>
 
-                      {/* CAPTION */}
-
-                      {memory.caption ? (
-
-                        <p
-                          className="
-                            text-gray-600
-                            leading-relaxed
-                            mb-6
-                          "
-                        >
-                          {memory.caption}
-                        </p>
-
-                      ) : (
-
-                        <p
-                          className="
-                            text-gray-400
-                            italic
-                            mb-6
-                          "
-                        >
-                          No caption
-                        </p>
-
-                      )}
-
-                      {/* ACTIONS */}
+                      {/* MEDIA SUMMARY */}
 
                       <div
                         className="
                           flex
                           gap-3
+                          mt-4
+                          flex-wrap
                         "
                       >
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleEdit(
-                              memory
-                            )
-                          }
+                        <span
                           className="
-                            flex-1
-                            rounded-xl
+                            rounded-full
                             bg-[#EEF7E8]
-                            text-[#5A5148]
-                            py-3
+                            text-[#527044]
+                            px-4
+                            py-2
+                            text-sm
                             font-semibold
-                            hover:bg-[#E0EFD8]
-                            transition
                           "
                         >
-                          Edit
-                        </button>
+                          📷 {photoCount}{" "}
+                          {photoCount === 1
+                            ? "Photo"
+                            : "Photos"}
+                        </span>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleDelete(
-                              memory
-                            )
-                          }
-                          className="
-                            flex-1
-                            rounded-xl
-                            bg-[#FFF0F0]
-                            text-[#A24D4D]
-                            py-3
-                            font-semibold
-                            hover:bg-[#FFE2E2]
-                            transition
-                          "
-                        >
-                          Delete
-                        </button>
+                        {videoCount > 0 && (
+                          <span
+                            className="
+                              rounded-full
+                              bg-[#F0ECE7]
+                              text-[#5A5148]
+                              px-4
+                              py-2
+                              text-sm
+                              font-semibold
+                            "
+                          >
+                            🎥 {videoCount}{" "}
+                            {videoCount === 1
+                              ? "Video"
+                              : "Videos"}
+                          </span>
+                        )}
 
                       </div>
+
+                    </div>
+
+                    {/* ==================================================
+                        ALL MEDIA FOR THIS FAMILY MEMBER
+                        ================================================== */}
+
+                    <div
+                      className="
+                        px-7
+                        pb-7
+                      "
+                    >
+
+                      <div
+                        className="
+                          grid
+                          grid-cols-3
+                          sm:grid-cols-4
+                          gap-3
+                        "
+                      >
+
+                        {group.memories.map(
+                          (
+                            memory
+                          ) =>
+                            renderMedia(
+                              memory
+                            )
+                        )}
+
+                      </div>
+
+                    </div>
+
+                    {/* ==================================================
+                        EDIT FAMILY MEMBER
+                        ================================================== */}
+
+                    <div
+                      className="
+                        px-7
+                        pb-7
+                      "
+                    >
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleEditFamilyMember(
+                            group.memories
+                          )
+                        }
+                        className="
+                          w-full
+                          rounded-2xl
+                          bg-[#EEF7E8]
+                          text-[#5A5148]
+                          py-4
+                          font-semibold
+                          hover:bg-[#E0EFD8]
+                          transition
+                        "
+                      >
+                        Edit{" "}
+                        {group.memberName}{" "}
+                        Memories
+                      </button>
 
                     </div>
 

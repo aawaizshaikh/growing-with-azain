@@ -329,6 +329,7 @@ export default function FavoriteSongs() {
                     { title: "Favourite Songs", path: "/favorite-songs" },
                     { title: "Gallery", path: "/gallery" },
                     { title: "Letters", path: "/letters" },
+                    { title: "My People", path: "/family" },
                     { title: "About Azain", path: "/about" },
                   ].map((item) => (
                     <Link

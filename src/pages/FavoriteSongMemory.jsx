@@ -81,8 +81,8 @@ const POSITIONS = {
   cover: {
     left: "29.5%",
     top: "28.0%",
-    width: "13.5%",
-    height: "45.0%",
+    width: "17.5%",
+    height: "47.0%",
   },
 
   /*
@@ -92,7 +92,7 @@ const POSITIONS = {
   */
 
   story: {
-    left: "60.0%",
+    left: "50%",
     top: "25.0%",
     width: "21.2%",
     height: "19.0%",
@@ -361,16 +361,17 @@ function RusticFrame({
       style={{
         background:
           "linear-gradient(145deg, #f5e8cf 0%, #e7d2ad 48%, #f1dfc0 100%)",
-        border: isCover
-          ? "0.35vw solid #c9aa7a"
-          : "0.22vw solid #c9aa7a",
-        boxShadow: `
-          0 0 0 0.12vw #f8edd9,
-          0 0 0 0.28vw #b89462,
-          0 0.45vw 0.8vw rgba(63, 38, 18, 0.28),
-          inset 0 0 0 0.08vw rgba(255,255,255,0.65),
-          inset 0 0 1vw rgba(111, 76, 39, 0.14)
-        `,
+       border: isCover
+  ? "0.35vw solid #B98245"
+  : "0.22vw solid #B98245",
+
+boxShadow: `
+  0 0 0 0.12vw #F1D7A5,
+  0 0 0 0.28vw #9A6535,
+  0 0.45vw 0.8vw rgba(63, 38, 18, 0.28),
+  inset 0 0 0 0.08vw rgba(255,255,255,0.55),
+  inset 0 0 1vw rgba(111, 76, 39, 0.14)
+`,
         borderRadius: "0.35%",
       }}
     >

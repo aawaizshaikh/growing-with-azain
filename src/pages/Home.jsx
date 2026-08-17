@@ -22,7 +22,7 @@ export default function Home() {
       <div
         className="
           relative
-          max-w-[1600px]
+          max-w-[2000px]
           mx-auto
           bg-white
           rounded-[40px]
