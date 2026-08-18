@@ -7,8 +7,11 @@
 body {
   margin: 0;
   padding: 0;
+
   background: #faf8f2;
+
   font-family: "Nunito", sans-serif;
+
   overflow-x: hidden;
 }
 
@@ -24,6 +27,7 @@ img {
   user-select: none;
   -webkit-user-drag: none;
 }
+
 
 /* ======================================================
    TIMELINE ANIMATIONS
@@ -47,16 +51,24 @@ img {
   animation: timelineFloat 5s ease-in-out infinite;
 }
 
-/* Smooth animations */
+
+/* ======================================================
+   SMOOTH ANIMATIONS
+====================================================== */
 
 .timeline-transition {
   transition: all 0.35s ease;
 }
 
-/* Books */
+
+/* ======================================================
+   BOOKS
+====================================================== */
 
 .timeline-book {
-  transition: transform 0.3s ease, filter 0.3s ease,
+  transition:
+    transform 0.3s ease,
+    filter 0.3s ease,
     box-shadow 0.3s ease;
 }
 
@@ -67,12 +79,13 @@ img {
 .timeline-book.selected {
   transform: translateY(-18px) scale(1.05);
 }
+
+
 /* ======================================================
-SCRAPBOOK SOFT FLOAT ANIMATION
+   SCRAPBOOK SOFT FLOAT ANIMATION
 ====================================================== */
 
 @keyframes floatSoft {
-
   0% {
     transform: translateY(0px);
   }
@@ -84,13 +97,709 @@ SCRAPBOOK SOFT FLOAT ANIMATION
   100% {
     transform: translateY(0px);
   }
+}
+
+.float-soft {
+  animation:
+    floatSoft 5s ease-in-out infinite;
+}
+
+
+/* ======================================================
+   AZAIN MEMORY GALAXY
+======================================================
+
+   IMPORTANT ARCHITECTURE
+
+   The Gallery scene is designed as:
+
+       1920 × 1080
+
+   Gallery.jsx scales the complete scene.
+
+   Therefore this component must NOT use:
+
+       100vw
+       100vh
+
+   for its internal coordinate system.
+
+   Everything inside this stage is positioned relative
+   to the same 1920 × 1080 scene.
+
+====================================================== */
+
+
+/* ======================================================
+   GALAXY STAGE
+====================================================== */
+
+.memory-galaxy-stage {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+
+  border-radius: 0;
+
+  isolation: isolate;
+
+  background: #071a35;
+}
+
+
+/* ======================================================
+   SPACE BACKGROUND
+
+   IMPORTANT:
+
+   This is an ACTUAL IMAGE ELEMENT.
+
+   It is NOT a CSS background.
+
+   The PNG fills the entire 1920 × 1080 scene.
+====================================================== */
+
+.memory-galaxy-background {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 0;
+
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  max-width: none;
+
+  margin: 0;
+  padding: 0;
+
+  object-fit: cover;
+  object-position: center center;
+
+  pointer-events: none;
+
+  user-select: none;
+
+  -webkit-user-drag: none;
+}
+
+
+/* ======================================================
+   DECORATIVE STARS
+====================================================== */
+
+.galaxy-stars {
+  position: absolute;
+
+  z-index: 2;
+
+  display: block;
+
+  height: auto;
+
+  pointer-events: none;
+
+  user-select: none;
+
+  opacity: 0.32;
+
+  mix-blend-mode: screen;
+}
+
+.galaxy-stars-left {
+  transform: rotate(-7deg);
+}
+
+.galaxy-stars-right {
+  transform: rotate(8deg);
+
+  opacity: 0.26;
+}
+
+
+/* ======================================================
+   PLANET / MOON CONTAINERS
+====================================================== */
+
+.memory-galaxy-illustration {
+  position: absolute;
+
+  z-index: 4;
+
+  display: block;
+
+  margin: 0;
+  padding: 0;
+
+  transform:
+    translate(-50%, -50%);
+
+  pointer-events: none;
+}
+
+
+/* ======================================================
+   PLANET / MOON IMAGES
+====================================================== */
+
+.memory-galaxy-illustration-image {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  margin: 0;
+  padding: 0;
+
+  transform-origin: center center;
+
+  filter:
+    drop-shadow(
+      0 8px 12px rgba(0, 0, 0, 0.20)
+    );
+
+  user-select: none;
+
+  -webkit-user-drag: none;
+}
+
+
+/* ======================================================
+   EARTH
+====================================================== */
+
+.galaxy-planet-earth
+.memory-galaxy-illustration-image {
+  animation:
+    galaxyPlanetSpin
+    30s
+    linear
+    infinite;
+}
+
+
+/* ======================================================
+   JUPITER
+====================================================== */
+
+.galaxy-planet-jupiter
+.memory-galaxy-illustration-image {
+  animation:
+    galaxyPlanetSpinReverse
+    38s
+    linear
+    infinite;
+}
+
+
+/* ======================================================
+   SATURN
+====================================================== */
+
+.galaxy-planet-saturn
+.memory-galaxy-illustration-image {
+  animation:
+    galaxyPlanetSpin
+    48s
+    linear
+    infinite;
+}
+
+
+/* ======================================================
+   MOON
+====================================================== */
+
+.galaxy-planet-moon
+.memory-galaxy-illustration-image {
+  animation:
+    galaxyPlanetSpinReverse
+    26s
+    linear
+    infinite;
+}
+
+
+/* ======================================================
+   PLANET ROTATION
+====================================================== */
+
+@keyframes galaxyPlanetSpin {
+
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 
 }
 
 
-.float-soft {
+@keyframes galaxyPlanetSpinReverse {
+
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
+
+}
+
+
+/* ======================================================
+   AZAIN CENTRE
+====================================================== */
+
+.memory-galaxy-center {
+  position: absolute;
+
+  z-index: 6;
+
+  left: 50%;
+  top: 50%;
+
+  width: 25%;
+
+  min-width: 190px;
+  max-width: 360px;
+
+  transform:
+    translate(-50%, -50%);
+
+  text-align: center;
+
+  pointer-events: none;
+
+  color: #fff8e7;
+
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.50),
+    0 0 24px rgba(245, 214, 133, 0.30);
+}
+
+
+/* ======================================================
+   AZAIN NAME
+====================================================== */
+
+.memory-galaxy-center-name {
+  font-family:
+    "Baloo 2",
+    "Nunito",
+    sans-serif;
+
+  font-size:
+    clamp(42px, 5vw, 76px);
+
+  font-weight: 800;
+  color: #FFF4D6;
+
+  letter-spacing: 0.08em;
+
+  line-height: 0.95;
+}
+
+
+/* ======================================================
+   CENTRE SUBTITLE
+====================================================== */
+
+.memory-galaxy-center-line {
+  margin-top: 10px;
+
+  font-family: "Nunito", sans-serif;
+
+  font-size:
+    clamp(10px, 1vw, 15px);
+
+  line-height: 1.35;
+
+  color:
+    rgba(255, 248, 231, 0.92);
+}
+
+
+/* ======================================================
+   MEMORY LAYER
+
+   This covers the complete Space scene.
+
+   Every photo/video is positioned using percentage
+   coordinates calculated by MemoryGalaxy.jsx.
+====================================================== */
+
+.memory-galaxy-memory-layer {
+  position: absolute;
+
+  z-index: 7;
+
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+
+  width: 100%;
+  height: 100%;
+
+  pointer-events: none;
+}
+
+
+/* ======================================================
+   INDIVIDUAL MEMORY
+
+   React supplies:
+
+       left: xx%
+       top: xx%
+
+   The thumbnail is centred on that coordinate.
+====================================================== */
+
+.memory-galaxy-item {
+  position: absolute;
+
+  display: block;
+
+  margin: 0;
+  padding: 0;
+
+  border:
+    2px solid
+    rgba(255, 235, 184, 0.82);
+
+  border-radius: 50%;
+
+  overflow: hidden;
+
+  transform:
+    translate(-50%, -50%);
+
+  background:
+    #eee8db;
+
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.28);
+
+  cursor: pointer;
+
+  pointer-events: auto;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  transition:
+    transform 0.20s ease,
+    box-shadow 0.20s ease,
+    border-color 0.20s ease;
+}
+
+
+/* ======================================================
+   MEMORY HOVER
+====================================================== */
+
+.memory-galaxy-item:hover {
+  z-index: 50;
+
+  transform:
+    translate(-50%, -50%)
+    scale(1.8);
+
+  border-color:
+    #fff4c7;
+
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.34),
+    0 0 0 3px rgba(255, 241, 189, 0.35);
+}
+
+
+/* ======================================================
+   MEMORY IMAGE / VIDEO
+====================================================== */
+
+.memory-galaxy-media {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  margin: 0;
+  padding: 0;
+
+  object-fit: cover;
+
+  border-radius: 50%;
+
+  user-select: none;
+
+  -webkit-user-drag: none;
+}
+
+
+/* ======================================================
+   VIDEO PLAY INDICATOR
+====================================================== */
+
+.memory-galaxy-video-badge {
+  position: absolute;
+
+  right: 0;
+  bottom: 0;
+
+  width: 42%;
+  height: 42%;
+
+  min-width: 8px;
+  min-height: 8px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    rgba(10, 25, 50, 0.80);
+
+  color:
+    #fff8df;
+
+  font-size:
+    clamp(5px, 0.55vw, 9px);
+
+  line-height: 1;
+
+  pointer-events: none;
+}
+
+
+/* ======================================================
+   ROCKET
+
+   Static position.
+
+   No unnecessary animation.
+====================================================== */
+
+.memory-galaxy-rocket {
+  position: absolute;
+
+  z-index: 5;
+
+  left: 31%;
+  top: 87%;
+
+  width: 8%;
+
+  height: auto;
+
+  margin: 0;
+  padding: 0;
+
+  transform:
+    translate(-50%, -50%)
+    rotate(8deg);
+
+  pointer-events: none;
+
+  filter:
+    drop-shadow(
+      0 7px 10px
+      rgba(0, 0, 0, 0.20)
+    );
+
+  user-select: none;
+
+  -webkit-user-drag: none;
+}
+
+
+/* ======================================================
+   ASTRONAUT
+
+   Slow flight across the complete 1920 × 1080 scene.
+
+   IMPORTANT:
+
+   Uses percentage-based left/top positions so its
+   movement remains tied to the Space artwork instead
+   of the browser viewport.
+====================================================== */
+
+.memory-galaxy-astronaut {
+  position: absolute;
+
+  z-index: 12;
+
+  left: -12%;
+  top: 66%;
+
+  width:
+    clamp(110px, 12%, 210px);
+
+  height: auto;
+
+  margin: 0;
+  padding: 0;
+
+  pointer-events: none;
 
   animation:
-    floatSoft 5s ease-in-out infinite;
+    galaxyAstronautFlight
+    75s
+    linear
+    infinite;
+
+  filter:
+    drop-shadow(
+      0 10px 15px
+      rgba(0, 0, 0, 0.24)
+    );
+
+  user-select: none;
+
+  -webkit-user-drag: none;
+}
+
+
+/* ======================================================
+   ASTRONAUT FLIGHT
+
+   The astronaut crosses the Space artwork slowly.
+
+   It does NOT affect any other element.
+====================================================== */
+
+@keyframes galaxyAstronautFlight {
+
+  0% {
+    left: -12%;
+    top: 66%;
+
+    transform:
+      rotate(-8deg);
+  }
+
+  18% {
+    left: 18%;
+    top: 58%;
+
+    transform:
+      rotate(-2deg);
+  }
+
+  38% {
+    left: 42%;
+    top: 43%;
+
+    transform:
+      rotate(7deg);
+  }
+
+  58% {
+    left: 66%;
+    top: 55%;
+
+    transform:
+      rotate(2deg);
+  }
+
+  78% {
+    left: 88%;
+    top: 39%;
+
+    transform:
+      rotate(9deg);
+  }
+
+  100% {
+    left: 112%;
+    top: 28%;
+
+    transform:
+      rotate(3deg);
+  }
+
+}
+
+
+/* ======================================================
+   REDUCED MOTION
+====================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .galaxy-planet-earth
+  .memory-galaxy-illustration-image,
+
+  .galaxy-planet-jupiter
+  .memory-galaxy-illustration-image,
+
+  .galaxy-planet-saturn
+  .memory-galaxy-illustration-image,
+
+  .galaxy-planet-moon
+  .memory-galaxy-illustration-image,
+
+  .memory-galaxy-astronaut {
+
+    animation: none;
+
+  }
+
+}
+
+
+/* ======================================================
+   MOBILE
+====================================================== */
+
+@media (max-width: 640px) {
+
+  .memory-galaxy-center {
+    width: 34%;
+
+    min-width: 120px;
+  }
+
+  .memory-galaxy-center-name {
+    font-size:
+      clamp(28px, 8vw, 46px);
+  }
+
+  .memory-galaxy-center-line {
+    display: none;
+  }
+
+  .memory-galaxy-rocket {
+    width: 9%;
+  }
+
+  .memory-galaxy-astronaut {
+    width: 18%;
+  }
+
+  .memory-galaxy-item:hover {
+    transform:
+      translate(-50%, -50%)
+      scale(1.5);
+  }
 
 }
