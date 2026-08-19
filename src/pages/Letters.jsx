@@ -1,38 +1,43 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 
 import TimelineDrawer from "../components/timeline/TimelineDrawer";
 
 import { getPublishedLetters } from "../services/letterService";
 
 // ============================================================================
-// LETTER ARTWORK
+// LETTER GARDEN ARTWORK
+// ============================================================================
+//
+// These are visual assets only.
+//
+// IMPORTANT:
+// The Letter Garden background is deliberately rendered as an actual <img>
+// element inside the fixed 1920 x 1080 scene.
+//
+// It is NOT a CSS background-image.
+//
+// This keeps the Letters page consistent with the existing illustrated
+// scene architecture used elsewhere in the project.
+//
+// Files:
+//
+// src/assets/illustrations/letters/
+// ├── letter-garden-background.png
+// ├── letter-envelope.png
+// └── letter-writing-table-background.png
+//
+// The writing-table background is used by LetterMemory.jsx.
 // ============================================================================
 
-import background from "../assets/illustrations/letters/background.webp";
-
-import caveBoy from "../assets/illustrations/letters/cave-boy.webp";
-import caveDad from "../assets/illustrations/letters/cave-dad.webp";
-import caveFire from "../assets/illustrations/letters/cave-fire.webp";
-import caveMom from "../assets/illustrations/letters/cave-mom.webp";
-import caveGirl from "../assets/illustrations/letters/cave-girl.webp";
-import letterChildBackground from "../assets/illustrations/letters/letter-child-background.webp";
-import tigerRug from "../assets/illustrations/letters/tiger-rug.webp";
-import caveStone from "../assets/illustrations/letters/cave-stone.webp";
+import letterGardenBackground from "../assets/illustrations/letters/letter-garden-background.png";
+import letterEnvelope from "../assets/illustrations/letters/letter-envelope.png";
 
 // ============================================================================
 // PAGINATION
-// ============================================================================
-//
-// There are 10 stone positions in the cave.
-//
-// Each page displays up to 10 letters:
-// Page 1 = letters 1 - 10
-// Page 2 = letters 11 - 20
-// Page 3 = letters 21 - 30
-// etc.
-//
-// The same 10 stone artworks are reused for every page.
 // ============================================================================
 
 const LETTERS_PER_PAGE = 10;
@@ -41,216 +46,225 @@ const LETTERS_PER_PAGE = 10;
 // LETTER SLOTS
 // ============================================================================
 //
-// These positions belong to the visual cave artwork.
-// They should NOT be changed by Admin.
+// The positions are intentionally kept as percentages of the 1920 x 1080
+// scene.
 //
-// The actual title/content comes from Supabase.
+// The envelopes have been moved slightly downward to create a dedicated
+// visual area for the page title and subtitle.
 // ============================================================================
 
 const LETTER_SLOTS = [
   {
-    key: "stone-1",
-    stoneLeft: "14%",
-    stoneTop: "19%",
-    stoneWidth: "11%",
+    key: "envelope-1",
+    envelopeLeft: "22%",
+    envelopeTop: "33%",
+    envelopeWidth: "12%",
   },
 
   {
-    key: "stone-2",
-    stoneLeft: "25.5%",
-    stoneTop: "19%",
-    stoneWidth: "11%",
+    key: "envelope-2",
+    envelopeLeft: "35%",
+    envelopeTop: "33%",
+    envelopeWidth: "12%",
   },
 
   {
-    key: "stone-3",
-    stoneLeft: "36.5%",
-    stoneTop: "19%",
-    stoneWidth: "11%",
+    key: "envelope-3",
+    envelopeLeft: "48%",
+    envelopeTop: "33%",
+    envelopeWidth: "12%",
   },
 
   {
-    key: "stone-4",
-    stoneLeft: "47.5%",
-    stoneTop: "19%",
-    stoneWidth: "11%",
+    key: "envelope-4",
+    envelopeLeft: "61%",
+    envelopeTop: "33%",
+    envelopeWidth: "12%",
   },
 
   {
-    key: "stone-5",
-    stoneLeft: "58%",
-    stoneTop: "19%",
-    stoneWidth: "11%",
+    key: "envelope-5",
+    envelopeLeft: "74%",
+    envelopeTop: "33%",
+    envelopeWidth: "12%",
   },
 
   {
-    key: "stone-6",
-    stoneLeft: "14%",
-    stoneTop: "47%",
-    stoneWidth: "11%",
+    key: "envelope-6",
+    envelopeLeft: "22%",
+    envelopeTop: "52%",
+    envelopeWidth: "12%",
   },
 
   {
-    key: "stone-7",
-    stoneLeft: "25.5%",
-    stoneTop: "47%",
-    stoneWidth: "11%",
+    key: "envelope-7",
+    envelopeLeft: "35%",
+    envelopeTop: "52%",
+    envelopeWidth: "12%",
   },
 
   {
-    key: "stone-8",
-    stoneLeft: "36.5%",
-    stoneTop: "47%",
-    stoneWidth: "11%",
+    key: "envelope-8",
+    envelopeLeft: "48%",
+    envelopeTop: "52%",
+    envelopeWidth: "12%",
   },
 
   {
-    key: "stone-9",
-    stoneLeft: "47.5%",
-    stoneTop: "47%",
-    stoneWidth: "11%",
+    key: "envelope-9",
+    envelopeLeft: "61%",
+    envelopeTop: "52%",
+    envelopeWidth: "12%",
   },
 
   {
-    key: "stone-10",
-    stoneLeft: "58%",
-    stoneTop: "47%",
-    stoneWidth: "11%",
+    key: "envelope-10",
+    envelopeLeft: "74%",
+    envelopeTop: "52%",
+    envelopeWidth: "12%",
   },
 ];
 
 // ============================================================================
-// CAVE CHARACTERS
+// PAGE TITLE
 // ============================================================================
 //
-// These are decorative illustrations only.
-// They are NOT connected to Supabase or the letters.
+// Dynamic HTML/React text.
+//
+// Nothing is baked into the illustration.
 // ============================================================================
 
-function CaveCharacters() {
+function PageHeading() {
   return (
-    <>
-      {/* ====================================================================
-          DAD
-          ==================================================================== */}
+    <div
+      className="
+        absolute
+        z-50
+        pointer-events-none
+        left-1/2
+        -translate-x-1/2
+        top-[10.5%]
+        w-[62%]
+        text-center
+      "
+    >
+      {/* ==================================================================
+          MAIN TITLE
+          ================================================================== */}
 
-      <img
-        src={caveDad}
-        alt=""
-        draggable={false}
+      <h1
         className="
-          absolute
-          z-50
-          pointer-events-none
-          select-none
-          object-contain
+          m-0
+          font-semibold
+          leading-none
+          text-[#5B4C3A]
+          drop-shadow-[0_2px_3px_rgba(255,250,235,0.72)]
         "
         style={{
-          left: "77%",
-          top: "38%",
-          width: "13%",
+          fontFamily:
+            "DM Serif Display, Georgia, serif",
+
+          fontSize:
+            "clamp(34px, 3.1vw, 60px)",
+
+          letterSpacing:
+            "0.01em",
         }}
-      />
+      >
+        Letters from the Heart
+      </h1>
 
-      {/* ====================================================================
-          BOY
-          ==================================================================== */}
+      {/* ==================================================================
+          SUBTITLE
+          ================================================================== */}
 
-      <img
-        src={caveBoy}
-        alt=""
-        draggable={false}
+      <p
         className="
-          absolute
-          z-50
-          pointer-events-none
-          select-none
-          object-contain
+          m-0
+          mt-[0.7%]
+          text-[#75624D]
+          italic
+          leading-tight
+          drop-shadow-[0_1px_2px_rgba(255,250,235,0.72)]
         "
         style={{
-          left: "57%",
-          top: "65%",
-          width: "15%",
+          fontFamily:
+            "Parisienne, cursive",
+
+          fontSize:
+            "clamp(16px, 1.35vw, 26px)",
+
+          letterSpacing:
+            "0.015em",
         }}
-      />
-      
+      >
+        A little garden of words, waiting to be discovered.
+      </p>
 
-      {/* ====================================================================
-          MOM
-          ==================================================================== */}
+      {/* ==================================================================
+          SMALL DECORATIVE DIVIDER
+          ================================================================== */}
 
-      <img
-        src={caveMom}
-        alt=""
-        draggable={false}
+      <div
         className="
-          absolute
-          z-50
-          pointer-events-none
-          select-none
-          object-contain
+          mt-[1.3%]
+          flex
+          items-center
+          justify-center
+          gap-[0.65%]
         "
-        style={{
-          right: "4%",
-          top: "50%",
-          width: "15%",
-          transform: "scaleX(-1)",
-        }}
-      />
+      >
+        <span
+          className="
+            h-px
+            w-[7%]
+            bg-[#9D805C]/45
+          "
+        />
 
-      {/* ====================================================================
-          GIRL
-          ==================================================================== */}
+        <span
+          className="
+            text-[#A1845E]
+          "
+          style={{
+            fontSize:
+              "clamp(8px, 0.65vw, 13px)",
+          }}
+        >
+          ✦
+        </span>
 
-      <img
-        src={caveGirl}
-        alt=""
-        draggable={false}
-        className="
-          absolute
-          z-50
-          pointer-events-none
-          select-none
-          object-contain
-        "
-        style={{
-          right: "40%",
-          top: "70%",
-          width: "19%",
-        }}
-      />
-    </>
+        <span
+          className="
+            h-px
+            w-[7%]
+            bg-[#9D805C]/45
+          "
+        />
+      </div>
+    </div>
   );
 }
 
 // ============================================================================
-// LETTER STONE
+// LETTER ENVELOPE
 // ============================================================================
 
-function LetterStone({
+function LetterEnvelope({
   slot,
   letter,
   onOpen,
 }) {
-  // --------------------------------------------------------------------------
-  // A stone only becomes an actual letter if Supabase supplied a slug.
-  // --------------------------------------------------------------------------
+  const hasLetter =
+    Boolean(letter?.slug);
 
-  const hasLetter = Boolean(letter?.slug);
-
-  // --------------------------------------------------------------------------
-  // IMPORTANT:
-  // No fallback title.
-  //
-  // Empty stone = completely blank.
-  // --------------------------------------------------------------------------
-
-  const title = letter?.title || "";
+  const title =
+    letter?.title || "";
 
   return (
     <>
       {/* ====================================================================
-          STONE
+          ENVELOPE
           ==================================================================== */}
 
       <button
@@ -264,7 +278,7 @@ function LetterStone({
         aria-label={
           hasLetter
             ? `Open ${title}`
-            : "Empty letter stone"
+            : "Empty letter envelope"
         }
         className={`
           absolute
@@ -280,14 +294,21 @@ function LetterStone({
           }
         `}
         style={{
-          left: slot.stoneLeft,
-          top: slot.stoneTop,
-          width: slot.stoneWidth,
-          WebkitTapHighlightColor: "transparent",
+          left:
+            slot.envelopeLeft,
+
+          top:
+            slot.envelopeTop,
+
+          width:
+            slot.envelopeWidth,
+
+          WebkitTapHighlightColor:
+            "transparent",
         }}
       >
         <img
-          src={caveStone}
+          src={letterEnvelope}
           alt=""
           draggable={false}
           className={`
@@ -295,19 +316,24 @@ function LetterStone({
             w-full
             h-auto
             select-none
+            object-contain
             transition-all
             duration-300
             ${
               hasLetter
-                ? "hover:scale-[1.04] hover:-translate-y-[2%] active:scale-[0.98]"
-                : "opacity-75"
+                ? `
+                  hover:scale-[1.035]
+                  hover:-translate-y-[2%]
+                  active:scale-[0.98]
+                `
+                : "opacity-35"
             }
           `}
         />
       </button>
 
       {/* ====================================================================
-          TITLE
+          DYNAMIC LETTER TITLE
           ==================================================================== */}
 
       {hasLetter && (
@@ -322,20 +348,29 @@ function LetterStone({
             text-center
           "
           style={{
-            left: `calc(${slot.stoneLeft} + ${slot.stoneWidth} * 0.16)`,
-            top: `calc(${slot.stoneTop} + ${slot.stoneWidth} * 0.22)`,
-            width: `calc(${slot.stoneWidth} * 0.68)`,
-            minHeight: `calc(${slot.stoneWidth} * 0.30)`,
-            transform: "translateY(300%)",
-          }}
+  left:
+    `calc(${slot.envelopeLeft} + ${slot.envelopeWidth} * 0.05)`,
+
+  top:
+    `calc(${slot.envelopeTop} - ${slot.envelopeWidth} * -0.10)`,
+
+  width:
+    `calc(${slot.envelopeWidth} * 0.90)`,
+
+  minHeight:
+    `calc(${slot.envelopeWidth} * 0.18)`,
+
+  transform:
+    "none",
+}}
         >
           <span
             className="
               max-w-full
               font-semibold
               leading-[1.05]
-              text-[#4A3323]
-              drop-shadow-[0_1px_1px_rgba(255,248,225,0.8)]
+              text-[#66553F]
+              drop-shadow-[0_1px_2px_rgba(255,250,235,0.85)]
             "
             style={{
               fontFamily:
@@ -349,83 +384,51 @@ function LetterStone({
           </span>
         </div>
       )}
-
       {/* ====================================================================
-          PUBLISHED INDICATOR
-          ==================================================================== */}
+    DYNAMIC LETTER SIGNATURE
+    ==================================================================== */}
 
-      {hasLetter && (
-        <div
-          className="
-            absolute
-            z-50
-            pointer-events-none
-            flex
-            items-center
-            justify-center
-            rounded-full
-            bg-[#FFF0C8]
-            border
-            border-[#A77C4D]
-            shadow-[0_2px_5px_rgba(50,30,15,0.25)]
-          "
-          style={{
-            left:
-              `calc(${slot.stoneLeft} + ${slot.stoneWidth} * 0.77)`,
+{hasLetter && letter.signature && (
+  <div
+    className="
+      absolute
+      z-40
+      pointer-events-none
+      text-left
+      whitespace-pre-line
+      leading-[0.95]
+    "
+    style={{
+      left:
+        `calc(${slot.envelopeLeft} + ${slot.envelopeWidth} * 0.08)`,
 
-            top:
-              `calc(${slot.stoneTop} + ${slot.stoneWidth} * 0.08)`,
+      top:
+        `calc(${slot.envelopeTop} + ${slot.envelopeWidth} * 0.85)`,
 
-            width:
-              `calc(${slot.stoneWidth} * 0.15)`,
+      width:
+        `calc(${slot.envelopeWidth} * 0.48)`,
 
-            aspectRatio: "1",
-          }}
-        >
-          <span
-            className="
-              text-[#6C4B30]
-              font-bold
-            "
-            style={{
-              fontFamily:
-                "Georgia, serif",
+      color:
+        "#66533F",
 
-              fontSize:
-                "clamp(7px, 0.5vw, 11px)",
-            }}
-          >
-            ♥
-          </span>
-        </div>
-      )}
-    </>
-  );
-}
+      fontFamily:
+        "Cormorant Garamond, Georgia, serif",
 
-// ============================================================================
-// FIRE
-// ============================================================================
+      fontSize:
+        "clamp(10px, 0.85vw, 18px)",
 
-function FireDecoration() {
-  return (
-    <img
-      src={caveFire}
-      alt=""
-      draggable={false}
-      className="
-        absolute
-        z-20
-        pointer-events-none
-        select-none
-        object-contain
-      "
-      style={{
-        left: "52.5%",
-        bottom: "4%",
-        width: "11%",
-      }}
-    />
+      fontStyle:
+        "italic",
+
+      lineHeight:
+        1.05,
+    }}
+  >
+    {letter.signature}
+  </div>
+)}
+
+         </>
   );
 }
 
@@ -464,7 +467,9 @@ function Pagination({
       <button
         type="button"
         onClick={onPrevious}
-        disabled={currentPage === 0}
+        disabled={
+          currentPage === 0
+        }
         aria-label="Previous letters page"
         className={`
           flex
@@ -472,23 +477,37 @@ function Pagination({
           justify-center
           rounded-full
           border
-          shadow-[0_3px_10px_rgba(45,25,12,0.22)]
           transition-all
           duration-200
           ${
             currentPage === 0
               ? "cursor-default opacity-40"
-              : "cursor-pointer hover:scale-105 hover:bg-[#FFF1CE]"
+              : `
+                cursor-pointer
+                hover:scale-105
+                hover:bg-[#FFF9EE]
+              `
           }
         `}
         style={{
-          width: "clamp(30px, 2.5vw, 48px)",
-          height: "clamp(24px, 2vw, 38px)",
+          width:
+            "clamp(30px, 2.5vw, 48px)",
+
+          height:
+            "clamp(24px, 2vw, 38px)",
+
           background:
-            "rgba(255, 243, 214, 0.92)",
+            "rgba(255, 250, 238, 0.88)",
+
           borderColor:
-            "rgba(167, 124, 77, 0.75)",
-          color: "#68492F",
+            "rgba(157, 132, 91, 0.55)",
+
+          color:
+            "#685B47",
+
+          boxShadow:
+            "0 3px 10px rgba(72,58,35,0.14)",
+
           fontSize:
             "clamp(16px, 1.3vw, 25px)",
         }}
@@ -509,27 +528,36 @@ function Pagination({
           border
           px-[0.45vw]
           py-[0.25vw]
-          shadow-[0_3px_10px_rgba(45,25,12,0.18)]
         "
         style={{
           background:
-            "rgba(255, 243, 214, 0.92)",
+            "rgba(255, 250, 238, 0.88)",
+
           borderColor:
-            "rgba(167, 124, 77, 0.75)",
+            "rgba(157, 132, 91, 0.55)",
+
+          boxShadow:
+            "0 3px 10px rgba(72,58,35,0.12)",
         }}
       >
         {Array.from(
-          { length: totalPages },
+          {
+            length:
+              totalPages,
+          },
           (_, index) => {
             const isActive =
-              index === currentPage;
+              index ===
+              currentPage;
 
             return (
               <button
                 key={index}
                 type="button"
                 onClick={() =>
-                  onPageChange(index)
+                  onPageChange(
+                    index
+                  )
                 }
                 aria-label={`Go to letters page ${index + 1}`}
                 aria-current={
@@ -542,13 +570,20 @@ function Pagination({
                   items-center
                   justify-center
                   rounded-full
-                  font-bold
+                  font-semibold
                   transition-all
                   duration-200
                   ${
                     isActive
-                      ? "bg-[#8C6945] text-[#FFF7E5] scale-105"
-                      : "text-[#68492F] hover:bg-[#E8D2A7]"
+                      ? `
+                        bg-[#A48A62]
+                        text-[#FFF8E8]
+                        scale-105
+                      `
+                      : `
+                        text-[#70634F]
+                        hover:bg-[#EDE2CF]
+                      `
                   }
                 `}
                 style={{
@@ -590,24 +625,38 @@ function Pagination({
           justify-center
           rounded-full
           border
-          shadow-[0_3px_10px_rgba(45,25,12,0.22)]
           transition-all
           duration-200
           ${
             currentPage ===
             totalPages - 1
               ? "cursor-default opacity-40"
-              : "cursor-pointer hover:scale-105 hover:bg-[#FFF1CE]"
+              : `
+                cursor-pointer
+                hover:scale-105
+                hover:bg-[#FFF9EE]
+              `
           }
         `}
         style={{
-          width: "clamp(30px, 2.5vw, 48px)",
-          height: "clamp(24px, 2vw, 38px)",
+          width:
+            "clamp(30px, 2.5vw, 48px)",
+
+          height:
+            "clamp(24px, 2vw, 38px)",
+
           background:
-            "rgba(255, 243, 214, 0.92)",
+            "rgba(255, 250, 238, 0.88)",
+
           borderColor:
-            "rgba(167, 124, 77, 0.75)",
-          color: "#68492F",
+            "rgba(157, 132, 91, 0.55)",
+
+          color:
+            "#685B47",
+
+          boxShadow:
+            "0 3px 10px rgba(72,58,35,0.14)",
+
           fontSize:
             "clamp(16px, 1.3vw, 25px)",
         }}
@@ -638,16 +687,24 @@ function LoadingOverlay() {
       <div
         className="
           rounded-full
-          bg-[#FFF4DB]/90
           border
-          border-[#D5B47C]
           px-5
           py-2.5
-          shadow-[0_5px_18px_rgba(40,25,15,0.2)]
-          text-[#65462D]
           font-semibold
         "
         style={{
+          background:
+            "rgba(255,250,238,0.90)",
+
+          borderColor:
+            "rgba(167,145,105,0.55)",
+
+          boxShadow:
+            "0 5px 18px rgba(72,58,35,0.15)",
+
+          color:
+            "#675B49",
+
           fontFamily:
             "Nunito, Arial, sans-serif",
 
@@ -682,26 +739,33 @@ function ErrorOverlay({
       <div
         className="
           rounded-[22px]
-          bg-[#FFF6E4]/95
-          border
-          border-[#D6B27B]
           px-[3%]
           py-[2%]
           text-center
-          shadow-[0_8px_30px_rgba(45,25,12,0.25)]
         "
         style={{
           width: "34%",
           minWidth: "280px",
+
+          background:
+            "rgba(255,250,238,0.95)",
+
+          border:
+            "1px solid rgba(167,145,105,0.55)",
+
+          boxShadow:
+            "0 8px 30px rgba(72,58,35,0.18)",
         }}
       >
         <h2
           className="
             m-0
-            text-[#60412B]
-            font-bold
+            font-semibold
           "
           style={{
+            color:
+              "#625542",
+
             fontFamily:
               "Cormorant Garamond, Georgia, serif",
 
@@ -709,15 +773,17 @@ function ErrorOverlay({
               "clamp(24px, 2vw, 40px)",
           }}
         >
-          The cave is quiet...
+          The garden is quiet...
         </h2>
 
         <p
           className="
             mt-2
-            text-[#76583F]
           "
           style={{
+            color:
+              "#776C59",
+
             fontFamily:
               "Nunito, Arial, sans-serif",
 
@@ -735,17 +801,23 @@ function ErrorOverlay({
             mt-4
             rounded-full
             border
-            border-[#A98254]
-            bg-[#F0D9AD]
             px-5
             py-2
-            font-bold
-            text-[#5E402A]
+            font-semibold
             transition
-            hover:bg-[#F5E3C2]
+            hover:scale-[1.02]
             active:scale-95
           "
           style={{
+            background:
+              "#D9C7A8",
+
+            borderColor:
+              "rgba(139,113,76,0.55)",
+
+            color:
+              "#5D503E",
+
             fontFamily:
               "Nunito, Arial, sans-serif",
 
@@ -765,41 +837,83 @@ function ErrorOverlay({
 // ============================================================================
 
 export default function Letters() {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  // ==========================================================================
+  // PAGE URL STATE
+  // ==========================================================================
 
-  // Timeline-style COVER scene scaling.
-  // The entire artwork lives in one fixed 16:9 coordinate system and
-  // scales to COVER the viewport, cropping only when the viewport ratio differs.
-  const [viewport, setViewport] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
+  const [
+    searchParams,
+    setSearchParams,
+  ] = useSearchParams();
+
+  const [
+    drawerOpen,
+    setDrawerOpen,
+  ] = useState(false);
+
+  // ==========================================================================
+  // TIMELINE-STYLE COVER SCENE SCALING
+  // ==========================================================================
+
+  const [
+    viewport,
+    setViewport,
+  ] = useState({
+    width:
+      window.innerWidth,
+
+    height:
+      window.innerHeight,
   });
 
   useEffect(() => {
-    const handleResize = () => {
-      setViewport({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
+    const handleResize =
+      () => {
+        setViewport({
+          width:
+            window.innerWidth,
+
+          height:
+            window.innerHeight,
+        });
+      };
 
     handleResize();
-    window.addEventListener("resize", handleResize);
+
+    window.addEventListener(
+      "resize",
+      handleResize
+    );
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener(
+        "resize",
+        handleResize
+      );
     };
   }, []);
 
-  const SCENE_WIDTH = 1920;
-  const SCENE_HEIGHT = 1080;
+  const SCENE_WIDTH =
+    1920;
 
-  const sceneScale = Math.max(
-    viewport.width / SCENE_WIDTH,
-    viewport.height / SCENE_HEIGHT
-  );
+  const SCENE_HEIGHT =
+    1080;
+
+  const sceneScale =
+    Math.max(
+      viewport.width /
+        SCENE_WIDTH,
+
+      viewport.height /
+        SCENE_HEIGHT
+    );
+
+  // ==========================================================================
+  // LETTER DATA
+  // ==========================================================================
 
   const [
     letters,
@@ -820,10 +934,80 @@ export default function Letters() {
   // PAGINATION STATE
   // ==========================================================================
 
+  const pageFromUrl =
+    Number(
+      searchParams.get("page")
+    );
+
+  const safeInitialPage =
+    Number.isFinite(
+      pageFromUrl
+    ) &&
+    pageFromUrl >= 1
+      ? pageFromUrl - 1
+      : 0;
+
   const [
     currentPage,
     setCurrentPage,
-  ] = useState(0);
+  ] = useState(
+    safeInitialPage
+  );
+
+  // ==========================================================================
+  // KEEP URL IN SYNC WITH PAGINATION
+  // ==========================================================================
+
+  useEffect(() => {
+    const expectedPage =
+      currentPage + 1;
+
+    const currentUrlPage =
+      Number(
+        searchParams.get(
+          "page"
+        )
+      );
+
+    if (
+      expectedPage === 1
+    ) {
+      if (
+        searchParams.has(
+          "page"
+        )
+      ) {
+        setSearchParams(
+          {},
+          {
+            replace: true,
+          }
+        );
+      }
+
+      return;
+    }
+
+    if (
+      currentUrlPage !==
+      expectedPage
+    ) {
+      setSearchParams(
+        {
+          page: String(
+            expectedPage
+          ),
+        },
+        {
+          replace: true,
+        }
+      );
+    }
+  }, [
+    currentPage,
+    searchParams,
+    setSearchParams,
+  ]);
 
   // ==========================================================================
   // LOAD LETTERS
@@ -837,8 +1021,9 @@ export default function Letters() {
       const data =
         await getPublishedLetters();
 
-      setLetters(data || []);
-      setCurrentPage(0);
+      setLetters(
+        data || []
+      );
     } catch (err) {
       console.error(
         "Unable to load published letters:",
@@ -869,8 +1054,9 @@ export default function Letters() {
 
         if (!mounted) return;
 
-        setLetters(data || []);
-        setCurrentPage(0);
+        setLetters(
+          data || []
+        );
       } catch (err) {
         console.error(
           "Unable to load published letters:",
@@ -898,45 +1084,55 @@ export default function Letters() {
   // ==========================================================================
   // SORT LETTERS
   // ==========================================================================
-  //
-  // Admin controls display_order.
-  //
-  // Letters with no display_order are placed after ordered letters.
-  // ==========================================================================
 
-  const sortedLetters = useMemo(() => {
-    return [...letters].sort(
-      (a, b) => {
-        const orderA =
-          Number.isFinite(
-            Number(a?.display_order)
-          )
-            ? Number(a.display_order)
-            : Number.MAX_SAFE_INTEGER;
+  const sortedLetters =
+    useMemo(() => {
+      return [
+        ...letters,
+      ].sort(
+        (a, b) => {
+          const orderA =
+            Number.isFinite(
+              Number(
+                a?.display_order
+              )
+            )
+              ? Number(
+                  a.display_order
+                )
+              : Number.MAX_SAFE_INTEGER;
 
-        const orderB =
-          Number.isFinite(
-            Number(b?.display_order)
-          )
-            ? Number(b.display_order)
-            : Number.MAX_SAFE_INTEGER;
+          const orderB =
+            Number.isFinite(
+              Number(
+                b?.display_order
+              )
+            )
+              ? Number(
+                  b.display_order
+                )
+              : Number.MAX_SAFE_INTEGER;
 
-        return orderA - orderB;
-      }
-    );
-  }, [letters]);
+          return (
+            orderA -
+            orderB
+          );
+        }
+      );
+    }, [letters]);
 
   // ==========================================================================
   // TOTAL PAGES
   // ==========================================================================
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(
-      sortedLetters.length /
-        LETTERS_PER_PAGE
-    )
-  );
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        sortedLetters.length /
+          LETTERS_PER_PAGE
+      )
+    );
 
   // ==========================================================================
   // CURRENT PAGE LETTERS
@@ -950,7 +1146,8 @@ export default function Letters() {
 
       return sortedLetters.slice(
         start,
-        start + LETTERS_PER_PAGE
+        start +
+          LETTERS_PER_PAGE
       );
     }, [
       sortedLetters,
@@ -958,16 +1155,13 @@ export default function Letters() {
     ]);
 
   // ==========================================================================
-  // SAFETY
-  // ==========================================================================
-  //
-  // If letters are deleted and the current page no longer exists,
-  // automatically return to the last valid page.
+  // PAGE SAFETY
   // ==========================================================================
 
   useEffect(() => {
     if (
-      currentPage >= totalPages
+      currentPage >=
+      totalPages
     ) {
       setCurrentPage(
         totalPages - 1
@@ -982,22 +1176,30 @@ export default function Letters() {
   // OPEN LETTER
   // ==========================================================================
 
-  function openLetter(slug) {
+  function openLetter(
+    slug
+  ) {
     if (!slug) return;
 
+    const page =
+      currentPage + 1;
+
     navigate(
-      `/letters/${slug}`
+      `/letters/${slug}?page=${page}`
     );
   }
 
   // ==========================================================================
-  // PAGINATION CONTROLS
+  // PAGINATION
   // ==========================================================================
 
   function goPrevious() {
     setCurrentPage(
       (page) =>
-        Math.max(0, page - 1)
+        Math.max(
+          0,
+          page - 1
+        )
     );
   }
 
@@ -1011,7 +1213,9 @@ export default function Letters() {
     );
   }
 
-  function goToPage(page) {
+  function goToPage(
+    page
+  ) {
     setCurrentPage(
       Math.max(
         0,
@@ -1033,7 +1237,7 @@ export default function Letters() {
         fixed
         inset-0
         overflow-hidden
-        bg-[#241A13]
+        bg-[#DCE8E2]
       "
     >
       {/* ====================================================================
@@ -1048,18 +1252,27 @@ export default function Letters() {
           overflow-hidden
         "
         style={{
-          width: `${SCENE_WIDTH}px`,
-          height: `${SCENE_HEIGHT}px`,
-          transform: `translate(-50%, -50%) scale(${sceneScale})`,
-          transformOrigin: "center center",
+          width:
+            `${SCENE_WIDTH}px`,
+
+          height:
+            `${SCENE_HEIGHT}px`,
+
+          transform:
+            `translate(-50%, -50%) scale(${sceneScale})`,
+
+          transformOrigin:
+            "center center",
         }}
       >
         {/* ==================================================================
-            BACKGROUND
+            LETTER GARDEN BACKGROUND
             ================================================================== */}
 
         <img
-          src={background}
+          src={
+            letterGardenBackground
+          }
           alt=""
           draggable={false}
           className="
@@ -1074,12 +1287,41 @@ export default function Letters() {
         />
 
         {/* ==================================================================
+            SUBTLE CENTRAL LIGHT
+            ================================================================== */}
+
+        <div
+          className="
+            absolute
+            z-10
+            pointer-events-none
+          "
+          style={{
+            left: "7%",
+            top: "12%",
+            width: "86%",
+            height: "72%",
+
+            background:
+              "radial-gradient(ellipse at center, rgba(255,252,239,0.13) 0%, rgba(255,252,239,0.035) 48%, rgba(255,252,239,0) 75%)",
+          }}
+        />
+
+        {/* ==================================================================
+            PAGE TITLE + SUBTITLE
+            ================================================================== */}
+
+        <PageHeading />
+
+        {/* ==================================================================
             BACK BUTTON
             ================================================================== */}
 
         <button
           type="button"
-          onClick={() => navigate("/")}
+          onClick={() =>
+            navigate("/")
+          }
           aria-label="Back to home"
           className="
             absolute
@@ -1091,20 +1333,32 @@ export default function Letters() {
             justify-center
             rounded-full
             border
-            border-[#D7B985]
-            bg-[#FFF3D6]/90
-            text-[#68492F]
-            shadow-[0_3px_10px_rgba(45,25,12,0.25)]
             transition-all
             duration-200
             hover:scale-105
-            hover:bg-[#FFF8E8]
             active:scale-95
           "
           style={{
-            width: "clamp(34px, 3vw, 52px)",
-            height: "clamp(34px, 3vw, 52px)",
-            fontSize: "clamp(18px, 1.5vw, 28px)",
+            width:
+              "clamp(34px, 3vw, 52px)",
+
+            height:
+              "clamp(34px, 3vw, 52px)",
+
+            background:
+              "rgba(255,250,238,0.84)",
+
+            borderColor:
+              "rgba(157,132,91,0.55)",
+
+            color:
+              "#675A46",
+
+            boxShadow:
+              "0 3px 10px rgba(72,58,35,0.16)",
+
+            fontSize:
+              "clamp(18px, 1.5vw, 28px)",
           }}
         >
           ←
@@ -1116,7 +1370,11 @@ export default function Letters() {
 
         <button
           type="button"
-          onClick={() => setDrawerOpen(true)}
+          onClick={() =>
+            setDrawerOpen(
+              true
+            )
+          }
           aria-label="Open navigation"
           className="
             absolute
@@ -1128,73 +1386,63 @@ export default function Letters() {
             justify-center
             rounded-full
             border
-            border-[#D7B985]
-            bg-[#FFF3D6]/90
-            text-[#68492F]
-            shadow-[0_3px_10px_rgba(45,25,12,0.25)]
             transition-all
             duration-200
             hover:scale-105
-            hover:bg-[#FFF8E8]
             active:scale-95
           "
           style={{
-            width: "clamp(34px, 3vw, 52px)",
-            height: "clamp(34px, 3vw, 52px)",
-            fontSize: "clamp(17px, 1.3vw, 24px)",
+            width:
+              "clamp(34px, 3vw, 52px)",
+
+            height:
+              "clamp(34px, 3vw, 52px)",
+
+            background:
+              "rgba(255,250,238,0.84)",
+
+            borderColor:
+              "rgba(157,132,91,0.55)",
+
+            color:
+              "#675A46",
+
+            boxShadow:
+              "0 3px 10px rgba(72,58,35,0.16)",
+
+            fontSize:
+              "clamp(17px, 1.3vw, 24px)",
           }}
         >
           ☰
         </button>
 
         {/* ==================================================================
-            CAVE CHARACTERS
+            LETTER ENVELOPES
             ================================================================== */}
-
-        <CaveCharacters />
-
-        {/* ==================================================================
-            FIRE
-            ================================================================== */}
-
-        <FireDecoration />
-
-        {/* ==================================================================
-            LETTER STONES
-            ================================================================== */}
-        {/*
-            IMPORTANT:
-
-            The 10 visual stone positions never move.
-
-            Instead, the letters assigned to those positions change
-            when the user changes page.
-
-            Page 1:
-              letters 1-10
-
-            Page 2:
-              letters 11-20
-
-            Page 3:
-              letters 21-30
-
-            etc.
-        */}
 
         {LETTER_SLOTS.map(
-          (slot, index) => {
+          (
+            slot,
+            index
+          ) => {
             const letter =
               currentPageLetters[
                 index
               ];
 
             return (
-              <LetterStone
+              <LetterEnvelope
                 key={`${slot.key}-${currentPage}`}
-                slot={slot}
-                letter={letter}
-                onOpen={openLetter}
+                slot={
+                  slot
+                }
+                letter={
+                  letter
+                }
+                onOpen={
+                  openLetter
+                }
               />
             );
           }
@@ -1205,11 +1453,21 @@ export default function Letters() {
             ================================================================== */}
 
         <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPrevious={goPrevious}
-          onNext={goNext}
-          onPageChange={goToPage}
+          currentPage={
+            currentPage
+          }
+          totalPages={
+            totalPages
+          }
+          onPrevious={
+            goPrevious
+          }
+          onNext={
+            goNext
+          }
+          onPageChange={
+            goToPage
+          }
         />
 
         {/* ==================================================================
@@ -1224,11 +1482,14 @@ export default function Letters() {
             ERROR
             ================================================================== */}
 
-        {!loading && error && (
-          <ErrorOverlay
-            onRetry={loadLetters}
-          />
-        )}
+        {!loading &&
+          error && (
+            <ErrorOverlay
+              onRetry={
+                loadLetters
+              }
+            />
+          )}
       </div>
 
       {/* ====================================================================
@@ -1236,8 +1497,14 @@ export default function Letters() {
           ==================================================================== */}
 
       <TimelineDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        open={
+          drawerOpen
+        }
+        onClose={() =>
+          setDrawerOpen(
+            false
+          )
+        }
       />
     </div>
   );

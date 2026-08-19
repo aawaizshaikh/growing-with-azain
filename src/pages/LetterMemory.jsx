@@ -1,41 +1,13 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import {
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 
 import { getLetterBySlug } from "../services/letterService";
 
-import letterChildBackground from "../assets/illustrations/letters/letter-child-background.webp";
-import tigerRug from "../assets/illustrations/letters/tiger-rug.webp";
-
-
-// ============================================================================
-// CATEGORY LABELS
-// ============================================================================
-
-const CATEGORY_LABELS = {
-  "little-one": "A Letter for My Little One",
-  mommy: "A Letter from Mommy",
-  daddy: "A Letter from Daddy",
-  family: "A Letter from Family",
-  "for-you": "A Letter for You",
-  birthday: "A Birthday Letter",
-  milestone: "A Milestone Letter",
-  "big-moments": "A Letter for a Big Moment",
-  "open-when": "A Letter to Open When...",
-  future: "A Letter for the Future",
-};
-
-
-// ============================================================================
-// CATEGORY LABEL
-// ============================================================================
-
-function getCategoryLabel(slotKey) {
-  return (
-    CATEGORY_LABELS[slotKey] ||
-    "A Letter to Treasure"
-  );
-}
-
+import letterWritingTableBackground from "../assets/illustrations/letters/letter-writing-table-background.png";
 
 // ============================================================================
 // LOADING
@@ -50,23 +22,35 @@ function LoadingScreen() {
         flex
         items-center
         justify-center
-        bg-[#241A13]
+        bg-[#DCE8E2]
       "
     >
       <div
         className="
           rounded-full
           border
-          border-[#D8B87D]
-          bg-[#FFF5DE]
           px-6
           py-3
-          text-[#64442B]
-          shadow-[0_6px_25px_rgba(30,18,10,0.25)]
+          font-semibold
         "
         style={{
-          fontFamily: "Nunito, Arial, sans-serif",
-          fontSize: "clamp(11px, 0.8vw, 16px)",
+          background:
+            "rgba(255,250,238,0.92)",
+
+          borderColor:
+            "rgba(157,132,91,0.55)",
+
+          color:
+            "#675B49",
+
+          boxShadow:
+            "0 6px 25px rgba(72,58,35,0.16)",
+
+          fontFamily:
+            "Nunito, Arial, sans-serif",
+
+          fontSize:
+            "clamp(11px, 0.8vw, 16px)",
         }}
       >
         Opening your letter...
@@ -75,12 +59,13 @@ function LoadingScreen() {
   );
 }
 
-
 // ============================================================================
 // ERROR
 // ============================================================================
 
-function ErrorScreen({ onBack }) {
+function ErrorScreen({
+  onBack,
+}) {
   return (
     <div
       className="
@@ -89,7 +74,7 @@ function ErrorScreen({ onBack }) {
         flex
         items-center
         justify-center
-        bg-[#241A13]
+        bg-[#DCE8E2]
         px-6
       "
     >
@@ -99,22 +84,32 @@ function ErrorScreen({ onBack }) {
           max-w-[520px]
           rounded-[28px]
           border
-          border-[#D8B87D]
-          bg-[#FFF5DE]
           px-8
           py-10
           text-center
-          shadow-[0_12px_40px_rgba(30,18,10,0.3)]
         "
+        style={{
+          background:
+            "rgba(255,250,238,0.96)",
+
+          borderColor:
+            "rgba(157,132,91,0.55)",
+
+          boxShadow:
+            "0 12px 40px rgba(72,58,35,0.18)",
+        }}
       >
         <div
           className="
-            text-[#62432B]
-            font-bold
+            font-semibold
           "
           style={{
+            color:
+              "#625542",
+
             fontFamily:
               "Cormorant Garamond, Georgia, serif",
+
             fontSize:
               "clamp(28px, 3vw, 48px)",
           }}
@@ -123,10 +118,14 @@ function ErrorScreen({ onBack }) {
         </div>
 
         <p
-          className="mt-3 text-[#795B41]"
+          className="mt-3"
           style={{
+            color:
+              "#776C59",
+
             fontFamily:
               "Nunito, Arial, sans-serif",
+
             fontSize:
               "clamp(11px, 0.85vw, 16px)",
           }}
@@ -141,20 +140,29 @@ function ErrorScreen({ onBack }) {
             mt-6
             rounded-full
             border
-            border-[#A98254]
-            bg-[#F0D9AD]
             px-6
             py-2.5
-            font-bold
-            text-[#5D402A]
-            shadow-sm
+            font-semibold
             transition
-            hover:bg-[#F5E3C2]
+            hover:scale-[1.02]
             active:scale-95
           "
           style={{
+            background:
+              "#D9C7A8",
+
+            borderColor:
+              "rgba(139,113,76,0.55)",
+
+            color:
+              "#5D503E",
+
+            boxShadow:
+              "0 3px 10px rgba(72,58,35,0.12)",
+
             fontFamily:
               "Nunito, Arial, sans-serif",
+
             fontSize:
               "clamp(10px, 0.75vw, 15px)",
           }}
@@ -166,20 +174,24 @@ function ErrorScreen({ onBack }) {
   );
 }
 
-
 // ============================================================================
 // META
 // ============================================================================
+//
+// Only the date is displayed.
+//
+// The date comes dynamically from the Admin/Supabase letter record.
+//
+// Age has intentionally been removed.
+// ============================================================================
 
-function LetterMeta({ letter }) {
-  const hasDate = Boolean(letter?.date);
+function LetterMeta({
+  letter,
+}) {
+  const hasDate =
+    Boolean(letter?.date);
 
-  const hasAge =
-    letter?.age !== null &&
-    letter?.age !== undefined &&
-    String(letter.age).trim() !== "";
-
-  if (!hasDate && !hasAge) {
+  if (!hasDate) {
     return null;
   }
 
@@ -190,60 +202,42 @@ function LetterMeta({ letter }) {
         flex
         items-center
         justify-center
-        gap-[2%]
-        flex-wrap
-        text-[#77583E]
       "
       style={{
+        color:
+          "#77583E",
+
         fontFamily:
           "Nunito, Arial, sans-serif",
+
         fontSize:
           "clamp(9px, 0.72vw, 14px)",
       }}
     >
-      {hasDate && (
-        <span>
-          {letter.date}
-        </span>
-      )}
-
-      {hasDate && hasAge && (
-        <span
-          className="
-            h-[0.3em]
-            w-[0.3em]
-            rounded-full
-            bg-[#A9845B]
-          "
-        />
-      )}
-
-      {hasAge && (
-        <span>
-          {letter.age}
-        </span>
-      )}
+      {letter.date}
     </div>
   );
 }
-
 
 // ============================================================================
 // LETTER BODY
 // ============================================================================
 
-function LetterBody({ content }) {
+function LetterBody({
+  content,
+}) {
   if (!content) {
     return (
       <p
         className="
           text-center
           italic
-          text-[#2F2118]
+          text-[#5B4D3D]
         "
         style={{
           fontFamily:
             "Cormorant Garamond, Georgia, serif",
+
           fontSize:
             "clamp(14px, 1.15vw, 23px)",
         }}
@@ -253,56 +247,68 @@ function LetterBody({ content }) {
     );
   }
 
-  const paragraphs = String(content)
-    .split(/\n\s*\n/)
-    .filter(Boolean);
+  const paragraphs =
+    String(content)
+      .split(/\n\s*\n/)
+      .filter(Boolean);
 
   return (
     <div
       className="
-        text-[#2F2118]
+        text-[#4D4235]
         text-left
-        font-semibold
       "
       style={{
         fontFamily:
           "Cormorant Garamond, Georgia, serif",
+
         fontSize:
-          "clamp(14px, 1.12vw, 23px)",
-        lineHeight: 1.55,
+          "clamp(15px, 1.12vw, 23px)",
+
+        lineHeight:
+          1.62,
+
+        fontWeight:
+          500,
       }}
     >
-      {paragraphs.map((paragraph, index) => (
-        <p
-          key={index}
-          className="
-            m-0
-            mb-[1.1em]
-            last:mb-0
-          "
-          style={{
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          {paragraph}
-        </p>
-      ))}
+      {paragraphs.map(
+        (paragraph, index) => (
+          <p
+            key={index}
+            className="
+              m-0
+              mb-[1.15em]
+              last:mb-0
+            "
+            style={{
+              whiteSpace:
+                "pre-wrap",
+            }}
+          >
+            {paragraph}
+          </p>
+        )
+      )}
     </div>
   );
 }
 
-
 // ============================================================================
 // LETTER CONTENT
+// ============================================================================
 //
-// The new background already contains the parchment.
-// Therefore we DO NOT render cave-stone.png here.
+// The supplied Garden Writing Table background contains the central
+// parchment/stationery area.
+//
+// The actual letter information remains dynamic HTML/React content.
+//
+// Nothing is baked into the artwork.
 // ============================================================================
 
-function LetterContent({ letter }) {
-  const categoryLabel =
-    getCategoryLabel(letter.slot_key);
-
+function LetterContent({
+  letter,
+}) {
   return (
     <div
       className="
@@ -313,17 +319,14 @@ function LetterContent({ letter }) {
         items-center
       "
       style={{
-        left: "14%",
-        top: "15%",
-        width: "48%",
-        height: "58%",
+        left: "32%",
+        top: "18%",
+        width: "40%",
+        height: "60%",
       }}
     >
-
       {/* ==================================================================
           LETTER TITLE
-          
-          Positioned independently over the small hanging parchment.
           ================================================================== */}
 
       <h1
@@ -331,27 +334,31 @@ function LetterContent({ letter }) {
           absolute
           z-40
           text-center
-          font-bold
-          leading-[0.95]
-          text-[#2F2118]
+          font-semibold
+          leading-[0.98]
+          text-[#5B4C3A]
         "
         style={{
           left: "27%",
-          top: "16%",
+          top: "15%",
           width: "46%",
+
           fontFamily:
             "Cormorant Garamond, Georgia, serif",
+
           fontSize:
             "clamp(18px, 1.55vw, 32px)",
+
+          letterSpacing:
+            "0.01em",
         }}
       >
         {letter.title}
       </h1>
 
-
-      {/* ================================================================
+      {/* ==================================================================
           CONTENT AREA
-          ================================================================ */}
+          ================================================================== */}
 
       <div
         className="
@@ -368,46 +375,14 @@ function LetterContent({ letter }) {
           paddingBottom: "5%",
         }}
       >
-
-        {/* ==============================================================
-            CATEGORY
-            ============================================================== */}
-
-        <div
-          className="
-            uppercase
-            tracking-[0.18em]
-            text-[#88623E]
-            text-center
-            flex-shrink-0
-          "
-          style={{
-            fontFamily:
-              "Nunito, Arial, sans-serif",
-            fontSize:
-              "clamp(7px, 0.55vw, 12px)",
-          }}
-        >
-          {categoryLabel}
-        </div>
-
-
-        {/* ==============================================================
-            TITLE
-            ============================================================== */}
-
-        {/* Title intentionally removed from normal content flow.
-            It is positioned above on the hanging parchment. */}
-
-
-        {/* ==============================================================
-            HEART
-            ============================================================== */}
+        {/* ==================================================================
+            SMALL BOTANICAL HEART
+            ================================================================== */}
 
         <div
           className="
-            mt-[1.2%]
-            text-[#9C6843]
+            mt-[-1.5%]
+            text-[#9A8060]
             flex-shrink-0
           "
           style={{
@@ -418,58 +393,19 @@ function LetterContent({ letter }) {
           ♥
         </div>
 
+        
 
-      
+        {/* ==================================================================
+            LETTER META
+            ================================================================== */}
 
+        <LetterMeta
+          letter={letter}
+        />
 
-        {/* ==============================================================
-            DIVIDER
-            ============================================================== */}
-
-        <div
-          className="
-            my-[2.2%]
-            flex
-            items-center
-            justify-center
-            w-[70%]
-            flex-shrink-0
-          "
-        >
-          <div
-            className="
-              h-px
-              flex-1
-              bg-[#A9825B]/45
-            "
-          />
-
-          <span
-            className="
-              mx-[4%]
-              text-[#9A7049]
-            "
-            style={{
-              fontSize:
-                "clamp(8px, 0.7vw, 14px)",
-            }}
-          >
-            ✦
-          </span>
-
-          <div
-            className="
-              h-px
-              flex-1
-              bg-[#A9825B]/45
-            "
-          />
-        </div>
-
-
-        {/* ==============================================================
+        {/* ==================================================================
             LETTER BODY
-            ============================================================== */}
+            ================================================================== */}
 
         <div
           className="
@@ -480,20 +416,24 @@ function LetterContent({ letter }) {
             pr-[2%]
           "
           style={{
-            scrollbarWidth: "thin",
+            paddingTop: "12%",
+            scrollbarWidth:
+              "thin",
+
             scrollbarColor:
               "#A9825B transparent",
           }}
         >
           <LetterBody
-            content={letter.letter_content}
+            content={
+              letter.letter_content
+            }
           />
         </div>
 
-
-        {/* ==============================================================
+        {/* ==================================================================
             SIGNATURE
-            ============================================================== */}
+            ================================================================== */}
 
         {letter.signature && (
           <div
@@ -501,35 +441,94 @@ function LetterContent({ letter }) {
               mt-[2.2%]
               w-full
               text-right
-              text-[#62432D]
+              text-[#66533F]
               flex-shrink-0
             "
             style={{
               fontFamily:
                 "Cormorant Garamond, Georgia, serif",
+
               fontSize:
-                "clamp(13px, 1.05vw, 22px)",
-              whiteSpace: "pre-wrap",
+                "clamp(14px, 1.05vw, 22px)",
+
+              fontStyle:
+                "italic",
+
+              whiteSpace:
+                "pre-wrap",
             }}
           >
             {letter.signature}
           </div>
         )}
+      </div>
 
+      {/* ==================================================================
+          SUBTLE WAX-SEAL ACCENT
+          ==================================================================
+          
+          This remains deliberately understated so it does not compete with
+          the actual letter content.
+      ================================================================== */}
+
+      <div
+        className="
+          absolute
+          z-40
+          pointer-events-none
+          flex
+          items-center
+          justify-center
+          rounded-full
+          bg-[#B89A62]/75
+          border
+          border-[#947545]/55
+        "
+        style={{
+          right: "7%",
+          bottom: "3%",
+
+          width:
+            "clamp(24px, 2.2vw, 42px)",
+
+          aspectRatio:
+            "1 / 1",
+
+          boxShadow:
+            "0 2px 6px rgba(72,58,35,0.12)",
+        }}
+      >
+        <span
+          className="
+            text-[#FFF5DC]
+          "
+          style={{
+            fontSize:
+              "clamp(9px, 0.65vw, 14px)",
+          }}
+        >
+          ♥
+        </span>
       </div>
     </div>
   );
 }
 
-
 // ============================================================================
 // BACK BUTTON
+// ============================================================================
 //
-// The supplied background already contains the visual arrow.
-// This button provides the actual clickable functionality on top of it.
+// The button remains a real HTML button.
+//
+// It sits above the illustrated scene and provides the actual navigation.
+//
+// The destination is now supplied dynamically so the user can return to the
+// exact Letters pagination page they came from.
 // ============================================================================
 
-function BackButton({ onClick }) {
+function BackButton({
+  onClick,
+}) {
   return (
     <button
       type="button"
@@ -544,8 +543,7 @@ function BackButton({ onClick }) {
         items-center
         justify-center
         rounded-full
-        bg-transparent
-        border-0
+        border
         p-0
         cursor-pointer
         transition
@@ -553,10 +551,30 @@ function BackButton({ onClick }) {
         active:scale-95
       "
       style={{
-        width: "5.2%",
-        aspectRatio: "1 / 1",
+        width:
+          "clamp(38px, 4.2vw, 70px)",
+
+        height:
+          "clamp(38px, 4.2vw, 70px)",
+
+        background:
+          "rgba(255,250,238,0.72)",
+
+        borderColor:
+          "rgba(157,132,91,0.40)",
+
+        color:
+          "#675A46",
+
+        boxShadow:
+          "0 3px 10px rgba(72,58,35,0.12)",
+
+        fontSize:
+          "clamp(18px, 1.6vw, 28px)",
       }}
     >
+      ←
+
       <span className="sr-only">
         Back to Letters
       </span>
@@ -564,52 +582,139 @@ function BackButton({ onClick }) {
   );
 }
 
-
 // ============================================================================
 // MAIN PAGE
 // ============================================================================
 
 export default function LetterMemory() {
-  const { slug } = useParams();
-  const navigate = useNavigate();
+  const {
+    slug,
+  } = useParams();
 
-  const [letter, setLetter] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const navigate =
+    useNavigate();
 
-  // Timeline-style COVER scene scaling.
-  const [viewport, setViewport] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
+  // ==========================================================================
+  // PAGE PARAMETER
+  // ==========================================================================
+  //
+  // Letters.jsx now opens a letter as:
+  //
+  // /letters/example-slug?page=4
+  //
+  // We read that parameter here ONLY for returning to the correct Letters
+  // pagination page.
+  //
+  // It does not affect the Supabase query.
+  // It does not affect the slug.
+  // It does not affect Admin.
+  // ==========================================================================
+
+  const [
+    searchParams,
+  ] = useSearchParams();
+
+  const pageParam =
+    Number(
+      searchParams.get("page")
+    );
+
+  const returnPage =
+    Number.isFinite(pageParam) &&
+    pageParam >= 1
+      ? pageParam
+      : 1;
+
+  // ==========================================================================
+  // LETTER STATE
+  // ==========================================================================
+
+  const [
+    letter,
+    setLetter,
+  ] = useState(null);
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  const [
+    error,
+    setError,
+  ] = useState(null);
+
+  // ==========================================================================
+  // TIMELINE-STYLE COVER SCENE SCALING
+  // ==========================================================================
+  //
+  // Existing 1920 x 1080 architecture preserved.
+  // ==========================================================================
+
+  const [
+    viewport,
+    setViewport,
+  ] = useState({
+    width:
+      window.innerWidth,
+
+    height:
+      window.innerHeight,
   });
 
   useEffect(() => {
-    const handleResize = () => {
-      setViewport({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
+    const handleResize =
+      () => {
+        setViewport({
+          width:
+            window.innerWidth,
+
+          height:
+            window.innerHeight,
+        });
+      };
 
     handleResize();
-    window.addEventListener("resize", handleResize);
+
+    window.addEventListener(
+      "resize",
+      handleResize
+    );
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener(
+        "resize",
+        handleResize
+      );
     };
   }, []);
 
-  const SCENE_WIDTH = 1920;
-  const SCENE_HEIGHT = 1080;
+  const SCENE_WIDTH =
+    1920;
 
-  const sceneScale = Math.max(
-    viewport.width / SCENE_WIDTH,
-    viewport.height / SCENE_HEIGHT
-  );
+  const SCENE_HEIGHT =
+    1080;
 
+  const sceneScale =
+    Math.max(
+      viewport.width /
+        SCENE_WIDTH,
+
+      viewport.height /
+        SCENE_HEIGHT
+    );
 
   // ==========================================================================
   // LOAD LETTER
+  // ==========================================================================
+  //
+  // IMPORTANT:
+  //
+  // Existing Supabase/service call remains exactly the same:
+  //
+  // getLetterBySlug(slug)
+  //
+  // No data-flow changes.
   // ==========================================================================
 
   useEffect(() => {
@@ -627,7 +732,9 @@ export default function LetterMemory() {
         }
 
         const data =
-          await getLetterBySlug(slug);
+          await getLetterBySlug(
+            slug
+          );
 
         if (!mounted) return;
 
@@ -656,28 +763,44 @@ export default function LetterMemory() {
     };
   }, [slug]);
 
+  // ==========================================================================
+  // RETURN TO EXACT LETTERS PAGE
+  // ==========================================================================
+
+  function goBackToLetters() {
+    navigate(
+      returnPage === 1
+        ? "/letters"
+        : `/letters?page=${returnPage}`
+    );
+  }
 
   // ==========================================================================
   // LOADING
   // ==========================================================================
 
   if (loading) {
-    return <LoadingScreen />;
+    return (
+      <LoadingScreen />
+    );
   }
-
 
   // ==========================================================================
   // ERROR
   // ==========================================================================
 
-  if (error || !letter) {
+  if (
+    error ||
+    !letter
+  ) {
     return (
       <ErrorScreen
-        onBack={() => navigate("/letters")}
+        onBack={
+          goBackToLetters
+        }
       />
     );
   }
-
 
   // ==========================================================================
   // SCENE
@@ -689,13 +812,12 @@ export default function LetterMemory() {
         fixed
         inset-0
         overflow-hidden
-        bg-[#241A13]
+        bg-[#DCE8E2]
       "
     >
-
-      {/* ==================================================================
-          MASTER SCENE
-          ================================================================== */}
+      {/* ====================================================================
+          MASTER 16:9 SCENE
+          ==================================================================== */}
 
       <div
         className="
@@ -705,19 +827,37 @@ export default function LetterMemory() {
           overflow-hidden
         "
         style={{
-          width: `${SCENE_WIDTH}px`,
-          height: `${SCENE_HEIGHT}px`,
-          transform: `translate(-50%, -50%) scale(${sceneScale})`,
-          transformOrigin: "center center",
+          width:
+            `${SCENE_WIDTH}px`,
+
+          height:
+            `${SCENE_HEIGHT}px`,
+
+          transform:
+            `translate(-50%, -50%) scale(${sceneScale})`,
+
+          transformOrigin:
+            "center center",
         }}
       >
-
-        {/* ================================================================
-            NEW CHILD PAGE BACKGROUND
-            ================================================================ */}
+        {/* ==================================================================
+            GARDEN WRITING TABLE BACKGROUND
+            ==================================================================
+            
+            IMPORTANT:
+            
+            This is an actual IMAGE ELEMENT.
+            
+            It is NOT a CSS background.
+            
+            The artwork itself provides the visual environment while React
+            renders the actual letter content dynamically on top.
+        ================================================================== */}
 
         <img
-          src={letterChildBackground}
+          src={
+            letterWritingTableBackground
+          }
           alt=""
           draggable={false}
           className="
@@ -730,28 +870,10 @@ export default function LetterMemory() {
             select-none
           "
         />
-<img
-  src={tigerRug}
-  alt=""
-  draggable={false}
-  className="
-    absolute
-    z-20
-    pointer-events-none
-    select-none
-    object-contain
-  "
-  style={{
-    left: "30%",
-    bottom: "-2%",
-    width: "20%",
-     transform: "rotate(8deg)",
-  }}
-/>
 
-        {/* ================================================================
-            VERY SOFT OVERLAY
-            ================================================================ */}
+        {/* ==================================================================
+            SOFT ATMOSPHERIC OVERLAY
+            ================================================================== */}
 
         <div
           className="
@@ -762,28 +884,27 @@ export default function LetterMemory() {
           "
           style={{
             background:
-              "radial-gradient(circle at 50% 45%, rgba(255,235,195,0.04) 0%, rgba(45,28,16,0.04) 55%, rgba(25,15,9,0.10) 100%)",
+              "radial-gradient(circle at 50% 43%, rgba(255,252,239,0.10) 0%, rgba(255,250,235,0.025) 52%, rgba(72,58,35,0.055) 100%)",
           }}
         />
 
-
-        {/* ================================================================
-            ACTUAL LETTER
-            ================================================================ */}
+        {/* ==================================================================
+            ACTUAL DYNAMIC LETTER
+            ================================================================== */}
 
         <LetterContent
           letter={letter}
         />
 
-
-        {/* ================================================================
+        {/* ==================================================================
             BACK BUTTON
-            ================================================================ */}
+            ================================================================== */}
 
         <BackButton
-          onClick={() => navigate("/letters")}
+          onClick={
+            goBackToLetters
+          }
         />
-
       </div>
     </div>
   );
