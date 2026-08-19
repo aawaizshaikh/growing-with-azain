@@ -16,9 +16,9 @@ import Navbar from "../components/Navbar";
 
 import familyMembers from "../data/familyMembers";
 
-import desktopBackground from "../assets/illustrations/people/memory-suitcase-desktop-bg.png";
-import suitcaseImage from "../assets/illustrations/people/family-memory-gallery-main.png";
-import memoryPhotoFrame from "../assets/illustrations/people/memory-photo-frame.png";
+import desktopBackground from "../assets/illustrations/people/memory-suitcase-desktop-bg.webp";
+import suitcaseImage from "../assets/illustrations/people/family-memory-gallery-main.webp";
+import memoryPhotoFrame from "../assets/illustrations/people/memory-photo-frame.webp";
 
 import {
   filterValidFamilyMemories,

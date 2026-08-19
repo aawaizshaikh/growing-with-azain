@@ -1,13 +1,13 @@
-import dadaPhoto from "../assets/illustrations/people/dada.png";
-import dadiPhoto from "../assets/illustrations/people/dadi.png";
-import nanaPhoto from "../assets/illustrations/people/nana.png";
-import naniPhoto from "../assets/illustrations/people/nani.png";
-import mummaPhoto from "../assets/illustrations/people/mumma.png";
-import papaPhoto from "../assets/illustrations/people/papa.png";
-import chachuPhoto from "../assets/illustrations/people/chachu.png";
-import mamuPhoto from "../assets/illustrations/people/mamu.png";
-import yaayaPhoto from "../assets/illustrations/people/yaya.png";
-import anshaPhoto from "../assets/illustrations/people/ansha.png";
+import dadaPhoto from "../assets/illustrations/people/dada.webp";
+import dadiPhoto from "../assets/illustrations/people/dadi.webp";
+import nanaPhoto from "../assets/illustrations/people/nana.webp";
+import naniPhoto from "../assets/illustrations/people/nani.webp";
+import mummaPhoto from "../assets/illustrations/people/mumma.webp";
+import papaPhoto from "../assets/illustrations/people/papa.webp";
+import chachuPhoto from "../assets/illustrations/people/chachu.webp";
+import mamuPhoto from "../assets/illustrations/people/mamu.webp";
+import yaayaPhoto from "../assets/illustrations/people/yaya.webp";
+import anshaPhoto from "../assets/illustrations/people/ansha.webp";
 
 /**
  * ============================================================================

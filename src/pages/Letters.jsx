@@ -33,8 +33,8 @@ import { getPublishedLetters } from "../services/letterService";
 // The writing-table background is used by LetterMemory.jsx.
 // ============================================================================
 
-import letterGardenBackground from "../assets/illustrations/letters/letter-garden-background.png";
-import letterEnvelope from "../assets/illustrations/letters/letter-envelope.png";
+import letterGardenBackground from "../assets/illustrations/letters/letter-garden-background.webp";
+import letterEnvelope from "../assets/illustrations/letters/letter-envelope.webp";
 
 // ============================================================================
 // PAGINATION

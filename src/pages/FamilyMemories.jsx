@@ -6,11 +6,11 @@ import Navbar from "../components/Navbar";
 
 import familyMembers from "../data/familyMembers";
 
-import suitcaseImage from "../assets/illustrations/people/family-suitcase-main.png";
-import titlePlaque from "../assets/illustrations/people/memory-title-plaque.png";
-import luggageTag from "../assets/illustrations/people/memory-luggage-tag.png";
-import travelStickers from "../assets/illustrations/people/memory-travel-stickers.png";
-import desktopBackground from "../assets/illustrations/people/memory-suitcase-desktop-bg.png";
+import suitcaseImage from "../assets/illustrations/people/family-suitcase-main.webp";
+import titlePlaque from "../assets/illustrations/people/memory-title-plaque.webp";
+import luggageTag from "../assets/illustrations/people/memory-luggage-tag.webp";
+import travelStickers from "../assets/illustrations/people/memory-travel-stickers.webp";
+import desktopBackground from "../assets/illustrations/people/memory-suitcase-desktop-bg.webp";
 
 /*
 ===============================================================================

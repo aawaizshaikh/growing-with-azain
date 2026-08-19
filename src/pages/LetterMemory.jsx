@@ -7,7 +7,7 @@ import {
 
 import { getLetterBySlug } from "../services/letterService";
 
-import letterWritingTableBackground from "../assets/illustrations/letters/letter-writing-table-background.png";
+import letterWritingTableBackground from "../assets/illustrations/letters/letter-writing-table-background.webp";
 
 // ============================================================================
 // LOADING

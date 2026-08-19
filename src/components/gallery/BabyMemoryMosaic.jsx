@@ -9,7 +9,7 @@ import {
 } from "../../utils/mosaicBuilder";
 
 const BACKGROUND_IMAGE =
-  "/azain-mosaic-background.png";
+  "/azain-mosaic-background.webp";
 
 export default function BabyMemoryMosaic({
   items = [],

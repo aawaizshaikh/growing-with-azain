@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 
-import backgroundImage from "../../assets/illustrations/space/space-memory-galaxy.png";
-import earthImage from "../../assets/illustrations/space/planet-earth.png";
-import jupiterImage from "../../assets/illustrations/space/planet-jupiter.png";
-import saturnImage from "../../assets/illustrations/space/planet-saturn.png";
-import moonImage from "../../assets/illustrations/space/moon.png";
-import astronautImage from "../../assets/illustrations/space/astronaut.png";
-import rocketImage from "../../assets/illustrations/space/rocket.png";
+import backgroundImage from "../../assets/illustrations/space/space-memory-galaxy.webp";
+import earthImage from "../../assets/illustrations/space/planet-earth.webp";
+import jupiterImage from "../../assets/illustrations/space/planet-jupiter.webp";
+import saturnImage from "../../assets/illustrations/space/planet-saturn.webp";
+import moonImage from "../../assets/illustrations/space/moon.webp";
+import astronautImage from "../../assets/illustrations/space/astronaut.webp";
+import rocketImage from "../../assets/illustrations/space/rocket.webp";
 
 
 /* ======================================================
