@@ -14,6 +14,10 @@ import {
 
 import mapFavoriteSong from "../utils/mapFavoriteSong";
 import { isVideoMedia } from "../utils/mediaHelpers";
+import {
+  getCardImageUrl,
+  getDetailImageUrl,
+} from "../utils/supabaseImageUrl";
 
 import background from "../assets/illustrations/favsongs/favorite-song-memory-background.webp";
 
@@ -435,7 +439,7 @@ function MemoryCard({
       >
         <RusticFrame>
           <img
-            src={memory.src}
+            src={getCardImageUrl(memory.src)}
             alt={title || "Memory"}
             className="block h-full w-full object-cover"
             draggable="false"
@@ -1137,7 +1141,7 @@ export default function FavoriteSongMemory() {
           {song.cover ? (
             <RusticFrame isCover>
               <img
-                src={song.cover}
+                src={getDetailImageUrl(song.cover)}
                 alt={
                   song.title ||
                   "Cover"
@@ -1467,7 +1471,7 @@ export default function FavoriteSongMemory() {
           >
             {memories[lightboxIndex].type === "image" ? (
               <img
-                src={memories[lightboxIndex].src}
+                src={getDetailImageUrl(memories[lightboxIndex].src)}
                 alt={`Memory ${lightboxIndex + 1}`}
                 className="max-h-[84vh] max-w-[88vw] rounded-[12px] object-contain"
               />

@@ -12,6 +12,10 @@ import {
   FaPlay,
 } from "react-icons/fa";
 
+import {
+  getDetailImageUrl,
+} from "../../utils/supabaseImageUrl";
+
 export default function Lightbox({
   /*
   ==========================================================
@@ -330,7 +334,9 @@ export default function Lightbox({
                 currentMedia.image
               }
               src={
-                currentMedia.image
+                getDetailImageUrl(
+                  currentMedia.image
+                )
               }
               alt={
                 currentMedia.title ||

@@ -7,6 +7,10 @@ import {
   getAllFamilyMemories,
 } from "../../services/familyMemoryService";
 
+import {
+  getCardImageUrl,
+} from "../../utils/supabaseImageUrl";
+
 import familyMembers from "../../data/familyMembers";
 
 export default function FamilyMemoryManager() {
@@ -166,8 +170,7 @@ export default function FamilyMemoryManager() {
   /*
   ============================================================================
   OPEN FAMILY MEMBER EDITOR
-  ============================================================================
-  
+
   The database currently stores each memory as its own row.
 
   Therefore the existing edit route still requires an ID.
@@ -281,7 +284,7 @@ export default function FamilyMemoryManager() {
           </>
         ) : (
           <img
-            src={memory.media_url}
+            src={getCardImageUrl(memory.media_url)}
             alt={
               memory.caption ||
               "Family memory"

@@ -6,6 +6,8 @@ import {
   FaCalendarAlt,
 } from "react-icons/fa";
 
+import { getCardImageUrl } from "../../utils/supabaseImageUrl";
+
 export default function MemoryCard({
   memory,
   onEdit,
@@ -22,8 +24,9 @@ export default function MemoryCard({
 
         <img
           src={
-            memory.cover_image ||
-            "https://placehold.co/1200x700?text=No+Cover"
+            memory.cover_image
+              ? getCardImageUrl(memory.cover_image)
+              : "https://placehold.co/1200x700?text=No+Cover"
           }
           alt={memory.title}
           className="w-full h-72 object-cover"

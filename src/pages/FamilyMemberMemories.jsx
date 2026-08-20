@@ -27,6 +27,9 @@ import {
 } from "../services/familyMemoryService";
 
 import FamilyMemoryLightbox from "../components/family/FamilyMemoryLightbox";
+import {
+  getGalaxyImageUrl,
+} from "../utils/supabaseImageUrl";
 
 /*
 ===============================================================================
@@ -359,7 +362,7 @@ function FamilyMemoryCard({
             />
           ) : (
             <img
-              src={memory.media_url}
+              src={getGalaxyImageUrl(memory.media_url)}
               alt={
                 memory.caption ||
                 "Family memory"

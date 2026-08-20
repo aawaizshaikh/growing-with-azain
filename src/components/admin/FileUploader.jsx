@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { isVideoMedia } from "../../utils/mediaHelpers";
+import { getCardImageUrl } from "../../utils/supabaseImageUrl";
 
 export default function FileUploader({
   label = "Upload",
@@ -157,7 +158,7 @@ export default function FileUploader({
                     />
                   ) : (
                     <img
-                      src={file}
+                      src={getCardImageUrl(file)}
                       alt=""
                       className="rounded-xl h-36 w-full object-cover"
                     />

@@ -10,6 +10,10 @@ import { getTimelineMemoryBySlug } from "../services/timelineService";
 import mapTimelineMemory from "../utils/mapTimelineMemory";
 import { isVideoMedia } from "../utils/mediaHelpers";
 
+import {
+  getCardImageUrl,
+} from "../utils/supabaseImageUrl";
+
 export default function Memory() {
   const navigate = useNavigate();
   const { slug } = useParams();
@@ -112,7 +116,9 @@ export default function Memory() {
             <div className="relative h-[500px] overflow-hidden">
 
               <img
-                src={memory.coverImage}
+                src={getCardImageUrl(
+                  memory.coverImage
+                )}
                 alt={memory.title}
                 className="absolute inset-0 w-full h-full object-cover"
               />
@@ -195,12 +201,16 @@ export default function Memory() {
                       />
                     ) : (
                       <img
-                        src={photo}
+                        src={getCardImageUrl(
+                          photo
+                        )}
                         alt=""
                         onClick={() => {
                           setCurrentIndex(imageIndex);
                           setIsOpen(true);
                         }}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-[300px] object-cover cursor-pointer hover:scale-105 transition"
                       />
                     )}

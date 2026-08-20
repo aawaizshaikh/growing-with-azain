@@ -19,6 +19,11 @@ import vintageRockingHorse from "../assets/illustrations/timeline-vintage-rockin
 import vintageTeddyPillow from "../assets/illustrations/timeline-vintage-teddy-pillow.webp";
 import { isVideoMedia } from "../utils/mediaHelpers";
 
+import {
+  getCardImageUrl,
+  getDetailImageUrl,
+} from "../utils/supabaseImageUrl";
+
 
 /*
 =====================================================
@@ -65,10 +70,12 @@ No Admin Panel files are changed by this page.
 =====================================================
 */
 
+
 const SCENE_WIDTH = 1920;
 const SCENE_HEIGHT = 1080;
 
 const SUPPORTING_PHOTOS_PER_PAGE = 3;
+
 
 /*
 =====================================================
@@ -208,6 +215,7 @@ const LAYOUT = {
   },
 };
 
+
 /*
 =====================================================
 HELPERS
@@ -227,7 +235,10 @@ function parseArray(value) {
         return parsed.filter(Boolean);
       }
 
-      if (typeof parsed === "string" && parsed.trim()) {
+      if (
+        typeof parsed === "string" &&
+        parsed.trim()
+      ) {
         return [parsed.trim()];
       }
     } catch {
@@ -241,17 +252,20 @@ function parseArray(value) {
   return [];
 }
 
+
 function normalize(value) {
   return String(value || "")
     .trim()
     .toLowerCase();
 }
 
+
 function getMemoryChapter(memory) {
   return normalize(
     memory?.category || memory?.age
   );
 }
+
 
 /*
 =====================================================
@@ -1222,7 +1236,9 @@ export default function MemoryDetails() {
           }}
         >
           <img
-            src={coverImage}
+            src={getDetailImageUrl(
+              coverImage
+            )}
             alt={
               memory.title ||
               "Memory cover"
@@ -1562,7 +1578,9 @@ export default function MemoryDetails() {
                         />
                       ) : (
                         <img
-                          src={media}
+                          src={getCardImageUrl(
+                            media
+                          )}
                           alt={`Memory photo ${
                             (photoPage - 1) *
                               SUPPORTING_PHOTOS_PER_PAGE +
@@ -2034,11 +2052,11 @@ export default function MemoryDetails() {
                 />
               ) : (
                 <img
-                  src={
+                  src={getDetailImageUrl(
                     lightboxPhotos[
                       lightboxIndex
                     ]
-                  }
+                  )}
                   alt={`Memory photo ${
                     lightboxIndex + 1
                   }`}

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { getDetailImageUrl } from "../../utils/supabaseImageUrl";
 
 /**
  * FamilyMemoryLightbox
@@ -604,7 +605,7 @@ export default function FamilyMemoryLightbox({
                     activeMemory.media_url
                   }
                   className="family-lightbox__image"
-                  src={activeMemory.media_url}
+                  src={getDetailImageUrl(activeMemory.media_url)}
                   alt={
                     activeMemory.caption ||
                     "Family memory"

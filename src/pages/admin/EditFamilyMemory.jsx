@@ -19,6 +19,10 @@ import {
 
 import { supabase } from "../../lib/supabase";
 
+import {
+  getCardImageUrl,
+} from "../../utils/supabaseImageUrl";
+
 /*
 ===============================================================================
 EDIT FAMILY MEMORY
@@ -898,7 +902,9 @@ export default function EditFamilyMemory() {
                           ) : (
                             <img
                               src={
-                                media.media_url
+                                getCardImageUrl(
+                                  media.media_url
+                                )
                               }
                               alt={
                                 media.caption ||

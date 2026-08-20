@@ -1,8 +1,15 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function MemoryCard({ memory }) {
-  const navigate = useNavigate();
+import {
+  getCardImageUrl,
+} from "../../utils/supabaseImageUrl";
+
+export default function MemoryCard({
+  memory,
+}) {
+  const navigate =
+    useNavigate();
 
   /*
   =====================================================
@@ -10,11 +17,44 @@ export default function MemoryCard({ memory }) {
   =====================================================
   */
 
-  const coverImage =
+  const originalCoverImage =
     memory.cover_image ||
     memory.cover ||
     memory.image ||
     "/placeholder-memory.jpg";
+
+
+  /*
+  =====================================================
+  GLOBAL OPTIMIZED IMAGE DELIVERY
+  =====================================================
+
+  The database continues to contain the original
+  Supabase URL.
+
+  We do NOT modify the database here.
+
+  We only change the URL requested by the browser:
+
+      Original Supabase image
+              ↓
+      getCardImageUrl()
+              ↓
+      Supabase Image Transformation
+              ↓
+      optimized 600px image
+
+  Local placeholder images remain untouched because
+  getCardImageUrl() only transforms Supabase Storage
+  URLs.
+  =====================================================
+  */
+
+  const coverImage =
+    getCardImageUrl(
+      originalCoverImage
+    );
+
 
   /*
   =====================================================
@@ -23,8 +63,11 @@ export default function MemoryCard({ memory }) {
   */
 
   function openMemory() {
-    navigate(`/timeline/memory/${memory.slug}`);
+    navigate(
+      `/timeline/memory/${memory.slug}`
+    );
   }
+
 
   /*
   =====================================================
@@ -60,8 +103,13 @@ export default function MemoryCard({ memory }) {
 
       <img
         src={coverImage}
-        alt={memory.title || "Memory"}
+        alt={
+          memory.title ||
+          "Memory"
+        }
         draggable={false}
+        loading="lazy"
+        decoding="async"
         className="
           absolute
           inset-0
@@ -73,10 +121,13 @@ export default function MemoryCard({ memory }) {
           group-hover:scale-[1.03]
         "
         style={{
-          objectPosition: "center",
-          userSelect: "none",
+          objectPosition:
+            "center",
+          userSelect:
+            "none",
         }}
       />
+
 
       {/* =====================================================
           SUBTLE BOTTOM GRADIENT
@@ -98,6 +149,7 @@ export default function MemoryCard({ memory }) {
             "linear-gradient(to top, rgba(55, 38, 25, 0.72), rgba(55, 38, 25, 0))",
         }}
       />
+
 
       {/* =====================================================
           TITLE
@@ -123,7 +175,8 @@ export default function MemoryCard({ memory }) {
             drop-shadow-[0_2px_3px_rgba(0,0,0,0.45)]
           "
           style={{
-            fontFamily: "Cormorant Garamond, serif",
+            fontFamily:
+              "Cormorant Garamond, serif",
           }}
         >
           {memory.title}

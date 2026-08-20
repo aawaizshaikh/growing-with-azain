@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaHeart, FaRegHeart, FaCalendarAlt } from "react-icons/fa";
+import { getCardImageUrl } from "../../utils/supabaseImageUrl";
 
 export default function TimelineCard({ item }) {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export default function TimelineCard({ item }) {
           {/* Image */}
           <div className="relative overflow-hidden bg-[#F8F6F2]">
             <img
-              src={item.coverImage}
+              src={getCardImageUrl(item.coverImage)}
               alt={item.title}
               className="w-full h-64 lg:h-full object-cover"
             />
