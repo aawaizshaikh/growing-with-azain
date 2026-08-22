@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../../lib/supabase";
 import AdminLayout from "../../components/admin/AdminLayout";
 
 export default function Login() {
@@ -15,19 +14,54 @@ export default function Login() {
 
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const response = await fetch(
+        "https://azain-api-worker.aaawaizshaikh.workers.dev/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
 
-    setLoading(false);
+      const data = await response.json();
 
-    if (error) {
-      alert(error.message);
-      return;
+      if (!response.ok) {
+        alert(
+          data?.error ||
+            "Invalid email or password."
+        );
+        return;
+      }
+
+      if (!data?.token) {
+        alert("Login failed. No authentication token received.");
+        return;
+      }
+
+      localStorage.setItem(
+        "azain_admin_token",
+        data.token
+      );
+
+      navigate("/admin");
+    } catch (error) {
+      console.error(
+        "Admin login error:",
+        error
+      );
+
+      alert(
+        "Unable to connect to the authentication server."
+      );
+    } finally {
+      setLoading(false);
     }
-
-    navigate("/admin");
   }
 
   return (

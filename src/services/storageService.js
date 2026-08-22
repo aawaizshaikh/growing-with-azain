@@ -1,5 +1,3 @@
-import { supabase } from "../lib/supabase";
-
 /*
 |--------------------------------------------------------------------------
 | GLOBAL IMAGE UPLOAD OPTIMIZATION
@@ -19,17 +17,15 @@ import { supabase } from "../lib/supabase";
 |        ↓
 | Convert to WebP
 |        ↓
-| Upload optimized WebP to Supabase
+| Upload optimized WebP to Cloudflare R2
 |
 | WebP:
-|
-| Already optimized
 |        ↓
 | Uploaded unchanged
 |
 | VIDEO:
-|
-| Existing video upload behavior remains unchanged for now.
+|        ↓
+| Uploaded unchanged to Cloudflare R2.
 |
 | IMPORTANT:
 |
@@ -48,11 +44,27 @@ import { supabase } from "../lib/supabase";
 
 /*
 |--------------------------------------------------------------------------
+| R2 CONFIGURATION
+|--------------------------------------------------------------------------
+*/
+
+const MEDIA_WORKER_URL =
+  import.meta.env.VITE_MEDIA_WORKER_URL ||
+  "";
+
+const MEDIA_API_KEY =
+  import.meta.env.VITE_MEDIA_API_KEY ||
+  "";
+
+
+/*
+|--------------------------------------------------------------------------
 | IMAGE SETTINGS
 |--------------------------------------------------------------------------
 */
 
 const MAX_IMAGE_DIMENSION = 2400;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -101,16 +113,6 @@ const RASTER_IMAGE_TYPES = new Set([
 |--------------------------------------------------------------------------
 | Create a safe unique WebP filename
 |--------------------------------------------------------------------------
-|
-| Example:
-|
-| original:
-|     baby-first-birthday.jpg
-|
-| result:
-|     1720000000000-a8k2mz91-baby-first-birthday.webp
-|
-|--------------------------------------------------------------------------
 */
 
 function createOptimizedFileName(
@@ -143,11 +145,6 @@ function createOptimizedFileName(
 /*
 |--------------------------------------------------------------------------
 | Load an image safely
-|--------------------------------------------------------------------------
-|
-| URL.createObjectURL() allows us to decode the selected file locally
-| in the browser without uploading the original file first.
-|
 |--------------------------------------------------------------------------
 */
 
@@ -228,17 +225,6 @@ function canvasToWebP(
 |--------------------------------------------------------------------------
 | Optimize Image
 |--------------------------------------------------------------------------
-|
-| This function:
-|
-| 1. Checks whether the file is a supported JPG/JPEG/PNG image.
-| 2. Decodes the image.
-| 3. Never enlarges a smaller image.
-| 4. Limits the longest dimension to 2400px.
-| 5. Preserves transparency.
-| 6. Converts the result to WebP.
-|
-|--------------------------------------------------------------------------
 */
 
 async function optimizeImage(
@@ -302,21 +288,6 @@ async function optimizeImage(
   /*
   |--------------------------------------------------------------------------
   | Calculate resize ratio
-  |
-  | IMPORTANT:
-  |
-  | Smaller images are NEVER enlarged.
-  |
-  | Example:
-  |
-  | 6000 × 4000
-  |     ↓
-  | 2400 × 1600
-  |
-  | 1200 × 800
-  |     ↓
-  | 1200 × 800
-  |
   |--------------------------------------------------------------------------
   */
 
@@ -342,6 +313,7 @@ async function optimizeImage(
           scale
       )
     );
+
 
   const height =
     Math.max(
@@ -409,9 +381,6 @@ async function optimizeImage(
   /*
   |--------------------------------------------------------------------------
   | Draw image
-  |
-  | Transparent PNGs remain transparent because we do not paint a
-  | background onto the canvas.
   |--------------------------------------------------------------------------
   */
 
@@ -460,16 +429,29 @@ async function optimizeImage(
 
 /*
 |--------------------------------------------------------------------------
-| Upload Single File
+| Build R2 upload URL
 |--------------------------------------------------------------------------
-|
-| THIS IS THE CENTRAL ENTRY POINT.
-|
-| Existing Admin components do not need to know whether the uploaded
-| file is JPG, PNG, WebP or video.
-|
-| They continue calling uploadFile().
-|
+*/
+
+function buildR2UploadUrl(
+  filePath
+) {
+  if (!MEDIA_WORKER_URL) {
+    throw new Error(
+      "VITE_MEDIA_WORKER_URL is not configured."
+    );
+  }
+
+  return `${MEDIA_WORKER_URL.replace(
+    /\/+$/,
+    ""
+  )}/media/${filePath}`;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Upload Single File
 |--------------------------------------------------------------------------
 */
 
@@ -485,15 +467,20 @@ export async function uploadFile(
 
   /*
   |--------------------------------------------------------------------------
-  | IMAGE
+  | R2 authentication configuration
   |--------------------------------------------------------------------------
-  |
-  | JPG/JPEG/PNG images are automatically converted to WebP.
-  |
-  | Existing WebP files are kept unchanged.
-  |
-  | Videos continue through the existing upload path unchanged for now.
-  |
+  */
+
+  if (!MEDIA_API_KEY) {
+    throw new Error(
+      "VITE_MEDIA_API_KEY is not configured."
+    );
+  }
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | IMAGE
   |--------------------------------------------------------------------------
   */
 
@@ -514,15 +501,6 @@ export async function uploadFile(
   /*
   |--------------------------------------------------------------------------
   | Filename
-  |--------------------------------------------------------------------------
-  |
-  | Optimized images already have a generated .webp filename.
-  |
-  | Existing WebP files retain their original filename.
-  |
-  | Videos and other non-image files retain their existing extension
-  | behavior.
-  |
   |--------------------------------------------------------------------------
   */
 
@@ -556,83 +534,136 @@ export async function uploadFile(
   |--------------------------------------------------------------------------
   */
 
+  let r2Folder;
+
+
+  if (
+    bucket ===
+    "timeline"
+  ) {
+    r2Folder =
+      `media/memories/${folder}`;
+  } else if (
+    bucket ===
+    "milestones"
+  ) {
+    r2Folder =
+      `media/milestones/${folder}`;
+  } else if (
+    bucket ===
+    "favorite_songs"
+  ) {
+    r2Folder =
+      `media/songs/${folder}`;
+  } else if (
+    bucket ===
+    "family_memories"
+  ) {
+    r2Folder =
+      `media/family/${folder}`;
+  } else {
+    r2Folder =
+      `media/${bucket}/${folder}`;
+  }
+
+
   const filePath =
-    `${folder}/${filename}`;
+    `${r2Folder}/${filename}`;
 
 
   /*
   |--------------------------------------------------------------------------
-  | Upload to Supabase
-  |--------------------------------------------------------------------------
-  |
-  | One-year cache is safe because filenames are unique.
-  |
-  | If an image is replaced later, the new upload receives a new filename,
-  | so the browser/CDN will never be forced to serve stale content under
-  | the same URL.
+  | Upload to Cloudflare R2 through Worker
   |--------------------------------------------------------------------------
   */
 
-  const {
-    error,
-  } =
-    await supabase.storage
-      .from(bucket)
-      .upload(
-        filePath,
-        fileToUpload,
-        {
-          cacheControl:
-            "31536000",
+  const response =
+    await fetch(
+      buildR2UploadUrl(
+        filePath
+      ),
+      {
+        method:
+          "PUT",
 
-          contentType:
+        headers: {
+          Authorization:
+            `Bearer ${MEDIA_API_KEY}`,
+
+          "Content-Type":
             fileToUpload.type ||
-            undefined,
+            "application/octet-stream",
+        },
 
-          upsert: true,
-        }
-      );
+        body:
+          fileToUpload,
+      }
+    );
 
 
-  if (error) {
-    throw error;
+  if (!response.ok) {
+    let errorMessage =
+      `R2 upload failed (${response.status})`;
+
+    try {
+      const errorBody =
+        await response.text();
+
+      if (errorBody) {
+        errorMessage +=
+          `: ${errorBody}`;
+      }
+    } catch {
+      // Keep the original error message.
+    }
+
+    throw new Error(
+      errorMessage
+    );
   }
 
 
   /*
   |--------------------------------------------------------------------------
-  | Return the same kind of public URL the existing application expects
+  | Verify successful upload
   |--------------------------------------------------------------------------
   */
 
-  const {
-    data,
-  } =
-    supabase.storage
-      .from(bucket)
-      .getPublicUrl(
-        filePath
-      );
+  const r2Url =
+    buildR2UploadUrl(
+      filePath
+    );
+
+  const verifyResponse =
+    await fetch(
+      r2Url,
+      {
+        method:
+          "HEAD",
+      }
+    );
 
 
-  return data.publicUrl;
+  if (!verifyResponse.ok) {
+    throw new Error(
+      `R2 upload verification failed (${verifyResponse.status})`
+    );
+  }
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Return R2 public Worker URL
+  |--------------------------------------------------------------------------
+  */
+
+  return r2Url;
 }
 
 
 /*
 |--------------------------------------------------------------------------
 | Upload Multiple Files
-|--------------------------------------------------------------------------
-|
-| Existing multi-image Admin flows continue to use this function.
-|
-| Each individual file goes through uploadFile(), meaning each one gets
-| the same global optimization.
-|
-| Images continue through the existing WebP optimizer.
-|
-| Videos continue through the existing upload behavior.
-|
 |--------------------------------------------------------------------------
 */
 
@@ -677,17 +708,9 @@ export async function uploadMultiple(
 | Delete File
 |--------------------------------------------------------------------------
 |
-| Existing deletion behavior is preserved.
+| All application media is now stored in Cloudflare R2.
 |
-| IMPORTANT:
-|
-| This function does not automatically delete an original file simply
-| because an optimized version exists.
-|
-| That is intentional.
-|
-| Existing originals will remain available until any future migration
-| has been fully verified.
+| R2 objects are deleted through the Cloudflare Media Worker.
 |
 |--------------------------------------------------------------------------
 */
@@ -701,42 +724,139 @@ export async function deleteFile(
   }
 
 
-  try {
-    const marker =
-      `/storage/v1/object/public/${bucket}/`;
+  /*
+  |--------------------------------------------------------------------------
+  | R2 URL
+  |--------------------------------------------------------------------------
+  |
+  | Expected format:
+  |
+  | https://azain-media-worker...workers.dev/media/<r2-key>
+  |
+  |--------------------------------------------------------------------------
+  */
 
-
-    const path =
-      publicUrl.split(
-        marker
-      )[1];
-
-
-    if (!path) {
-      return;
+  if (
+    publicUrl.includes(
+      "/media/"
+    )
+  ) {
+    if (!MEDIA_API_KEY) {
+      throw new Error(
+        "VITE_MEDIA_API_KEY is not configured."
+      );
     }
 
+    try {
+      const url =
+        new URL(
+          publicUrl
+        );
 
-    await supabase.storage
-      .from(bucket)
-      .remove([
-        path,
-      ]);
+      const mediaMarker =
+        "/media/";
 
-  } catch (err) {
-    console.error(
-      err
-    );
+      const markerIndex =
+        url.pathname.indexOf(
+          mediaMarker
+        );
+
+      if (
+        markerIndex === -1
+      ) {
+        return;
+      }
+
+      const filePath =
+        url.pathname
+          .substring(
+            markerIndex +
+              mediaMarker.length
+          )
+          .split("/")
+          .map(
+            (segment) =>
+              encodeURIComponent(
+                decodeURIComponent(
+                  segment
+                )
+              )
+          )
+          .join("/");
+
+      if (!filePath) {
+        return;
+      }
+
+      const deleteUrl =
+        buildR2UploadUrl(
+          filePath
+        );
+
+      const response =
+        await fetch(
+          deleteUrl,
+          {
+            method:
+              "DELETE",
+
+            headers: {
+              Authorization:
+                `Bearer ${MEDIA_API_KEY}`,
+            },
+          }
+        );
+
+      if (!response.ok) {
+        let errorMessage =
+          `R2 delete failed (${response.status})`;
+
+        try {
+          const errorBody =
+            await response.text();
+
+          if (errorBody) {
+            errorMessage +=
+              `: ${errorBody}`;
+          }
+        } catch {
+          // Keep the original error message.
+        }
+
+        throw new Error(
+          errorMessage
+        );
+      }
+
+    } catch (err) {
+      console.error(
+        "R2 delete failed:",
+        err
+      );
+      throw err;
+    }
+
+    return;
   }
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Unknown / legacy URL
+  |--------------------------------------------------------------------------
+  |
+  | No Supabase Storage deletion is performed here.
+  |
+  | The remaining 31 missing migration files are being handled separately.
+  |
+  |--------------------------------------------------------------------------
+  */
 }
 
 
 /*
 |--------------------------------------------------------------------------
 | Delete Multiple Files
-|--------------------------------------------------------------------------
-|
-| Existing behavior preserved.
 |--------------------------------------------------------------------------
 */
 

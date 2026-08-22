@@ -12,6 +12,7 @@ import {
 import {
   uploadFile,
   uploadMultiple,
+  deleteFile,
 } from "../../services/storageService";
 
 export default function EditMemory() {
@@ -56,6 +57,8 @@ export default function EditMemory() {
       let coverImage = memory.cover_image;
       let galleryImages = memory.gallery_images || [];
 
+      let newCoverImage = null;
+
       /*
       ==============================
       Upload Cover
@@ -63,10 +66,12 @@ export default function EditMemory() {
       */
 
       if (formData.coverImage) {
-        coverImage = await uploadFile(
+        newCoverImage = await uploadFile(
           formData.coverImage,
           folderName
         );
+
+        coverImage = newCoverImage;
       }
 
       /*
@@ -89,6 +94,88 @@ export default function EditMemory() {
           ...galleryImages,
           ...uploaded,
         ];
+      }
+
+      /*
+      ============================================================
+      DELETE OLD COVER AFTER NEW COVER UPLOAD
+      ============================================================
+      */
+
+      if (
+        newCoverImage &&
+        memory.cover_image &&
+        memory.cover_image !== newCoverImage
+      ) {
+        try {
+          await deleteFile(
+            memory.cover_image,
+            "timeline"
+          );
+        } catch (deleteError) {
+          /*
+          --------------------------------------------------------
+          Roll back the newly uploaded cover if the old cover
+          could not be deleted.
+          --------------------------------------------------------
+          */
+
+          try {
+            await deleteFile(
+              newCoverImage,
+              "timeline"
+            );
+          } catch (rollbackError) {
+            console.error(
+              "Failed to rollback new cover:",
+              rollbackError
+            );
+          }
+
+          throw deleteError;
+        }
+      }
+
+      /*
+      ============================================================
+      DELETE EXISTING COVER REMOVED BY ADMIN
+      ============================================================
+      */
+
+      if (
+        formData.removedCover &&
+        formData.removedCover === memory.cover_image &&
+        !newCoverImage
+      ) {
+        await deleteFile(
+          formData.removedCover,
+          "timeline"
+        );
+
+        coverImage = null;
+      }
+
+      /*
+      ============================================================
+      DELETE EXISTING GALLERY MEDIA REMOVED BY ADMIN
+      ============================================================
+      */
+
+      if (
+        formData.removedGallery &&
+        formData.removedGallery.length > 0
+      ) {
+        for (const removedFile of formData.removedGallery) {
+          await deleteFile(
+            removedFile,
+            "timeline"
+          );
+        }
+
+        galleryImages = galleryImages.filter(
+          (url) =>
+            !formData.removedGallery.includes(url)
+        );
       }
 
       /*
@@ -154,7 +241,8 @@ export default function EditMemory() {
     <AdminLayout>
 
       <div className="max-w-5xl mx-auto">
-                <button
+
+        <button
           onClick={() => navigate("/admin/timeline")}
           className="mb-8 text-[#8FAE7A] font-semibold hover:underline"
         >

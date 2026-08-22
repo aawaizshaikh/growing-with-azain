@@ -36,6 +36,13 @@ export default function MemoryForm({
   const [existingGallery, setExistingGallery] =
     useState([]);
 
+  // Existing media removed by the Admin
+  const [removedCover, setRemovedCover] =
+    useState(null);
+
+  const [removedGallery, setRemovedGallery] =
+    useState([]);
+
   useEffect(() => {
     if (!initialData) return;
 
@@ -80,6 +87,10 @@ export default function MemoryForm({
         initialData.gallery ||
         []
     );
+
+    // Reset removed media when loading a different record
+    setRemovedCover(null);
+    setRemovedGallery([]);
   }, [initialData]);
 
   function handleChange(e) {
@@ -125,6 +136,10 @@ export default function MemoryForm({
       existingCover,
 
       existingGallery,
+
+      removedCover,
+
+      removedGallery,
 
       highlights,
     });
@@ -215,7 +230,8 @@ export default function MemoryForm({
         </div>
 
       </div>
-            {/* ======================================
+
+      {/* ======================================
           CHAPTER
       ====================================== */}
 
@@ -314,15 +330,22 @@ export default function MemoryForm({
         multiple={false}
         existingFiles={existingCover}
         onChange={setCoverImage}
+        onExistingRemove={setRemovedCover}
       />
 
       <FileUploader
-  label="Gallery Images & Videos"
-  multiple={true}
-  accept="image/*,video/*,.mp4,.mov,.m4v,.webm,.ogg"
-  existingFiles={existingGallery}
-  onChange={setGalleryImages}
-/>
+        label="Gallery Images & Videos"
+        multiple={true}
+        accept="image/*,video/*,.mp4,.mov,.m4v,.webm,.ogg"
+        existingFiles={existingGallery}
+        onChange={setGalleryImages}
+        onExistingRemove={(removedFile) =>
+          setRemovedGallery((prev) => [
+            ...prev,
+            removedFile,
+          ])
+        }
+      />
 
       {/* ======================================
           HIGHLIGHTS

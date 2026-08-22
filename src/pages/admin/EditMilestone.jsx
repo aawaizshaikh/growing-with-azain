@@ -12,6 +12,7 @@ import {
 import {
   uploadFile,
   uploadMultiple,
+  deleteFile,
 } from "../../services/storageService";
 
 export default function EditMilestone() {
@@ -44,13 +45,22 @@ export default function EditMilestone() {
       setSaving(true);
 
       let coverImage = milestone.cover_image || "";
-      let gallery = milestone.gallery || milestone.gallery_images || [];
+      let gallery =
+        milestone.gallery ||
+        milestone.gallery_images ||
+        [];
+
+      let newCoverImage = null;
 
       if (formData.coverImage) {
-        coverImage = await uploadFile(
+        newCoverImage = await uploadFile(
           formData.coverImage,
-          formData.slug || milestone.slug || "milestones"
+          formData.slug ||
+            milestone.slug ||
+            "milestones"
         );
+
+        coverImage = newCoverImage;
       }
 
       if (
@@ -59,13 +69,97 @@ export default function EditMilestone() {
       ) {
         const uploaded = await uploadMultiple(
           formData.galleryImages,
-          formData.slug || milestone.slug || "milestones"
+          formData.slug ||
+            milestone.slug ||
+            "milestones"
         );
 
         gallery = [
           ...gallery,
           ...uploaded,
         ];
+      }
+
+      /*
+      ============================================================
+      DELETE OLD R2 COVER AFTER NEW COVER UPLOAD
+      ============================================================
+      */
+
+      if (
+        newCoverImage &&
+        milestone.cover_image &&
+        milestone.cover_image !== newCoverImage
+      ) {
+        try {
+          await deleteFile(
+            milestone.cover_image,
+            "timeline"
+          );
+        } catch (deleteError) {
+          /*
+          --------------------------------------------------------
+          Roll back the newly uploaded cover if the old cover
+          could not be deleted.
+          --------------------------------------------------------
+          */
+
+          try {
+            await deleteFile(
+              newCoverImage,
+              "timeline"
+            );
+          } catch (rollbackError) {
+            console.error(
+              "Failed to rollback new cover:",
+              rollbackError
+            );
+          }
+
+          throw deleteError;
+        }
+      }
+
+      /*
+      ============================================================
+      DELETE EXISTING COVER REMOVED BY ADMIN
+      ============================================================
+      */
+
+      if (
+        formData.removedCover &&
+        formData.removedCover === milestone.cover_image &&
+        !newCoverImage
+      ) {
+        await deleteFile(
+          formData.removedCover,
+          "timeline"
+        );
+
+        coverImage = "";
+      }
+
+      /*
+      ============================================================
+      DELETE EXISTING GALLERY MEDIA REMOVED BY ADMIN
+      ============================================================
+      */
+
+      if (
+        formData.removedGallery &&
+        formData.removedGallery.length > 0
+      ) {
+        for (const removedFile of formData.removedGallery) {
+          await deleteFile(
+            removedFile,
+            "timeline"
+          );
+        }
+
+        gallery = gallery.filter(
+          (url) =>
+            !formData.removedGallery.includes(url)
+        );
       }
 
       await updateMilestone(id, {

@@ -1,5 +1,4 @@
 import { NavLink } from "react-router-dom";
-import { supabase } from "../../lib/supabase";
 
 export default function AdminNavbar() {
   const linkClass = ({ isActive }) =>
@@ -9,8 +8,11 @@ export default function AdminNavbar() {
         : "text-[#6E655E] hover:bg-[#EEF7E8]"
     }`;
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
+  function handleLogout() {
+    localStorage.removeItem(
+      "azain_admin_token"
+    );
+
     window.location.href = "/admin/login";
   }
 

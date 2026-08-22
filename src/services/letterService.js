@@ -1,4 +1,23 @@
-import { supabase } from "../lib/supabase";
+const API_BASE_URL =
+  "https://azain-api-worker.aaawaizshaikh.workers.dev";
+
+/* ===========================================================================
+
+   ADMIN AUTH
+
+=========================================================================== */
+
+function getAdminAuthHeaders() {
+  const token = localStorage.getItem(
+    "azain_admin_token"
+  );
+
+  return token
+    ? {
+        Authorization: `Bearer ${token}`,
+      }
+    : {};
+}
 
 
 // ============================================================================
@@ -10,34 +29,28 @@ import { supabase } from "../lib/supabase";
 // ============================================================================
 
 export async function getPublishedLetters() {
-
-  const {
-    data,
-    error,
-  } = await supabase
-    .from("letters")
-    .select("*")
-    .eq("published", true)
-    .order("display_order", {
-      ascending: true,
-    })
-    .order("created_at", {
-      ascending: true,
-    });
-
-
-  if (error) {
-
-    console.error(
-      "getPublishedLetters error:",
-      error
+  const response =
+    await fetch(
+      `${API_BASE_URL}/letters?published=true`
     );
 
-    throw error;
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+    throw new Error(
+      errorData?.error ||
+        "Failed to fetch published letters."
+    );
   }
 
-
-  return data || [];
+  return (
+    await response.json()
+  ) || [];
 }
 
 
@@ -50,33 +63,33 @@ export async function getPublishedLetters() {
 // ============================================================================
 
 export async function getLetters() {
-
-  const {
-    data,
-    error,
-  } = await supabase
-    .from("letters")
-    .select("*")
-    .order("display_order", {
-      ascending: true,
-    })
-    .order("created_at", {
-      ascending: true,
-    });
-
-
-  if (error) {
-
-    console.error(
-      "getLetters error:",
-      error
+  const response =
+    await fetch(
+      `${API_BASE_URL}/letters`,
+      {
+        headers: {
+          ...getAdminAuthHeaders(),
+        },
+      }
     );
 
-    throw error;
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+    throw new Error(
+      errorData?.error ||
+        "Failed to fetch letters."
+    );
   }
 
-
-  return data || [];
+  return (
+    await response.json()
+  ) || [];
 }
 
 
@@ -88,42 +101,41 @@ export async function getLetters() {
 // ============================================================================
 
 export async function getLetterById(id) {
-
   if (!id) {
     throw new Error(
       "Letter ID is required."
     );
   }
 
-
-  const {
-    data,
-    error,
-  } = await supabase
-    .from("letters")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
-
-
-  if (error) {
-
-    console.error(
-      "getLetterById error:",
-      error
+  const response =
+    await fetch(
+      `${API_BASE_URL}/letters/${encodeURIComponent(
+        id
+      )}`
     );
 
-    throw error;
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+    throw new Error(
+      errorData?.error ||
+        "Letter not found."
+    );
   }
 
+  const data =
+    await response.json();
 
   if (!data) {
-
     throw new Error(
       "Letter not found."
     );
   }
-
 
   return data;
 }
@@ -139,43 +151,41 @@ export async function getLetterById(id) {
 // ============================================================================
 
 export async function getLetterBySlug(slug) {
-
   if (!slug) {
     throw new Error(
       "Letter slug is required."
     );
   }
 
-
-  const {
-    data,
-    error,
-  } = await supabase
-    .from("letters")
-    .select("*")
-    .eq("slug", slug)
-    .eq("published", true)
-    .maybeSingle();
-
-
-  if (error) {
-
-    console.error(
-      "getLetterBySlug error:",
-      error
+  const response =
+    await fetch(
+      `${API_BASE_URL}/letters/slug/${encodeURIComponent(
+        slug
+      )}`
     );
 
-    throw error;
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+    throw new Error(
+      errorData?.error ||
+        "Published letter not found."
+    );
   }
 
+  const data =
+    await response.json();
 
   if (!data) {
-
     throw new Error(
       "Published letter not found."
     );
   }
-
 
   return data;
 }
@@ -189,13 +199,11 @@ export async function getLetterBySlug(slug) {
 // ============================================================================
 
 export async function createLetter(letter) {
-
   if (!letter) {
     throw new Error(
       "Letter data is required."
     );
   }
-
 
   const payload = {
     slot_key:
@@ -230,29 +238,41 @@ export async function createLetter(letter) {
       ) || 0,
   };
 
+  const response =
+    await fetch(
+      `${API_BASE_URL}/letters`,
+      {
+        method: "POST",
 
-  const {
-    data,
-    error,
-  } = await supabase
-    .from("letters")
-    .insert(payload)
-    .select()
-    .single();
+        headers: {
+          "Content-Type":
+            "application/json",
 
+          ...getAdminAuthHeaders(),
+        },
 
-  if (error) {
-
-    console.error(
-      "createLetter error:",
-      error
+        body:
+          JSON.stringify(
+            payload
+          ),
+      }
     );
 
-    throw error;
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+    throw new Error(
+      errorData?.error ||
+        "Failed to create letter."
+    );
   }
 
-
-  return data;
+  return await response.json();
 }
 
 
@@ -267,20 +287,17 @@ export async function updateLetter(
   id,
   letter
 ) {
-
   if (!id) {
     throw new Error(
       "Letter ID is required."
     );
   }
 
-
   if (!letter) {
     throw new Error(
       "Letter data is required."
     );
   }
-
 
   const payload = {
     slot_key:
@@ -318,30 +335,43 @@ export async function updateLetter(
       new Date().toISOString(),
   };
 
+  const response =
+    await fetch(
+      `${API_BASE_URL}/letters/${encodeURIComponent(
+        id
+      )}`,
+      {
+        method: "PUT",
 
-  const {
-    data,
-    error,
-  } = await supabase
-    .from("letters")
-    .update(payload)
-    .eq("id", id)
-    .select()
-    .single();
+        headers: {
+          "Content-Type":
+            "application/json",
 
+          ...getAdminAuthHeaders(),
+        },
 
-  if (error) {
-
-    console.error(
-      "updateLetter error:",
-      error
+        body:
+          JSON.stringify(
+            payload
+          ),
+      }
     );
 
-    throw error;
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+    throw new Error(
+      errorData?.error ||
+        "Failed to update letter."
+    );
   }
 
-
-  return data;
+  return await response.json();
 }
 
 
@@ -354,32 +384,39 @@ export async function updateLetter(
 // ============================================================================
 
 export async function deleteLetter(id) {
-
   if (!id) {
     throw new Error(
       "Letter ID is required."
     );
   }
 
+  const response =
+    await fetch(
+      `${API_BASE_URL}/letters/${encodeURIComponent(
+        id
+      )}`,
+      {
+        method: "DELETE",
 
-  const {
-    error,
-  } = await supabase
-    .from("letters")
-    .delete()
-    .eq("id", id);
-
-
-  if (error) {
-
-    console.error(
-      "deleteLetter error:",
-      error
+        headers: {
+          ...getAdminAuthHeaders(),
+        },
+      }
     );
 
-    throw error;
-  }
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
 
+    throw new Error(
+      errorData?.error ||
+        "Failed to delete letter."
+    );
+  }
 
   return true;
 }
@@ -395,41 +432,50 @@ export async function toggleLetterPublished(
   id,
   published
 ) {
-
   if (!id) {
     throw new Error(
       "Letter ID is required."
     );
   }
 
+  const response =
+    await fetch(
+      `${API_BASE_URL}/letters/${encodeURIComponent(
+        id
+      )}/published`,
+      {
+        method: "PUT",
 
-  const {
-    data,
-    error,
-  } = await supabase
-    .from("letters")
-    .update({
-      published:
-        Boolean(published),
+        headers: {
+          "Content-Type":
+            "application/json",
 
-      updated_at:
-        new Date().toISOString(),
-    })
-    .eq("id", id)
-    .select()
-    .single();
+          ...getAdminAuthHeaders(),
+        },
 
-
-  if (error) {
-
-    console.error(
-      "toggleLetterPublished error:",
-      error
+        body:
+          JSON.stringify({
+            published:
+              Boolean(
+                published
+              ),
+          }),
+      }
     );
 
-    throw error;
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+    throw new Error(
+      errorData?.error ||
+        "Failed to update letter published status."
+    );
   }
 
-
-  return data;
+  return await response.json();
 }

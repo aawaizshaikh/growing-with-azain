@@ -1,0 +1,14 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "azain-api-worker",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-20",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "azain-db",
+      "database_id": "7d3291a3-68de-4a83-a58d-c2a26e537b1e",
+      "remote": true
+    }
+  ]
+}

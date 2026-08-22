@@ -1,0 +1,12 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "azain-media-worker",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-20",
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "azain-media"
+    }
+  ]
+}

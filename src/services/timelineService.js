@@ -1,96 +1,176 @@
-import { supabase } from "../lib/supabase";
+const API_BASE_URL =
+  "https://azain-api-worker.aaawaizshaikh.workers.dev";
 
 /* ===========================================================================
+   ADMIN AUTH TOKEN
+=========================================================================== */
+
+function getAdminAuthHeaders() {
+  const token = localStorage.getItem(
+    "azain_admin_token"
+  );
+
+  return token
+    ? {
+        Authorization: `Bearer ${token}`,
+      }
+    : {};
+}
+
+/* ===========================================================================
+
    GET ALL MEMORIES
+
 =========================================================================== */
 
 export async function getTimelineMemories() {
-  const { data, error } = await supabase
-    .from("timeline")
-    .select("*")
-    .order("date", { ascending: false });
+  const response = await fetch(
+    `${API_BASE_URL}/timeline`
+  );
 
-  if (error) throw error;
+  if (!response.ok) {
+    throw new Error(
+      "Failed to fetch timeline memories."
+    );
+  }
 
-  return data || [];
+  return (await response.json()) || [];
 }
 
 /* ===========================================================================
+
    GET SINGLE MEMORY
+
 =========================================================================== */
 
 export async function getTimelineMemory(id) {
-  const { data, error } = await supabase
-    .from("timeline")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const response = await fetch(
+    `${API_BASE_URL}/timeline/${encodeURIComponent(id)}`
+  );
 
-  if (error) throw error;
+  if (!response.ok) {
+    throw new Error(
+      "Failed to fetch timeline memory."
+    );
+  }
 
-  return data;
+  return await response.json();
 }
 
 /* ===========================================================================
+
    GET MEMORY BY SLUG
+
 =========================================================================== */
 
-export async function getTimelineMemoryBySlug(slug) {
-  const { data, error } = await supabase
-    .from("timeline")
-    .select("*")
-    .eq("slug", slug)
-    .single();
+export async function getTimelineMemoryBySlug(
+  slug
+) {
+  const response = await fetch(
+    `${API_BASE_URL}/timeline/slug/${encodeURIComponent(slug)}`
+  );
 
-  if (error) throw error;
+  if (!response.ok) {
+    throw new Error(
+      "Failed to fetch timeline memory by slug."
+    );
+  }
 
-  return data;
+  return await response.json();
 }
 
 /* ===========================================================================
+
    CREATE MEMORY
+
 =========================================================================== */
 
-export async function createTimelineMemory(memory) {
-  const { data, error } = await supabase
-    .from("timeline")
-    .insert(memory)
-    .select()
-    .single();
+export async function createTimelineMemory(
+  memory
+) {
+  const payload = {
+    ...memory,
+    id:
+      memory.id ||
+      crypto.randomUUID(),
+  };
 
-  if (error) throw error;
+  const response = await fetch(
+    `${API_BASE_URL}/timeline`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAdminAuthHeaders(),
+      },
+      body: JSON.stringify(payload),
+    }
+  );
 
-  return data;
+  if (!response.ok) {
+    throw new Error(
+      "Failed to create timeline memory."
+    );
+  }
+
+  return await response.json();
 }
 
 /* ===========================================================================
+
    UPDATE MEMORY
+
 =========================================================================== */
 
-export async function updateTimelineMemory(id, memory) {
-  const { data, error } = await supabase
-    .from("timeline")
-    .update(memory)
-    .eq("id", id)
-    .select()
-    .single();
+export async function updateTimelineMemory(
+  id,
+  memory
+) {
+  const response = await fetch(
+    `${API_BASE_URL}/timeline/${encodeURIComponent(id)}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAdminAuthHeaders(),
+      },
+      body: JSON.stringify(memory),
+    }
+  );
 
-  if (error) throw error;
+  if (!response.ok) {
+    throw new Error(
+      "Failed to update timeline memory."
+    );
+  }
 
-  return data;
+  return await response.json();
 }
 
 /* ===========================================================================
+
    DELETE MEMORY
+
 =========================================================================== */
 
-export async function deleteTimelineMemory(id) {
-  const { error } = await supabase
-    .from("timeline")
-    .delete()
-    .eq("id", id);
+export async function deleteTimelineMemory(
+  id
+) {
+  const response = await fetch(
+    `${API_BASE_URL}/timeline/${encodeURIComponent(id)}`,
+    {
+      method: "DELETE",
+      headers: {
+        ...getAdminAuthHeaders(),
+      },
+    }
+  );
 
-  if (error) throw error;
+  if (!response.ok) {
+    throw new Error(
+      "Failed to delete timeline memory."
+    );
+  }
 
   return true;
 }

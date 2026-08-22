@@ -1,30 +1,26 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { supabase } from "../../lib/supabase";
 
 export default function ProtectedRoute({ children }) {
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState(null);
 
   useEffect(() => {
-    async function checkSession() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    function checkSession() {
+      const token = localStorage.getItem(
+        "azain_admin_token"
+      );
 
-      setSession(session);
+      setSession(
+        token
+          ? { token }
+          : null
+      );
+
       setLoading(false);
     }
 
     checkSession();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
   }, []);
 
   if (loading) {
@@ -36,7 +32,12 @@ export default function ProtectedRoute({ children }) {
   }
 
   if (!session) {
-    return <Navigate to="/admin/login" replace />;
+    return (
+      <Navigate
+        to="/admin/login"
+        replace
+      />
+    );
   }
 
   return children;

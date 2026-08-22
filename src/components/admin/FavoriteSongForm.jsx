@@ -27,6 +27,10 @@ export default function FavoriteSongForm({
   const [existingCover, setExistingCover] = useState([]);
   const [existingGallery, setExistingGallery] = useState([]);
 
+  // Existing media removed by the Admin
+  const [removedCover, setRemovedCover] = useState(null);
+  const [removedGallery, setRemovedGallery] = useState([]);
+
   useEffect(() => {
     if (!initialData) return;
 
@@ -54,6 +58,10 @@ export default function FavoriteSongForm({
     setExistingGallery(
       initialData.gallery_images || []
     );
+
+    // Reset removed media when loading a different song
+    setRemovedCover(null);
+    setRemovedGallery([]);
   }, [initialData]);
 
   function handleChange(e) {
@@ -87,6 +95,8 @@ export default function FavoriteSongForm({
       galleryImages,
       existingCover,
       existingGallery,
+      removedCover,
+      removedGallery,
       highlights,
     });
   }
@@ -173,6 +183,7 @@ export default function FavoriteSongForm({
         />
 
       </div>
+
       <div className="mt-6">
 
         <label className="block mb-2 font-semibold">
@@ -210,15 +221,22 @@ export default function FavoriteSongForm({
         multiple={false}
         existingFiles={existingCover}
         onChange={setCoverImage}
+        onExistingRemove={setRemovedCover}
       />
 
       <FileUploader
-  label="Gallery Images & Videos"
-  multiple={true}
-  accept="image/*,video/*,.mp4,.mov,.m4v,.webm,.ogg"
-  existingFiles={existingGallery}
-  onChange={setGalleryImages}
-/>
+        label="Gallery Images & Videos"
+        multiple={true}
+        accept="image/*,video/*,.mp4,.mov,.m4v,.webm,.ogg"
+        existingFiles={existingGallery}
+        onChange={setGalleryImages}
+        onExistingRemove={(removedFile) =>
+          setRemovedGallery((prev) => [
+            ...prev,
+            removedFile,
+          ])
+        }
+      />
 
       <HighlightsInput
         initialHighlights={highlights}

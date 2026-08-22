@@ -1,96 +1,178 @@
-import { supabase } from "../lib/supabase";
+const API_BASE_URL =
+  "https://azain-api-worker.aaawaizshaikh.workers.dev";
 
-/* ============================================================================
+/* ===========================================================================
+
+   ADMIN AUTH
+
+=========================================================================== */
+
+function getAdminAuthHeaders() {
+  const token = localStorage.getItem(
+    "azain_admin_token"
+  );
+
+  return token
+    ? {
+        Authorization: `Bearer ${token}`,
+      }
+    : {};
+}
+
+/* ===========================================================================
+
    GET ALL SONGS
-============================================================================ */
+
+=========================================================================== */
 
 export async function getFavoriteSongs() {
-  const { data, error } = await supabase
-    .from("favorite_songs")
-    .select("*")
-    .order("display_order", { ascending: true });
+  const response = await fetch(
+    `${API_BASE_URL}/favorite-songs`
+  );
 
-  if (error) throw error;
+  if (!response.ok) {
+    throw new Error(
+      "Failed to fetch favorite songs."
+    );
+  }
 
-  return data || [];
+  return (await response.json()) || [];
 }
 
-/* ============================================================================
+/* ===========================================================================
+
    GET SINGLE SONG
-============================================================================ */
+
+=========================================================================== */
 
 export async function getFavoriteSong(id) {
-  const { data, error } = await supabase
-    .from("favorite_songs")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const response = await fetch(
+    `${API_BASE_URL}/favorite-songs/${encodeURIComponent(id)}`
+  );
 
-  if (error) throw error;
+  if (!response.ok) {
+    throw new Error(
+      "Failed to fetch favorite song."
+    );
+  }
 
-  return data;
+  return await response.json();
 }
 
-/* ============================================================================
+/* ===========================================================================
+
    GET SONG BY SLUG
-============================================================================ */
 
-export async function getFavoriteSongBySlug(slug) {
-  const { data, error } = await supabase
-    .from("favorite_songs")
-    .select("*")
-    .eq("slug", slug)
-    .single();
+=========================================================================== */
 
-  if (error) throw error;
+export async function getFavoriteSongBySlug(
+  slug
+) {
+  const response = await fetch(
+    `${API_BASE_URL}/favorite-songs/slug/${encodeURIComponent(slug)}`
+  );
 
-  return data;
+  if (!response.ok) {
+    throw new Error(
+      "Failed to fetch favorite song by slug."
+    );
+  }
+
+  return await response.json();
 }
 
-/* ============================================================================
+/* ===========================================================================
+
    CREATE SONG
-============================================================================ */
 
-export async function createFavoriteSong(song) {
-  const { data, error } = await supabase
-    .from("favorite_songs")
-    .insert(song)
-    .select()
-    .single();
+=========================================================================== */
 
-  if (error) throw error;
+export async function createFavoriteSong(
+  song
+) {
+  const payload = {
+    ...song,
+    id:
+      song.id ||
+      crypto.randomUUID(),
+  };
 
-  return data;
+  const response = await fetch(
+    `${API_BASE_URL}/favorite-songs`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAdminAuthHeaders(),
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "Failed to create favorite song."
+    );
+  }
+
+  return await response.json();
 }
 
-/* ============================================================================
+/* ===========================================================================
+
    UPDATE SONG
-============================================================================ */
 
-export async function updateFavoriteSong(id, song) {
-  const { data, error } = await supabase
-    .from("favorite_songs")
-    .update(song)
-    .eq("id", id)
-    .select()
-    .single();
+=========================================================================== */
 
-  if (error) throw error;
+export async function updateFavoriteSong(
+  id,
+  song
+) {
+  const response = await fetch(
+    `${API_BASE_URL}/favorite-songs/${encodeURIComponent(id)}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAdminAuthHeaders(),
+      },
+      body: JSON.stringify(song),
+    }
+  );
 
-  return data;
+  if (!response.ok) {
+    throw new Error(
+      "Failed to update favorite song."
+    );
+  }
+
+  return await response.json();
 }
 
-/* ============================================================================
+/* ===========================================================================
+
    DELETE SONG
-============================================================================ */
 
-export async function deleteFavoriteSong(id) {
-  const { error } = await supabase
-    .from("favorite_songs")
-    .delete()
-    .eq("id", id);
+=========================================================================== */
 
-  if (error) throw error;
+export async function deleteFavoriteSong(
+  id
+) {
+  const response = await fetch(
+    `${API_BASE_URL}/favorite-songs/${encodeURIComponent(id)}`,
+    {
+      method: "DELETE",
+      headers: {
+        ...getAdminAuthHeaders(),
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "Failed to delete favorite song."
+    );
+  }
 
   return true;
 }

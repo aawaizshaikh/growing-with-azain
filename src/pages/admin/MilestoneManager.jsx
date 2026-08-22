@@ -9,6 +9,11 @@ import {
   deleteMilestone,
 } from "../../services/milestoneService";
 
+import {
+  deleteFile,
+  deleteMultiple,
+} from "../../services/storageService";
+
 export default function MilestoneManager() {
   const navigate = useNavigate();
 
@@ -43,6 +48,37 @@ export default function MilestoneManager() {
     if (!confirmed) return;
 
     try {
+      /*
+      ============================================================
+      DELETE R2 MEDIA FIRST
+      ============================================================
+      */
+
+      // Delete cover image/video
+      if (milestone.cover_image) {
+        await deleteFile(
+          milestone.cover_image,
+          "timeline"
+        );
+      }
+
+      // Delete all gallery images/videos
+      if (
+        Array.isArray(milestone.gallery_images) &&
+        milestone.gallery_images.length > 0
+      ) {
+        await deleteMultiple(
+          milestone.gallery_images,
+          "timeline"
+        );
+      }
+
+      /*
+      ============================================================
+      DELETE D1 RECORD
+      ============================================================
+      */
+
       await deleteMilestone(milestone.id);
 
       setMilestones((prev) =>
@@ -52,7 +88,11 @@ export default function MilestoneManager() {
       alert("Milestone Deleted");
     } catch (err) {
       console.error(err);
-      alert(err.message);
+
+      alert(
+        err.message ||
+          "Failed to delete milestone. The milestone was not removed."
+      );
     }
   }
 

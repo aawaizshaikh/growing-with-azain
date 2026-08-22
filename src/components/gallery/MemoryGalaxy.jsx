@@ -67,16 +67,17 @@ const PLANETS = [
 
 
 /* ======================================================
-   GALLERY IMAGE OPTIMIZATION
+   GALLERY IMAGE SOURCE
 
-   Original images remain untouched.
+   Media is now delivered through the Cloudflare R2
+   media Worker.
 
-   When the source is a public Supabase Storage image,
-   the Gallery requests a small transformed version
-   instead of downloading the original full-resolution
-   image.
+   R2 does not use the old Supabase Storage image
+   transformation endpoint, so the database/media URL
+   must be used directly.
 
-   Non-Supabase URLs are returned unchanged.
+   The images themselves are already optimized by the
+   existing global image-upload/migration pipeline.
 ====================================================== */
 
 function getGalleryImageSource(source) {
@@ -87,52 +88,7 @@ function getGalleryImageSource(source) {
     return null;
   }
 
-  const trimmedSource =
-    source.trim();
-
-  if (
-    !trimmedSource.includes(
-      "/storage/v1/object/public/"
-    )
-  ) {
-    return trimmedSource;
-  }
-
-  try {
-    const url =
-      new URL(trimmedSource);
-
-    url.pathname =
-      url.pathname.replace(
-        "/storage/v1/object/public/",
-        "/storage/v1/render/image/public/"
-      );
-
-    url.searchParams.set(
-      "width",
-      "240"
-    );
-
-    url.searchParams.set(
-      "height",
-      "240"
-    );
-
-    url.searchParams.set(
-      "resize",
-      "cover"
-    );
-
-    url.searchParams.set(
-      "quality",
-      "70"
-    );
-
-    return url.toString();
-
-  } catch {
-    return trimmedSource;
-  }
+  return source.trim();
 }
 
 

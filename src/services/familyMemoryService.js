@@ -1,13 +1,14 @@
-import { supabase } from "../lib/supabase";
+const API_BASE_URL =
+  "https://azain-api-worker.aaawaizshaikh.workers.dev";
 
 /*
 ===============================================================================
 FAMILY MEMORY SERVICE
 ===============================================================================
 
-Supabase table:
+Cloudflare API:
 
-    family_memories
+    /family-memories
 
 Family member identity is NOT stored here.
 
@@ -35,7 +36,29 @@ Supported media types:
 ===============================================================================
 */
 
-const TABLE_NAME = "family_memories";
+const TABLE_NAME = "family-memories";
+
+/*
+===============================================================================
+ADMIN AUTH
+===============================================================================
+*/
+
+function getAdminAuthHeaders() {
+  const token = localStorage.getItem(
+    "azain_admin_token"
+  );
+
+  if (!token) {
+    throw new Error(
+      "Admin authentication token is missing. Please log in again."
+    );
+  }
+
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+}
 
 /*
 ===============================================================================
@@ -232,34 +255,27 @@ export async function getFamilyMemories(
       memberKey
     );
 
-  const {
-    data,
-    error,
-  } = await supabase
-    .from(TABLE_NAME)
-    .select("*")
-    .eq(
-      "member_key",
-      normalizedMemberKey
-    )
-    .eq(
-      "published",
-      true
-    )
-    .order(
-      "display_order",
-      {
-        ascending: true,
-      }
-    )
-    .order(
-      "created_at",
-      {
-        ascending: true,
-      }
+  const response =
+    await fetch(
+      `${API_BASE_URL}/${TABLE_NAME}?member_key=${encodeURIComponent(
+        normalizedMemberKey
+      )}`
     );
 
-  if (error) {
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+    const error =
+      new Error(
+        errorData?.error ||
+          "Failed to fetch family memories."
+      );
+
     console.error(
       "getFamilyMemories error:",
       error
@@ -267,6 +283,9 @@ export async function getFamilyMemories(
 
     throw error;
   }
+
+  const data =
+    await response.json();
 
   return (
     data || []
@@ -307,42 +326,37 @@ export async function getAllFamilyMemories(
     includeUnpublished = true,
   } = options;
 
-  let query =
-    supabase
-      .from(TABLE_NAME)
-      .select("*");
+  const query =
+    includeUnpublished
+      ? "?include_unpublished=true"
+      : "?include_unpublished=false";
 
-  if (!includeUnpublished) {
-    query = query.eq(
-      "published",
-      true
-    );
-  }
-
-  const {
-    data,
-    error,
-  } = await query
-    .order(
-      "member_key",
+  const response =
+    await fetch(
+      `${API_BASE_URL}/${TABLE_NAME}${query}`,
       {
-        ascending: true,
-      }
-    )
-    .order(
-      "display_order",
-      {
-        ascending: true,
-      }
-    )
-    .order(
-      "created_at",
-      {
-        ascending: true,
+        headers: includeUnpublished
+          ? {
+              ...getAdminAuthHeaders(),
+            }
+          : {},
       }
     );
 
-  if (error) {
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+    const error =
+      new Error(
+        errorData?.error ||
+          "Failed to fetch all family memories."
+      );
+
     console.error(
       "getAllFamilyMemories error:",
       error
@@ -350,6 +364,9 @@ export async function getAllFamilyMemories(
 
     throw error;
   }
+
+  const data =
+    await response.json();
 
   return (
     data || []
@@ -377,19 +394,27 @@ export async function getFamilyMemoryById(
     );
   }
 
-  const {
-    data,
-    error,
-  } = await supabase
-    .from(TABLE_NAME)
-    .select("*")
-    .eq(
-      "id",
-      id
-    )
-    .maybeSingle();
+  const response =
+    await fetch(
+      `${API_BASE_URL}/${TABLE_NAME}/${encodeURIComponent(
+        id
+      )}`
+    );
 
-  if (error) {
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+    const error =
+      new Error(
+        errorData?.error ||
+          "Failed to fetch family memory."
+      );
+
     console.error(
       "getFamilyMemoryById error:",
       error
@@ -397,6 +422,9 @@ export async function getFamilyMemoryById(
 
     throw error;
   }
+
+  const data =
+    await response.json();
 
   return normalizeMemory(
     data
@@ -441,6 +469,10 @@ export async function createFamilyMemory(
   }
 
   const payload = {
+    id:
+      memory.id ||
+      crypto.randomUUID(),
+
     member_key:
       memberKey,
 
@@ -467,18 +499,40 @@ export async function createFamilyMemory(
       true,
   };
 
-  const {
-    data,
-    error,
-  } = await supabase
-    .from(TABLE_NAME)
-    .insert(
-      payload
-    )
-    .select()
-    .single();
+  const response =
+    await fetch(
+      `${API_BASE_URL}/${TABLE_NAME}`,
+      {
+        method: "POST",
 
-  if (error) {
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          ...getAdminAuthHeaders(),
+        },
+
+        body:
+          JSON.stringify(
+            payload
+          ),
+      }
+    );
+
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+    const error =
+      new Error(
+        errorData?.error ||
+          "Failed to create family memory."
+      );
+
     console.error(
       "createFamilyMemory error:",
       error
@@ -486,6 +540,9 @@ export async function createFamilyMemory(
 
     throw error;
   }
+
+  const data =
+    await response.json();
 
   return normalizeMemory(
     data
@@ -563,22 +620,42 @@ export async function updateFamilyMemory(
       true,
   };
 
-  const {
-    data,
-    error,
-  } = await supabase
-    .from(TABLE_NAME)
-    .update(
-      payload
-    )
-    .eq(
-      "id",
-      id
-    )
-    .select()
-    .single();
+  const response =
+    await fetch(
+      `${API_BASE_URL}/${TABLE_NAME}/${encodeURIComponent(
+        id
+      )}`,
+      {
+        method: "PUT",
 
-  if (error) {
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          ...getAdminAuthHeaders(),
+        },
+
+        body:
+          JSON.stringify(
+            payload
+          ),
+      }
+    );
+
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+    const error =
+      new Error(
+        errorData?.error ||
+          "Failed to update family memory."
+      );
+
     console.error(
       "updateFamilyMemory error:",
       error
@@ -586,6 +663,9 @@ export async function updateFamilyMemory(
 
     throw error;
   }
+
+  const data =
+    await response.json();
 
   return normalizeMemory(
     data
@@ -618,17 +698,34 @@ export async function deleteFamilyMemory(
     );
   }
 
-  const {
-    error,
-  } = await supabase
-    .from(TABLE_NAME)
-    .delete()
-    .eq(
-      "id",
-      id
+  const response =
+    await fetch(
+      `${API_BASE_URL}/${TABLE_NAME}/${encodeURIComponent(
+        id
+      )}`,
+      {
+        method: "DELETE",
+
+        headers: {
+          ...getAdminAuthHeaders(),
+        },
+      }
     );
 
-  if (error) {
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+    const error =
+      new Error(
+        errorData?.error ||
+          "Failed to delete family memory."
+      );
+
     console.error(
       "deleteFamilyMemory error:",
       error
@@ -660,25 +757,45 @@ export async function setFamilyMemoryPublished(
     );
   }
 
-  const {
-    data,
-    error,
-  } = await supabase
-    .from(TABLE_NAME)
-    .update({
-      published:
-        Boolean(
-          published
-        ),
-    })
-    .eq(
-      "id",
-      id
-    )
-    .select()
-    .single();
+  const response =
+    await fetch(
+      `${API_BASE_URL}/${TABLE_NAME}/${encodeURIComponent(
+        id
+      )}/published`,
+      {
+        method: "PUT",
 
-  if (error) {
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          ...getAdminAuthHeaders(),
+        },
+
+        body:
+          JSON.stringify({
+            published:
+              Boolean(
+                published
+              ),
+          }),
+      }
+    );
+
+  if (!response.ok) {
+    const errorData =
+      await response
+        .json()
+        .catch(
+          () => null
+        );
+
+    const error =
+      new Error(
+        errorData?.error ||
+          "Failed to update family memory published status."
+      );
+
     console.error(
       "setFamilyMemoryPublished error:",
       error
@@ -686,6 +803,9 @@ export async function setFamilyMemoryPublished(
 
     throw error;
   }
+
+  const data =
+    await response.json();
 
   return normalizeMemory(
     data

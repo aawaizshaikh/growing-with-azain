@@ -9,6 +9,11 @@ import {
   deleteTimelineMemory,
 } from "../../services/timelineService";
 
+import {
+  deleteFile,
+  deleteMultiple,
+} from "../../services/storageService";
+
 export default function TimelineManager() {
   const navigate = useNavigate();
 
@@ -43,7 +48,44 @@ export default function TimelineManager() {
     if (!confirmed) return;
 
     try {
+      /*
+      ============================================================
+      DELETE R2 MEDIA FIRST
+      ============================================================
+      */
+
+      // Delete cover image/video
+      if (memory.cover_image) {
+        await deleteFile(
+          memory.cover_image,
+          "timeline"
+        );
+      }
+
+      // Delete all gallery images/videos
+      if (
+        Array.isArray(memory.gallery_images) &&
+        memory.gallery_images.length > 0
+      ) {
+        await deleteMultiple(
+          memory.gallery_images,
+          "timeline"
+        );
+      }
+
+      /*
+      ============================================================
+      DELETE D1 RECORD
+      ============================================================
+      */
+
       await deleteTimelineMemory(memory.id);
+
+      /*
+      ============================================================
+      UPDATE ADMIN UI
+      ============================================================
+      */
 
       setMemories((prev) =>
         prev.filter((m) => m.id !== memory.id)
@@ -52,7 +94,11 @@ export default function TimelineManager() {
       alert("Memory Deleted");
     } catch (err) {
       console.error(err);
-      alert(err.message);
+
+      alert(
+        err.message ||
+          "Failed to delete memory. The memory was not removed."
+      );
     }
   }
 

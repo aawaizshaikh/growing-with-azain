@@ -10,6 +10,9 @@ export default function FileUploader({
 
   // Existing uploaded files
   existingFiles = [],
+
+  // Notify parent when an existing file is removed
+  onExistingRemove,
 }) {
   const inputRef = useRef(null);
 
@@ -82,11 +85,18 @@ export default function FileUploader({
   }
 
   function removeExistingImage(index) {
+    const removedFile = existing[index];
+
     const updated = existing.filter(
       (_, i) => i !== index
     );
 
     setExisting(updated);
+
+    // Tell the parent exactly which existing file was removed.
+    if (removedFile) {
+      onExistingRemove?.(removedFile);
+    }
   }
 
   return (

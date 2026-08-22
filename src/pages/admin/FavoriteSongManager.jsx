@@ -9,6 +9,10 @@ import {
   deleteFavoriteSong,
 } from "../../services/favoriteSongService";
 
+import {
+  deleteFile,
+} from "../../services/storageService";
+
 export default function FavoriteSongManager() {
   const navigate = useNavigate();
 
@@ -43,7 +47,52 @@ export default function FavoriteSongManager() {
     if (!confirmed) return;
 
     try {
+      /*
+      ============================================================
+      COLLECT ALL R2 MEDIA BELONGING TO THIS SONG
+      ============================================================
+      */
+
+      const mediaToDelete = [];
+
+      if (song.cover_image) {
+        mediaToDelete.push(song.cover_image);
+      }
+
+      if (
+        Array.isArray(song.gallery_images)
+      ) {
+        mediaToDelete.push(
+          ...song.gallery_images
+        );
+      }
+
+      /*
+      ============================================================
+      DELETE ALL R2 MEDIA FIRST
+      ============================================================
+      */
+
+      for (const mediaUrl of mediaToDelete) {
+        await deleteFile(
+          mediaUrl,
+          "timeline"
+        );
+      }
+
+      /*
+      ============================================================
+      DELETE D1 RECORD ONLY AFTER R2 DELETION SUCCEEDS
+      ============================================================
+      */
+
       await deleteFavoriteSong(song.id);
+
+      /*
+      ============================================================
+      UPDATE ADMIN UI
+      ============================================================
+      */
 
       setSongs((prev) =>
         prev.filter((s) => s.id !== song.id)
@@ -52,7 +101,19 @@ export default function FavoriteSongManager() {
       alert("Favourite Song Deleted");
     } catch (err) {
       console.error(err);
-      alert(err.message);
+
+      /*
+      ------------------------------------------------------------
+      IMPORTANT:
+      If R2 deletion fails, execution never reaches
+      deleteFavoriteSong(), so the D1 record remains intact.
+      ------------------------------------------------------------
+      */
+
+      alert(
+        err.message ||
+        "Failed to delete Favourite Song."
+      );
     }
   }
 

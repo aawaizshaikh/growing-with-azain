@@ -10,14 +10,14 @@ import {
   getFamilyMemoryById,
   updateFamilyMemory,
   createFamilyMemory,
+  getAllFamilyMemories,
+  deleteFamilyMemory,
 } from "../../services/familyMemoryService";
 
 import {
   uploadMultiple,
   deleteFile,
 } from "../../services/storageService";
-
-import { supabase } from "../../lib/supabase";
 
 import {
   getCardImageUrl,
@@ -109,20 +109,20 @@ export default function EditFamilyMemory() {
     try {
       setMediaLoading(true);
 
-      const { data, error } = await supabase
-        .from("family_memories")
-        .select("*")
-        .eq("member_key", selectedMemberKey)
-        .order("display_order", {
-          ascending: true,
-        })
-        .order("created_at", {
-          ascending: true,
-        });
+      const allMemories =
+        await getAllFamilyMemories();
 
-      if (error) {
-        throw error;
-      }
+      const data = allMemories
+        .filter(
+          (item) =>
+            item.member_key ===
+            selectedMemberKey
+        )
+        .sort(
+          (a, b) =>
+            (Number(a.display_order) || 0) -
+            (Number(b.display_order) || 0)
+        );
 
       setFamilyMedia(data || []);
       setRemovedMediaIds([]);
@@ -298,6 +298,60 @@ export default function EditFamilyMemory() {
 
       /*
       ------------------------------------------------------------------------
+      DETERMINE MEDIA MARKED FOR REMOVAL
+      ------------------------------------------------------------------------
+
+      R2 deletion MUST happen before the corresponding D1 rows are deleted.
+      ------------------------------------------------------------------------
+      */
+
+      const mediaToRemove =
+        familyMedia.filter((item) =>
+          removedMediaIds.includes(item.id)
+        );
+
+      /*
+      ------------------------------------------------------------------------
+      DELETE R2 MEDIA FIRST
+      ------------------------------------------------------------------------
+
+      IMPORTANT:
+
+      If any R2 deletion fails, deleteFile() throws.
+
+      We deliberately DO NOT catch and continue here.
+
+      This means:
+        R2 failure
+            ↓
+        handleSave throws
+            ↓
+        deleteFamilyMemory() is NOT called
+            ↓
+        D1 media row remains intact
+      ------------------------------------------------------------------------
+      */
+
+      for (const media of mediaToRemove) {
+        await deleteFile(
+          media.media_url
+        );
+      }
+
+      /*
+      ------------------------------------------------------------------------
+      DELETE D1 MEDIA ROWS ONLY AFTER ALL R2 DELETIONS SUCCEED
+      ------------------------------------------------------------------------
+      */
+
+      for (const media of mediaToRemove) {
+        await deleteFamilyMemory(
+          media.id
+        );
+      }
+
+      /*
+      ------------------------------------------------------------------------
       UPDATE THE ORIGINAL MEMORY
       ------------------------------------------------------------------------
       */
@@ -328,47 +382,6 @@ export default function EditFamilyMemory() {
 
       if (updatedMemory) {
         setMemory(updatedMemory);
-      }
-
-      /*
-      ------------------------------------------------------------------------
-      DELETE ALL MEDIA MARKED FOR REMOVAL
-      ------------------------------------------------------------------------
-
-      Each selected item is removed from storage and then from the
-      family_memories table.
-
-      This happens only when the admin clicks Save Changes.
-      ------------------------------------------------------------------------
-      */
-
-      const mediaToRemove =
-        familyMedia.filter((item) =>
-          removedMediaIds.includes(item.id)
-        );
-
-      for (const media of mediaToRemove) {
-        try {
-          await deleteFile(
-            media.media_url
-          );
-        } catch (storageError) {
-          console.error(
-            "Unable to delete media file:",
-            storageError
-          );
-        }
-
-        const {
-          error: deleteError,
-        } = await supabase
-          .from("family_memories")
-          .delete()
-          .eq("id", media.id);
-
-        if (deleteError) {
-          throw deleteError;
-        }
       }
 
       /*

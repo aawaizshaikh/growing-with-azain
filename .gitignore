@@ -7,10 +7,24 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+**/node_modules/
+
+# Build output
 dist
 dist-ssr
+**/dist/
+
+# Local environment / secrets
 *.local
+.env
+.env.*
+!.env.example
+
+# Cloudflare / Wrangler generated files
+.wrangler/
+**/.wrangler/
 
 # Editor directories and files
 .vscode/*
@@ -22,7 +36,17 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
 # Archives
 *.zip
 *.rar
 *.7z
+
+# Generated migration / optimization reports
+scripts/video-inventory.csv
+scripts/video-inventory.json
+scripts/video-optimization-progress.json
+scripts/video-optimization-report.csv
+scripts/video-optimization-report.json
+scripts/video-retry-report.csv
+scripts/video-retry-report.json

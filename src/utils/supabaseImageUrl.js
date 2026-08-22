@@ -1,37 +1,32 @@
 /*
 |--------------------------------------------------------------------------
-| SUPABASE IMAGE DELIVERY HELPERS
+| R2 IMAGE DELIVERY HELPERS
 |--------------------------------------------------------------------------
 |
 | GLOBAL IMAGE DELIVERY SYSTEM
 |
-| These helpers control HOW images are delivered from Supabase Storage.
+| Images are now stored in Cloudflare R2 and delivered through the
+| Cloudflare Media Worker.
 |
-| They DO NOT:
+| These helpers intentionally DO NOT perform any Supabase Storage
+| transformation.
 |
-| - modify the stored original
-| - rename the stored original
-| - delete the stored original
-| - change the database
-| - change page layout
-| - change image placement
-| - change React behavior
+| The stored database URL is already the final media URL:
 |
-| They only generate an optimized Supabase Image Transformation URL.
+|     Cloudflare R2 Worker
+|             ↓
+|     appropriately optimized WebP
+|             ↓
+|     browser
 |
-|--------------------------------------------------------------------------
+| IMPORTANT:
 |
-| GLOBAL FLOW
-|
-| Stored image
-|      ↓
-| getSupabaseImageUrl()
-|      ↓
-| Supabase Image Transformation
-|      ↓
-| appropriately sized image
-|      ↓
-| browser
+| - Existing helper names are preserved for compatibility.
+| - Existing component imports do not need to change.
+| - No image layout is changed.
+| - No image dimensions are changed here.
+| - No video URL is modified.
+| - No Supabase Storage URL is generated.
 |
 |--------------------------------------------------------------------------
 */
@@ -39,7 +34,24 @@
 
 /*
 |--------------------------------------------------------------------------
-| CORE IMAGE TRANSFORMATION
+| CORE IMAGE DELIVERY
+|--------------------------------------------------------------------------
+|
+| R2 does not use the old Supabase:
+|
+|     /storage/v1/render/image/public/
+|
+| transformation endpoint.
+|
+| Images migrated to R2 are already stored as optimized WebP files.
+|
+| New JPG/JPEG/PNG uploads are also converted to WebP before upload
+| by the global upload service.
+|
+| Therefore the correct behavior is simply:
+|
+|     source URL → return unchanged
+|
 |--------------------------------------------------------------------------
 */
 
@@ -66,184 +78,19 @@ export function getSupabaseImageUrl(
   }
 
 
-  const trimmedSource =
-    source.trim();
-
-
   /*
   |--------------------------------------------------------------------------
-  | Only transform public Supabase Storage object URLs.
+  | R2 MEDIA URL
   |--------------------------------------------------------------------------
   |
-  | Local/static images:
-  |     unchanged
+  | The source already points to the Cloudflare Media Worker.
   |
-  | External images:
-  |     unchanged
-  |
-  | Videos:
-  |     unchanged
-  |
-  | Supabase images:
-  |     transformed
+  | Do not modify it.
   |
   |--------------------------------------------------------------------------
   */
 
-  if (
-    !trimmedSource.includes(
-      "/storage/v1/object/public/"
-    )
-  ) {
-    return trimmedSource;
-  }
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | Protect videos
-  |--------------------------------------------------------------------------
-  |
-  | This global system is IMAGE ONLY.
-  |
-  | A video URL must never accidentally be sent through:
-  |
-  | /render/image/public/
-  |
-  |--------------------------------------------------------------------------
-  */
-
-  const lowerSource =
-    trimmedSource.toLowerCase();
-
-
-  if (
-    lowerSource.endsWith(
-      ".mp4"
-    ) ||
-    lowerSource.endsWith(
-      ".mov"
-    ) ||
-    lowerSource.endsWith(
-      ".m4v"
-    ) ||
-    lowerSource.endsWith(
-      ".webm"
-    ) ||
-    lowerSource.endsWith(
-      ".avi"
-    ) ||
-    lowerSource.endsWith(
-      ".mkv"
-    )
-  ) {
-    return trimmedSource;
-  }
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | Build transformed URL
-  |--------------------------------------------------------------------------
-  */
-
-  try {
-    const url =
-      new URL(
-        trimmedSource
-      );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Convert:
-    |
-    | /storage/v1/object/public/
-    |
-    | into:
-    |
-    | /storage/v1/render/image/public/
-    |--------------------------------------------------------------------------
-    */
-
-    url.pathname =
-      url.pathname.replace(
-        "/storage/v1/object/public/",
-        "/storage/v1/render/image/public/"
-      );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | WIDTH
-    |--------------------------------------------------------------------------
-    */
-
-    if (width) {
-      url.searchParams.set(
-        "width",
-        String(width)
-      );
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | HEIGHT
-    |--------------------------------------------------------------------------
-    */
-
-    if (height) {
-      url.searchParams.set(
-        "height",
-        String(height)
-      );
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | RESIZE MODE
-    |--------------------------------------------------------------------------
-    */
-
-    if (resize) {
-      url.searchParams.set(
-        "resize",
-        resize
-      );
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | QUALITY
-    |--------------------------------------------------------------------------
-    */
-
-    if (quality) {
-      url.searchParams.set(
-        "quality",
-        String(quality)
-      );
-    }
-
-
-    return url.toString();
-
-  } catch {
-    /*
-    |--------------------------------------------------------------------------
-    | Fail-safe behavior
-    |--------------------------------------------------------------------------
-    |
-    | If an unusual URL cannot be parsed, return the original URL rather
-    | than breaking the page.
-    |--------------------------------------------------------------------------
-    */
-
-    return trimmedSource;
-  }
+  return source.trim();
 }
 
 
@@ -252,13 +99,10 @@ export function getSupabaseImageUrl(
 | GALLERY THUMBNAIL
 |--------------------------------------------------------------------------
 |
-| Primary thumbnail helper for Gallery-style displays.
+| Kept as a separate named helper for compatibility with existing
+| Gallery components.
 |
-| Existing Gallery components that already use:
-|
-|     getGalleryThumbnailUrl()
-|
-| continue working.
+| R2 images are already optimized during migration/upload.
 |
 |--------------------------------------------------------------------------
 */
@@ -285,8 +129,6 @@ export function getGalleryThumbnailUrl(
 | Kept as a separate named helper for compatibility with existing
 | components that already use getGalleryImageUrl().
 |
-| It intentionally uses the same global Gallery thumbnail behavior.
-|
 |--------------------------------------------------------------------------
 */
 
@@ -305,6 +147,10 @@ export function getGalleryImageUrl(
 |--------------------------------------------------------------------------
 |
 | General-purpose image delivery for cards and previews.
+|
+| The sizing arguments are intentionally retained for API compatibility,
+| but R2 currently receives the already-optimized stored image directly.
+|
 |--------------------------------------------------------------------------
 */
 
@@ -334,6 +180,7 @@ export function getCardImageUrl(
 | - small previews
 | - member cards
 | - other small image surfaces
+|
 |--------------------------------------------------------------------------
 */
 
@@ -357,13 +204,11 @@ export function getSmallImageUrl(
 | MEMORY GALAXY
 |--------------------------------------------------------------------------
 |
-| The existing Galaxy behavior is preserved:
+| Existing Galaxy behavior remains visually controlled by the component.
 |
-| 240 × 240
-| quality 70
-| cover
+| The helper no longer performs Supabase Image Transformation because
+| R2 does not use that endpoint.
 |
-| We are not visually changing the Galaxy.
 |--------------------------------------------------------------------------
 */
 
@@ -393,7 +238,8 @@ export function getGalaxyImageUrl(
 | - lightbox
 | - larger preview
 |
-| The stored original is still not requested directly.
+| The stored R2 image is returned directly.
+|
 |--------------------------------------------------------------------------
 */
 
@@ -416,10 +262,10 @@ export function getDetailImageUrl(
 | GENERIC THUMBNAIL HELPER
 |--------------------------------------------------------------------------
 |
-| Useful for future components without creating another transformation
-| implementation.
+| Kept for compatibility with existing and future components.
 |
-| The caller can optionally provide a specific width/height.
+| R2 currently serves the already-optimized stored image directly.
+|
 |--------------------------------------------------------------------------
 */
 
