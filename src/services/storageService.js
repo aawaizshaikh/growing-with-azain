@@ -1,11 +1,9 @@
 /*
 |--------------------------------------------------------------------------
-| GLOBAL IMAGE UPLOAD OPTIMIZATION
+| GLOBAL IMAGE UPLOAD OPTIMIZATION + R2 THUMBNAILS
 |--------------------------------------------------------------------------
 |
-| This is the CENTRAL image-upload layer for the application.
-|
-| Every Admin image upload that reaches uploadFile() is processed here.
+| This is the CENTRAL media-upload layer for the application.
 |
 | IMAGE:
 |
@@ -17,17 +15,27 @@
 |        ↓
 | Convert to WebP
 |        ↓
-| Upload optimized WebP to Cloudflare R2
+| Upload original optimized WebP to Cloudflare R2
+|        ↓
+| Generate 320px gallery thumbnail
+|        ↓
+| Upload thumbnail to R2 /thumbs/
 |
 | WebP:
+|
 |        ↓
-| Uploaded unchanged
+| Uploaded unchanged as original
+|        ↓
+| 320px gallery thumbnail generated
 |
 | VIDEO:
-|        ↓
-| Uploaded unchanged to Cloudflare R2.
 |
-| IMPORTANT:
+|        ↓
+| Uploaded unchanged to Cloudflare R2
+|
+|--------------------------------------------------------------------------
+| IMPORTANT
+|--------------------------------------------------------------------------
 |
 | This file does NOT change:
 |
@@ -37,6 +45,12 @@
 | - page design
 | - image placement
 | - video behavior
+| - video optimization
+| - existing R2 folder structure
+|
+| The URL returned by uploadFile() is ALWAYS the ORIGINAL R2 URL.
+|
+| The thumbnail is an additional R2 object and is NOT stored in D1.
 |
 |--------------------------------------------------------------------------
 */
@@ -68,13 +82,10 @@ const MAX_IMAGE_DIMENSION = 2400;
 
 /*
 |--------------------------------------------------------------------------
-| WebP quality.
+| Original WebP quality
+|--------------------------------------------------------------------------
 |
-| 0.84 provides a strong balance between:
-|
-| - visual quality
-| - file size
-| - photographic detail
+| Existing behavior preserved.
 |
 |--------------------------------------------------------------------------
 */
@@ -84,29 +95,77 @@ const WEBP_QUALITY = 0.84;
 
 /*
 |--------------------------------------------------------------------------
-| Supported raster image formats
+| Gallery thumbnail settings
 |--------------------------------------------------------------------------
 |
-| SVG is intentionally excluded.
+| The thumbnail is deliberately small because it is used only for:
 |
-| SVG → WebP would rasterize the vector artwork and could change the
-| appearance/behavior of existing illustrations.
+| - Gallery
+| - Memory Galaxy
+| - Gallery cards
+| - Other small image previews
 |
-| IMPORTANT:
+| The original image remains untouched and is used for:
 |
-| WebP is intentionally NOT included here.
-|
-| Existing WebP files are already optimized and should be uploaded
-| unchanged rather than being decoded and re-encoded again.
+| - Lightbox
+| - Detail view
+| - Full-size viewing
 |
 |--------------------------------------------------------------------------
 */
 
-const RASTER_IMAGE_TYPES = new Set([
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-]);
+const THUMBNAIL_MAX_DIMENSION = 320;
+
+const THUMBNAIL_WEBP_QUALITY = 0.78;
+
+
+/*
+|--------------------------------------------------------------------------
+| Supported raster image formats
+|--------------------------------------------------------------------------
+|
+| Existing upload behavior:
+|
+| JPG / JPEG / PNG
+|        ↓
+| optimized to WebP
+|
+| WebP:
+|        ↓
+| uploaded unchanged
+|
+| SVG is intentionally excluded.
+|
+|--------------------------------------------------------------------------
+*/
+
+const RASTER_IMAGE_TYPES =
+  new Set([
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+  ]);
+
+
+/*
+|--------------------------------------------------------------------------
+| Supported image types for thumbnails
+|--------------------------------------------------------------------------
+|
+| WebP is included ONLY for thumbnail generation.
+|
+| This does NOT change the existing original WebP upload behavior.
+|
+|--------------------------------------------------------------------------
+*/
+
+const THUMBNAIL_IMAGE_TYPES =
+  new Set([
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+  ]);
 
 
 /*
@@ -139,6 +198,37 @@ function createOptimizedFileName(
   return `${Date.now()}-${Math.random()
     .toString(36)
     .substring(2, 10)}-${baseName}.webp`;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Create thumbnail filename
+|--------------------------------------------------------------------------
+|
+| The thumbnail uses the SAME filename as the original.
+|
+| Example:
+|
+| original:
+|   123-photo.webp
+|
+| thumbnail:
+|   thumbs/123-photo.webp
+|
+|--------------------------------------------------------------------------
+*/
+
+function createThumbnailFileName(
+  originalFileName
+) {
+  const baseName =
+    originalFileName
+      ?.split("/")
+      .pop() ||
+    "image.webp";
+
+  return baseName;
 }
 
 
@@ -195,7 +285,8 @@ function loadImageFromFile(
 */
 
 function canvasToWebP(
-  canvas
+  canvas,
+  quality = WEBP_QUALITY
 ) {
   return new Promise(
     (resolve, reject) => {
@@ -214,7 +305,7 @@ function canvasToWebP(
           resolve(blob);
         },
         "image/webp",
-        WEBP_QUALITY
+        quality
       );
     }
   );
@@ -224,6 +315,17 @@ function canvasToWebP(
 /*
 |--------------------------------------------------------------------------
 | Optimize Image
+|--------------------------------------------------------------------------
+|
+| EXISTING ORIGINAL IMAGE PIPELINE.
+|
+| JPG / JPEG / PNG:
+|   → resize if required
+|   → WebP
+|
+| WebP:
+|   → untouched
+|
 |--------------------------------------------------------------------------
 */
 
@@ -237,7 +339,7 @@ async function optimizeImage(
 
   /*
   |--------------------------------------------------------------------------
-  | Only JPG/JPEG/PNG images enter the optimizer.
+  | Only JPG/JPEG/PNG images enter the ORIGINAL optimizer.
   |--------------------------------------------------------------------------
   */
 
@@ -313,7 +415,6 @@ async function optimizeImage(
           scale
       )
     );
-
 
   const height =
     Math.max(
@@ -401,7 +502,8 @@ async function optimizeImage(
 
   const webpBlob =
     await canvasToWebP(
-      canvas
+      canvas,
+      WEBP_QUALITY
     );
 
 
@@ -416,6 +518,223 @@ async function optimizeImage(
       webpBlob,
     ],
     createOptimizedFileName(
+      file.name
+    ),
+    {
+      type: "image/webp",
+      lastModified:
+        Date.now(),
+    }
+  );
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Create Gallery Thumbnail
+|--------------------------------------------------------------------------
+|
+| IMPORTANT:
+|
+| This function NEVER modifies the original uploaded file.
+|
+| It creates a completely separate 320px WebP object.
+|
+|--------------------------------------------------------------------------
+*/
+
+async function createGalleryThumbnail(
+  file
+) {
+  if (!file) {
+    return null;
+  }
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Only supported image formats receive thumbnails.
+  |--------------------------------------------------------------------------
+  |
+  | Videos are intentionally skipped.
+  |
+  |--------------------------------------------------------------------------
+  */
+
+  if (
+    !THUMBNAIL_IMAGE_TYPES.has(
+      file.type
+    )
+  ) {
+    return null;
+  }
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Decode image
+  |--------------------------------------------------------------------------
+  */
+
+  const image =
+    await loadImageFromFile(
+      file
+    );
+
+
+  const originalWidth =
+    image.naturalWidth ||
+    image.width;
+
+  const originalHeight =
+    image.naturalHeight ||
+    image.height;
+
+
+  if (
+    !originalWidth ||
+    !originalHeight
+  ) {
+    return null;
+  }
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Preserve aspect ratio
+  |--------------------------------------------------------------------------
+  |
+  | The longest side becomes 320px maximum.
+  |
+  | No cropping.
+  | No distortion.
+  |
+  |--------------------------------------------------------------------------
+  */
+
+  const longestSide =
+    Math.max(
+      originalWidth,
+      originalHeight
+    );
+
+  const scale =
+    Math.min(
+      1,
+      THUMBNAIL_MAX_DIMENSION /
+        longestSide
+    );
+
+
+  const width =
+    Math.max(
+      1,
+      Math.round(
+        originalWidth *
+          scale
+      )
+    );
+
+  const height =
+    Math.max(
+      1,
+      Math.round(
+        originalHeight *
+          scale
+      )
+    );
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Create thumbnail canvas
+  |--------------------------------------------------------------------------
+  */
+
+  const canvas =
+    document.createElement(
+      "canvas"
+    );
+
+  canvas.width =
+    width;
+
+  canvas.height =
+    height;
+
+
+  const context =
+    canvas.getContext(
+      "2d",
+      {
+        alpha: true,
+      }
+    );
+
+
+  if (!context) {
+    throw new Error(
+      "The browser could not create the gallery thumbnail."
+    );
+  }
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | High-quality thumbnail resizing
+  |--------------------------------------------------------------------------
+  */
+
+  context.imageSmoothingEnabled =
+    true;
+
+  context.imageSmoothingQuality =
+    "high";
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Draw image
+  |--------------------------------------------------------------------------
+  */
+
+  context.drawImage(
+    image,
+    0,
+    0,
+    width,
+    height
+  );
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Convert thumbnail to WebP
+  |--------------------------------------------------------------------------
+  */
+
+  const thumbnailBlob =
+    await canvasToWebP(
+      canvas,
+      THUMBNAIL_WEBP_QUALITY
+    );
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Create thumbnail File
+  |--------------------------------------------------------------------------
+  |
+  | Same filename as the original.
+  |
+  |--------------------------------------------------------------------------
+  */
+
+  return new File(
+    [
+      thumbnailBlob,
+    ],
+    createThumbnailFileName(
       file.name
     ),
     {
@@ -446,6 +765,104 @@ function buildR2UploadUrl(
     /\/+$/,
     ""
   )}/media/${filePath}`;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Upload object to R2
+|--------------------------------------------------------------------------
+|
+| Shared internal helper.
+|
+| This keeps the original upload logic and thumbnail upload logic
+| consistent without changing the public API.
+|
+|--------------------------------------------------------------------------
+*/
+
+async function uploadObjectToR2(
+  file,
+  filePath
+) {
+  const response =
+    await fetch(
+      buildR2UploadUrl(
+        filePath
+      ),
+      {
+        method:
+          "PUT",
+
+        headers: {
+          Authorization:
+            `Bearer ${MEDIA_API_KEY}`,
+
+          "Content-Type":
+            file?.type ||
+            "application/octet-stream",
+        },
+
+        body:
+          file,
+      }
+    );
+
+
+  if (!response.ok) {
+    let errorMessage =
+      `R2 upload failed (${response.status})`;
+
+    try {
+      const errorBody =
+        await response.text();
+
+      if (errorBody) {
+        errorMessage +=
+          `: ${errorBody}`;
+      }
+    } catch {
+      // Keep the original error message.
+    }
+
+    throw new Error(
+      errorMessage
+    );
+  }
+
+
+  return buildR2UploadUrl(
+    filePath
+  );
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Verify R2 object
+|--------------------------------------------------------------------------
+*/
+
+async function verifyR2Object(
+  filePath
+) {
+  const verifyResponse =
+    await fetch(
+      buildR2UploadUrl(
+        filePath
+      ),
+      {
+        method:
+          "HEAD",
+      }
+    );
+
+
+  if (!verifyResponse.ok) {
+    throw new Error(
+      `R2 upload verification failed (${verifyResponse.status})`
+    );
+  }
 }
 
 
@@ -482,6 +899,10 @@ export async function uploadFile(
   |--------------------------------------------------------------------------
   | IMAGE
   |--------------------------------------------------------------------------
+  |
+  | EXISTING behavior preserved.
+  |
+  |--------------------------------------------------------------------------
   */
 
   const isRasterImage =
@@ -489,6 +910,18 @@ export async function uploadFile(
       file.type
     );
 
+
+  const isImageForThumbnail =
+    THUMBNAIL_IMAGE_TYPES.has(
+      file.type
+    );
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Optimize original image
+  |--------------------------------------------------------------------------
+  */
 
   const fileToUpload =
     isRasterImage
@@ -573,87 +1006,99 @@ export async function uploadFile(
 
   /*
   |--------------------------------------------------------------------------
-  | Upload to Cloudflare R2 through Worker
-  |--------------------------------------------------------------------------
-  */
-
-  const response =
-    await fetch(
-      buildR2UploadUrl(
-        filePath
-      ),
-      {
-        method:
-          "PUT",
-
-        headers: {
-          Authorization:
-            `Bearer ${MEDIA_API_KEY}`,
-
-          "Content-Type":
-            fileToUpload.type ||
-            "application/octet-stream",
-        },
-
-        body:
-          fileToUpload,
-      }
-    );
-
-
-  if (!response.ok) {
-    let errorMessage =
-      `R2 upload failed (${response.status})`;
-
-    try {
-      const errorBody =
-        await response.text();
-
-      if (errorBody) {
-        errorMessage +=
-          `: ${errorBody}`;
-      }
-    } catch {
-      // Keep the original error message.
-    }
-
-    throw new Error(
-      errorMessage
-    );
-  }
-
-
-  /*
-  |--------------------------------------------------------------------------
-  | Verify successful upload
+  | Upload ORIGINAL to R2
   |--------------------------------------------------------------------------
   */
 
   const r2Url =
-    buildR2UploadUrl(
+    await uploadObjectToR2(
+      fileToUpload,
       filePath
     );
 
-  const verifyResponse =
-    await fetch(
-      r2Url,
-      {
-        method:
-          "HEAD",
+
+  /*
+  |--------------------------------------------------------------------------
+  | Verify ORIGINAL upload
+  |--------------------------------------------------------------------------
+  */
+
+  await verifyR2Object(
+    filePath
+  );
+
+
+  /*
+  |--------------------------------------------------------------------------
+  | Generate + upload GALLERY THUMBNAIL
+  |--------------------------------------------------------------------------
+  |
+  | Only images receive thumbnails.
+  |
+  | Videos are completely unchanged.
+  |
+  |--------------------------------------------------------------------------
+  */
+
+  if (
+    isImageForThumbnail
+  ) {
+    try {
+      const thumbnail =
+        await createGalleryThumbnail(
+          fileToUpload
+        );
+
+
+      if (thumbnail) {
+        const thumbnailPath =
+          `${r2Folder}/thumbs/${filename}`;
+
+
+        await uploadObjectToR2(
+          thumbnail,
+          thumbnailPath
+        );
+
+
+        await verifyR2Object(
+          thumbnailPath
+        );
       }
-    );
+    } catch (thumbnailError) {
+      /*
+      |--------------------------------------------------------------------------
+      | IMPORTANT SAFETY BEHAVIOR
+      |--------------------------------------------------------------------------
+      |
+      | The ORIGINAL upload has already succeeded.
+      |
+      | Do not delete or invalidate the original because thumbnail creation
+      | failed.
+      |
+      | Log the thumbnail failure so it can be generated later by the
+      | dedicated R2 thumbnail-generation script.
+      |
+      |--------------------------------------------------------------------------
+      */
 
-
-  if (!verifyResponse.ok) {
-    throw new Error(
-      `R2 upload verification failed (${verifyResponse.status})`
-    );
+      console.error(
+        "R2 gallery thumbnail generation/upload failed:",
+        thumbnailError
+      );
+    }
   }
 
 
   /*
   |--------------------------------------------------------------------------
-  | Return R2 public Worker URL
+  | Return ORIGINAL R2 public Worker URL
+  |--------------------------------------------------------------------------
+  |
+  | D1 continues storing this URL.
+  |
+  | The thumbnail URL is NEVER returned.
+  |
   |--------------------------------------------------------------------------
   */
 
@@ -708,9 +1153,19 @@ export async function uploadMultiple(
 | Delete File
 |--------------------------------------------------------------------------
 |
-| All application media is now stored in Cloudflare R2.
+| All application media is stored in Cloudflare R2.
 |
 | R2 objects are deleted through the Cloudflare Media Worker.
+|
+| IMAGE:
+|
+|   original
+|      +
+|   gallery thumbnail
+|
+| VIDEO:
+|
+|   video only
 |
 |--------------------------------------------------------------------------
 */
@@ -747,25 +1202,30 @@ export async function deleteFile(
       );
     }
 
+
     try {
       const url =
         new URL(
           publicUrl
         );
 
+
       const mediaMarker =
         "/media/";
+
 
       const markerIndex =
         url.pathname.indexOf(
           mediaMarker
         );
 
+
       if (
         markerIndex === -1
       ) {
         return;
       }
+
 
       const filePath =
         url.pathname
@@ -784,14 +1244,23 @@ export async function deleteFile(
           )
           .join("/");
 
+
       if (!filePath) {
         return;
       }
+
+
+      /*
+      |--------------------------------------------------------------------------
+      | Delete ORIGINAL
+      |--------------------------------------------------------------------------
+      */
 
       const deleteUrl =
         buildR2UploadUrl(
           filePath
         );
+
 
       const response =
         await fetch(
@@ -806,6 +1275,7 @@ export async function deleteFile(
             },
           }
         );
+
 
       if (!response.ok) {
         let errorMessage =
@@ -828,13 +1298,131 @@ export async function deleteFile(
         );
       }
 
+
+      /*
+      |--------------------------------------------------------------------------
+      | Delete associated gallery thumbnail
+      |--------------------------------------------------------------------------
+      |
+      | Only image originals have thumbnails.
+      |
+      | Video deletion remains unchanged.
+      |
+      |--------------------------------------------------------------------------
+      */
+
+      const lowerPath =
+        filePath.toLowerCase();
+
+
+      const isImageFile =
+        lowerPath.endsWith(
+          ".webp"
+        ) ||
+        lowerPath.endsWith(
+          ".jpg"
+        ) ||
+        lowerPath.endsWith(
+          ".jpeg"
+        ) ||
+        lowerPath.endsWith(
+          ".png"
+        );
+
+
+      if (
+        isImageFile
+      ) {
+        const lastSlash =
+          filePath.lastIndexOf(
+            "/"
+          );
+
+
+        if (
+          lastSlash !== -1
+        ) {
+          const directory =
+            filePath.substring(
+              0,
+              lastSlash
+            );
+
+          const fileName =
+            filePath.substring(
+              lastSlash + 1
+            );
+
+
+          const thumbnailPath =
+            `${directory}/thumbs/${fileName}`;
+
+
+          try {
+            const thumbnailDeleteResponse =
+              await fetch(
+                buildR2UploadUrl(
+                  thumbnailPath
+                ),
+                {
+                  method:
+                    "DELETE",
+
+                  headers: {
+                    Authorization:
+                      `Bearer ${MEDIA_API_KEY}`,
+                  },
+                }
+              );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Missing thumbnail must NOT break deletion.
+            |--------------------------------------------------------------------------
+            |
+            | Older images may not have thumbnails yet.
+            |
+            | The original has already been successfully deleted.
+            |
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+              !thumbnailDeleteResponse.ok &&
+              thumbnailDeleteResponse.status !==
+                404
+            ) {
+              console.warn(
+                `R2 thumbnail delete returned ${thumbnailDeleteResponse.status}: ${thumbnailPath}`
+              );
+            }
+          } catch (
+            thumbnailDeleteError
+          ) {
+            /*
+            |--------------------------------------------------------------------------
+            | Thumbnail deletion failure must not reverse successful
+            | original deletion.
+            |--------------------------------------------------------------------------
+            */
+
+            console.warn(
+              "R2 thumbnail delete failed:",
+              thumbnailDeleteError
+            );
+          }
+        }
+      }
     } catch (err) {
       console.error(
         "R2 delete failed:",
         err
       );
+
       throw err;
     }
+
 
     return;
   }
@@ -847,7 +1435,7 @@ export async function deleteFile(
   |
   | No Supabase Storage deletion is performed here.
   |
-  | The remaining 31 missing migration files are being handled separately.
+  | Legacy URLs are intentionally ignored.
   |
   |--------------------------------------------------------------------------
   */

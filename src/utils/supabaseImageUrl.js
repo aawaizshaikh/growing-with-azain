@@ -107,19 +107,83 @@ export function getSupabaseImageUrl(
 |--------------------------------------------------------------------------
 */
 
-export function getGalleryThumbnailUrl(
-  source
-) {
-  return getSupabaseImageUrl(
-    source,
-    {
-      width: 600,
-      quality: 75,
-      resize: "contain",
-    }
-  );
-}
+export function getGalleryThumbnailUrl(source) {
+  if (
+    typeof source !== "string" ||
+    !source.trim()
+  ) {
+    return source || "";
+  }
 
+  const value = source.trim();
+
+  /*
+   * Only transform URLs served by our R2 Media Worker.
+   * Any other URL is returned unchanged.
+   */
+  if (!value.includes("/media/")) {
+    return value;
+  }
+
+  try {
+    const url = new URL(value);
+
+    const marker = "/media/";
+    const markerIndex =
+      url.pathname.indexOf(marker);
+
+    if (markerIndex === -1) {
+      return value;
+    }
+
+    const key =
+      url.pathname.substring(
+        markerIndex + marker.length
+      );
+
+    if (!key) {
+      return value;
+    }
+
+    const lastSlash =
+      key.lastIndexOf("/");
+
+    const directory =
+      lastSlash >= 0
+        ? key.substring(0, lastSlash)
+        : "";
+
+    const filename =
+      lastSlash >= 0
+        ? key.substring(lastSlash + 1)
+        : key;
+
+    if (!filename) {
+      return value;
+    }
+
+    /*
+     * Example:
+     *
+     * /media/memories/birthday/gallery/photo.webp
+     *
+     * becomes:
+     *
+     * /media/memories/birthday/gallery/thumbs/photo.webp
+     */
+    const thumbnailKey =
+      directory
+        ? `${directory}/thumbs/${filename}`
+        : `thumbs/${filename}`;
+
+    url.pathname =
+      `${marker}${thumbnailKey}`;
+
+    return url.toString();
+  } catch {
+    return value;
+  }
+}
 
 /*
 |--------------------------------------------------------------------------

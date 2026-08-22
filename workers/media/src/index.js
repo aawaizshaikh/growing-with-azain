@@ -854,7 +854,12 @@ function buildObjectHeaders(
     ] =
       object.httpMetadata
         .cacheControl;
-  }
+  } else {
+  headers[
+    "Cache-Control"
+  ] =
+    "public, max-age=31536000, immutable";
+}
 
   if (
     object.httpMetadata

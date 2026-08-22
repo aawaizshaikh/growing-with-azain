@@ -88,7 +88,72 @@ function getGalleryImageSource(source) {
     return null;
   }
 
-  return source.trim();
+  const value = source.trim();
+
+  /*
+   * R2 Gallery thumbnails are derived from the
+   * original R2 Media Worker URL.
+   *
+   * Original:
+   * /media/.../photo.webp
+   *
+   * Gallery:
+   * /media/.../thumbs/photo.webp
+   */
+
+  if (!value.includes("/media/")) {
+    return value;
+  }
+
+  try {
+    const url = new URL(value);
+
+    const marker = "/media/";
+    const markerIndex =
+      url.pathname.indexOf(marker);
+
+    if (markerIndex === -1) {
+      return value;
+    }
+
+    const key =
+      url.pathname.substring(
+        markerIndex + marker.length
+      );
+
+    if (!key) {
+      return value;
+    }
+
+    const lastSlash =
+      key.lastIndexOf("/");
+
+    const directory =
+      lastSlash >= 0
+        ? key.substring(0, lastSlash)
+        : "";
+
+    const filename =
+      lastSlash >= 0
+        ? key.substring(lastSlash + 1)
+        : key;
+
+    if (!filename) {
+      return value;
+    }
+
+    const thumbnailKey =
+      directory
+        ? `${directory}/thumbs/${filename}`
+        : `thumbs/${filename}`;
+
+    url.pathname =
+      `${marker}${thumbnailKey}`;
+
+    return url.toString();
+  } catch {
+    return value;
+  }
 }
 
 
@@ -501,7 +566,7 @@ function MemoryOrbitItem({
             src={videoSource}
             muted
             playsInline
-            preload="metadata"
+            preload="none"
             className="memory-galaxy-media"
             style={{
               display: "block",
@@ -641,8 +706,8 @@ export default function MemoryGalaxy({
   ====================================================
   */
 
-  const MEMORY_BATCH_SIZE = 100;
-  const MEMORY_BATCH_DELAY = 300;
+  const MEMORY_BATCH_SIZE = 200;
+  const MEMORY_BATCH_DELAY = 200;
 
   const [visibleMemoryCount, setVisibleMemoryCount] =
     useState(
