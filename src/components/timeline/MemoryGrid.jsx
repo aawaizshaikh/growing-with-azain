@@ -4,6 +4,8 @@ import MemoryCard from "./MemoryCard";
 export default function MemoryGrid({
   loading,
   memories,
+  book,
+  currentPage,
 }) {
   /* =====================================================
      LOADING
@@ -152,14 +154,16 @@ export default function MemoryGrid({
     >
       {memories.map((memory) => (
         <MemoryCard
-          key={
-            memory.id ||
-            memory.slug ||
-            memory.created_at ||
-            JSON.stringify(memory)
-          }
-          memory={memory}
-        />
+  key={
+    memory.id ||
+    memory.slug ||
+    memory.created_at ||
+    JSON.stringify(memory)
+  }
+  memory={memory}
+  book={book}
+  currentPage={currentPage}
+/>
       ))}
     </div>
   );

@@ -13,7 +13,7 @@ import azainPhoto from "../assets/images/azain.jpg";
 
 import nurseryRoom from "../assets/illustrations/about-nursery-room-background.webp";
 import nurseryBed from "../assets/illustrations/about-nursery-bed.webp";
-import nurseryRug from "../assets/illustrations/about-nursery-rug.webp";
+
 
 import memoryWall from "../assets/illustrations/about-memory-wall.webp";
 import woodenFrame from "../assets/illustrations/about-wooden-frame.webp";
@@ -468,12 +468,7 @@ export default function AboutAzain() {
           }}
         />
 
-        {/* Rug */}
-        <img
-          src={nurseryRug}
-          alt=""
-          className="absolute bottom-[-7%] left-1/2 w-[66%] max-w-[900px] -translate-x-1/2 opacity-80 pointer-events-none"
-        />
+        
 
         {/* Hero text */}
         <motion.div
@@ -894,16 +889,7 @@ export default function AboutAzain() {
           className="absolute inset-0 bg-[#17233C]/30"
         />
 
-        {/* Moon */}
-        <motion.img
-          src={moon}
-          alt=""
-          style={{
-            y: moonY,
-            opacity: nightOpacity,
-          }}
-          className="absolute right-[9%] top-[10%] z-20 w-[130px] sm:w-[180px] lg:w-[230px] drop-shadow-[0_0_30px_rgba(255,226,148,.35)]"
-        />
+        
 
         {/* Lamp */}
         <motion.img
@@ -1036,18 +1022,8 @@ export default function AboutAzain() {
               }}
             />
 
-            <motion.img
-              src={moon}
-              alt=""
-              className="pointer-events-none absolute right-[20%] top-[16%] w-[90px] sm:w-[125px] opacity-70"
-              animate={{
-                y: [-5, 5, -5],
-              }}
-              transition={{
-                duration: 6,
-                repeat: Infinity,
-              }}
-            />
+            
+            
           </motion.div>
         </div>
       </section>

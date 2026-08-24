@@ -964,7 +964,7 @@ export default {
             await selectAll(
               env,
               "timeline",
-              "date DESC"
+              "date ASC"
             );
 
           return jsonResponse(
@@ -1140,7 +1140,7 @@ export default {
             await selectAll(
               env,
               "milestones",
-              "date DESC"
+              "date ASC"
             );
 
           return jsonResponse(

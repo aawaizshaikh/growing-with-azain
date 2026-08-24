@@ -7,6 +7,7 @@ import React, {
 import {
   useNavigate,
   useParams,
+  useSearchParams,
 } from "react-router-dom";
 
 import {
@@ -276,6 +277,13 @@ COMPONENT
 export default function MemoryDetails() {
   const navigate = useNavigate();
   const { slug } = useParams();
+  const [searchParams] = useSearchParams();
+
+  const returnBook =
+    searchParams.get("returnBook");
+
+  const returnPage =
+    searchParams.get("returnPage");
 
   /*
   =====================================================
@@ -917,11 +925,19 @@ export default function MemoryDetails() {
 
           <button
             type="button"
-            onClick={() =>
-              navigate(
-                "/timeline"
-              )
-            }
+           onClick={() => {
+  if (returnBook) {
+    navigate(
+      `/timeline?book=${encodeURIComponent(
+        returnBook
+      )}&page=${encodeURIComponent(
+        returnPage || "1"
+      )}`
+    );
+  } else {
+    navigate("/timeline");
+  }
+}}
             className="
               mt-6
               px-6
@@ -1028,11 +1044,19 @@ export default function MemoryDetails() {
 
         <button
           type="button"
-          onClick={() =>
-            navigate(
-              "/timeline"
-            )
-          }
+         onClick={() => {
+  if (returnBook) {
+    navigate(
+      `/timeline?book=${encodeURIComponent(
+        returnBook
+      )}&page=${encodeURIComponent(
+        returnPage || "1"
+      )}`
+    );
+  } else {
+    navigate("/timeline");
+  }
+}}
           aria-label="Back to Journey"
           style={{
             position:
@@ -1863,10 +1887,14 @@ export default function MemoryDetails() {
             <button
               type="button"
               onClick={() =>
-                navigate(
-                  `/timeline/memory/${previousMemory.slug}`
-                )
-              }
+  navigate(
+    `/timeline/memory/${previousMemory.slug}?returnBook=${encodeURIComponent(
+      returnBook || ""
+    )}&returnPage=${encodeURIComponent(
+      returnPage || "1"
+    )}`
+  )
+}
               className="
                 px-5
                 py-2
@@ -1890,10 +1918,14 @@ export default function MemoryDetails() {
             <button
               type="button"
               onClick={() =>
-                navigate(
-                  `/timeline/memory/${nextMemory.slug}`
-                )
-              }
+  navigate(
+    `/timeline/memory/${nextMemory.slug}?returnBook=${encodeURIComponent(
+      returnBook || ""
+    )}&returnPage=${encodeURIComponent(
+      returnPage || "1"
+    )}`
+  )
+}
               className="
                 px-5
                 py-2

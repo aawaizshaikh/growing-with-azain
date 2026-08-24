@@ -7,6 +7,8 @@ import {
 
 export default function MemoryCard({
   memory,
+  book,
+  currentPage,
 }) {
   const navigate =
     useNavigate();
@@ -63,11 +65,12 @@ export default function MemoryCard({
   */
 
   function openMemory() {
-    navigate(
-      `/timeline/memory/${memory.slug}`
-    );
-  }
-
+  navigate(
+    `/timeline/memory/${memory.slug}?returnBook=${encodeURIComponent(
+      book.slug
+    )}&returnPage=${currentPage}`
+  );
+}
 
   /*
   =====================================================

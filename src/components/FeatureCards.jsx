@@ -65,7 +65,7 @@ const cards = [
     subtitle: "Messages from Mommy & Daddy.",
     color: "#FBF2DA",
     icon: <MdOutlineMailOutline size={42} />,
-    path: "/about",
+    path: "/letters",
   },
 
 ];

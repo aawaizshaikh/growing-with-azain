@@ -14,6 +14,7 @@ import MilestoneMemory from "./pages/MilestoneMemory";
 
 import Gallery from "./pages/Gallery";
 import AboutAzain from "./pages/AboutAzain";
+import ScrollToTop from "./components/ScrollToTop";
 
 import FavoriteSongs from "./pages/FavoriteSongs";
 import FavoriteSongMemory from "./pages/FavoriteSongMemory";
@@ -72,6 +73,7 @@ import ProtectedRoute from "./components/admin/ProtectedRoute";
 export default function App() {
   return (
     <BrowserRouter>
+    <ScrollToTop />
 
       <Routes>
 

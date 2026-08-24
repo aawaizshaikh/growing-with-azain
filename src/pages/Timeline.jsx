@@ -4,7 +4,10 @@ import React, {
   useState,
 } from "react";
 
-import { useNavigate } from "react-router-dom";
+import {
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 
 import books from "../components/timeline/books";
 
@@ -284,6 +287,8 @@ const SCENE_LAYOUT = {
 
 export default function Timeline() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] =
+    useSearchParams();
 
   /*
   ===================================================
@@ -300,8 +305,38 @@ export default function Timeline() {
   const [memories, setMemories] =
     useState([]);
 
-  const [selectedBook, setSelectedBook] =
-    useState(books[0]);
+  const initialBookSlug =
+  searchParams.get("book");
+
+const initialBook =
+  books.find(
+    (book) => book.slug === initialBookSlug
+  ) || books[0];
+
+const initialPage = Math.max(
+  1,
+  Number(searchParams.get("page")) || 1
+);
+
+const [selectedBook, setSelectedBook] =
+  useState(initialBook);
+
+const [selectedPage, setSelectedPage] =
+  useState(initialPage);
+  useEffect(() => {
+  const params = new URLSearchParams();
+
+  params.set("book", selectedBook.slug);
+  params.set("page", String(selectedPage));
+
+  setSearchParams(params, {
+    replace: true,
+  });
+}, [
+  selectedBook.slug,
+  selectedPage,
+  setSearchParams,
+]);
 
   /*
   ===================================================
@@ -424,9 +459,14 @@ export default function Timeline() {
     async function loadMemories() {
       try {
         const data =
-          await getTimelineMemories();
+  await getTimelineMemories();
 
-        setMemories(data || []);
+const sortedMemories = [...(data || [])].sort(
+  (a, b) =>
+    new Date(a.date) - new Date(b.date)
+);
+
+setMemories(sortedMemories);
       } catch (err) {
         console.error(err);
       } finally {
@@ -710,9 +750,10 @@ export default function Timeline() {
             selectedBook={
               selectedBook
             }
-            onSelectBook={
-              setSelectedBook
-            }
+            onSelectBook={(book) => {
+  setSelectedBook(book);
+  setSelectedPage(1);
+}}
           />
         </div>
 
@@ -751,12 +792,14 @@ export default function Timeline() {
           }}
         >
           <ChapterSection
-            loading={loading}
-            book={selectedBook}
-            memories={
-              selectedMemories
-            }
-          />
+  loading={loading}
+  book={selectedBook}
+  memories={
+    selectedMemories
+  }
+  currentPage={selectedPage}
+  onPageChange={setSelectedPage}
+/>
         </div>
 
         {/*

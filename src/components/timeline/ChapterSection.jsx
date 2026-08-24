@@ -50,8 +50,10 @@ export default function ChapterSection({
   loading,
   book,
   memories,
+  currentPage,
+  onPageChange,
 }) {
-  const [currentPage, setCurrentPage] = useState(1);
+ 
 
   const filteredMemories = memories || [];
 
@@ -67,17 +69,28 @@ export default function ChapterSection({
     currentPage * MEMORIES_PER_PAGE
   );
 
-  /* Reset pagination whenever another book is selected. */
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [book?.slug]);
-
+  
+  
   /* Keep the current page valid if the memory count changes. */
   useEffect(() => {
-    setCurrentPage((page) =>
-      Math.min(Math.max(page, 1), totalPages)
-    );
-  }, [totalPages]);
+  if (loading) {
+    return;
+  }
+
+  const validPage = Math.min(
+    Math.max(currentPage, 1),
+    totalPages
+  );
+
+  if (validPage !== currentPage) {
+    onPageChange(validPage);
+  }
+}, [
+  loading,
+  currentPage,
+  totalPages,
+  onPageChange,
+]);
 
   /*
   =====================================================
@@ -116,11 +129,11 @@ export default function ChapterSection({
     );
   }, [currentPage, totalPages]);
 
-  function goToPage(page) {
-    setCurrentPage(
-      Math.min(Math.max(page, 1), totalPages)
-    );
-  }
+ function goToPage(page) {
+  onPageChange(
+    Math.min(Math.max(page, 1), totalPages)
+  );
+}
 
   const firstVisiblePage = visiblePages[0];
   const lastVisiblePage =
@@ -173,9 +186,11 @@ export default function ChapterSection({
           existing one-row design remains unchanged.
           ===================================================== */}
       <MemoryGrid
-        loading={loading}
-        memories={paginatedMemories}
-      />
+  loading={loading}
+  memories={paginatedMemories}
+  book={book}
+  currentPage={currentPage}
+/>
 
       {/* =====================================================
           PAGINATION
