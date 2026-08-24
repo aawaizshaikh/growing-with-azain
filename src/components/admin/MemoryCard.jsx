@@ -6,7 +6,7 @@ import {
   FaCalendarAlt,
 } from "react-icons/fa";
 
-import { getCardImageUrl } from "../../utils/supabaseImageUrl";
+import { getCardImageUrl } from "../../utils/r2ImageUrl";
 
 export default function MemoryCard({
   memory,

@@ -65,10 +65,12 @@
 const MEDIA_WORKER_URL =
   import.meta.env.VITE_MEDIA_WORKER_URL ||
   "";
+function getAdminToken() {
+  return localStorage.getItem(
+    "azain_admin_token"
+  ) || "";
+}
 
-const MEDIA_API_KEY =
-  import.meta.env.VITE_MEDIA_API_KEY ||
-  "";
 
 
 /*
@@ -796,7 +798,7 @@ async function uploadObjectToR2(
 
         headers: {
           Authorization:
-            `Bearer ${MEDIA_API_KEY}`,
+            `Bearer ${getAdminToken()}`,
 
           "Content-Type":
             file?.type ||
@@ -888,11 +890,11 @@ export async function uploadFile(
   |--------------------------------------------------------------------------
   */
 
-  if (!MEDIA_API_KEY) {
-    throw new Error(
-      "VITE_MEDIA_API_KEY is not configured."
-    );
-  }
+ if (!getAdminToken()) {
+  throw new Error(
+    "Admin authentication is required for R2 deletion."
+  );
+}
 
 
   /*
@@ -1196,11 +1198,11 @@ export async function deleteFile(
       "/media/"
     )
   ) {
-    if (!MEDIA_API_KEY) {
-      throw new Error(
-        "VITE_MEDIA_API_KEY is not configured."
-      );
-    }
+    if (!getAdminToken()) {
+  throw new Error(
+    "Admin authentication is required for R2 deletion."
+  );
+}
 
 
     try {
@@ -1271,7 +1273,7 @@ export async function deleteFile(
 
             headers: {
               Authorization:
-                `Bearer ${MEDIA_API_KEY}`,
+                `Bearer ${getAdminToken()}`,
             },
           }
         );
@@ -1370,7 +1372,7 @@ export async function deleteFile(
 
                   headers: {
                     Authorization:
-                      `Bearer ${MEDIA_API_KEY}`,
+                      `Bearer ${getAdminToken()}`,
                   },
                 }
               );

@@ -12,6 +12,7 @@ import {
 import {
   uploadFile,
   uploadMultiple,
+  deleteFile,
 } from "../../services/storageService";
 
 export default function EditFavoriteSong() {
@@ -56,12 +57,16 @@ export default function EditFavoriteSong() {
       let coverImage = song.cover_image;
       let galleryImages = song.gallery_images || [];
 
+      let newCoverImage = null;
+
       // Upload new cover image
       if (formData.coverImage) {
-        coverImage = await uploadFile(
+        newCoverImage = await uploadFile(
           formData.coverImage,
           folderName
         );
+
+        coverImage = newCoverImage;
       }
 
       // Upload new gallery images
@@ -78,6 +83,88 @@ export default function EditFavoriteSong() {
           ...galleryImages,
           ...uploaded,
         ];
+      }
+
+      /*
+      ============================================================
+      DELETE OLD COVER AFTER NEW COVER UPLOAD
+      ============================================================
+      */
+
+      if (
+        newCoverImage &&
+        song.cover_image &&
+        song.cover_image !== newCoverImage
+      ) {
+        try {
+          await deleteFile(
+            song.cover_image,
+            "timeline"
+          );
+        } catch (deleteError) {
+          /*
+          --------------------------------------------------------
+          Roll back the newly uploaded cover if the old cover
+          could not be deleted.
+          --------------------------------------------------------
+          */
+
+          try {
+            await deleteFile(
+              newCoverImage,
+              "timeline"
+            );
+          } catch (rollbackError) {
+            console.error(
+              "Failed to rollback new cover:",
+              rollbackError
+            );
+          }
+
+          throw deleteError;
+        }
+      }
+
+      /*
+      ============================================================
+      DELETE EXISTING COVER REMOVED BY ADMIN
+      ============================================================
+      */
+
+      if (
+        formData.removedCover &&
+        formData.removedCover === song.cover_image &&
+        !newCoverImage
+      ) {
+        await deleteFile(
+          formData.removedCover,
+          "timeline"
+        );
+
+        coverImage = null;
+      }
+
+      /*
+      ============================================================
+      DELETE EXISTING GALLERY MEDIA REMOVED BY ADMIN
+      ============================================================
+      */
+
+      if (
+        formData.removedGallery &&
+        formData.removedGallery.length > 0
+      ) {
+        for (const removedFile of formData.removedGallery) {
+          await deleteFile(
+            removedFile,
+            "timeline"
+          );
+        }
+
+        galleryImages = galleryImages.filter(
+          (url) =>
+            !formData.removedGallery.includes(url)
+        );
       }
 
       await updateFavoriteSong(id, {

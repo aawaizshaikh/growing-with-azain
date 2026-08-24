@@ -17,9 +17,11 @@
  *
  * PUT and DELETE require:
  *
- *   Authorization: Bearer <SUPABASE_ACCESS_TOKEN>
+ *   Authorization: Bearer <AZAIN_ADMIN_TOKEN>
  *
- * The Supabase access token is validated by Supabase Auth.
+ * The AZAIN admin token is issued by the API Worker and
+ * validated locally using AUTH_SECRET.
+ * No external authentication provider is used.
  *
  * IMPORTANT:
  * - No R2 credentials are exposed to the browser.
@@ -185,10 +187,6 @@ export default {
        * ------------------------------------------------------------
        * GET
        * ------------------------------------------------------------
-       *
-       * Retrieves an object from R2.
-       *
-       * Range requests are passed through so videos can seek/stream.
        */
 
       if (
@@ -224,17 +222,6 @@ export default {
        * ------------------------------------------------------------
        * WRITE AUTHENTICATION
        * ------------------------------------------------------------
-       *
-       * PUT and DELETE are protected by the existing Supabase
-       * authenticated session.
-       *
-       * The browser sends the Supabase access token.
-       *
-       * The Worker validates that token against Supabase Auth.
-       *
-       * The old MEDIA_API_KEY is also accepted temporarily so that
-       * existing infrastructure tests continue to work while the
-       * frontend authentication transition is completed.
        */
 
       if (
@@ -385,11 +372,6 @@ async function handleGet(
     );
   }
 
-  /*
-   * If R2 returns no body because a conditional request failed,
-   * return 304/412 appropriately.
-   */
-
   if (!object.body) {
     const status =
       object.httpEtag
@@ -516,13 +498,6 @@ async function handlePut(
       contentDisposition;
   }
 
-  /*
-   * Do not buffer the file in Worker memory.
-   *
-   * request.body is passed directly to R2.
-   * This is particularly important for video uploads.
-   */
-
   const uploadedObject =
     await bucket.put(
       key,
@@ -531,10 +506,6 @@ async function handlePut(
         httpMetadata,
       }
     );
-
-  /*
-   * R2 returns an object with an ETag after successful upload.
-   */
 
   return jsonResponse(
     {
@@ -601,26 +572,65 @@ async function handleDelete(
  * AUTHORIZATION
  * ================================================================
  *
- * PRIMARY AUTHENTICATION:
+ * AZAIN ADMIN TOKEN AUTHENTICATION
  *
- *   Supabase access token
+ * The API Worker issues the admin token after successful login.
  *
- * The browser already has this token because the user is logged
- * into the existing AZAIN Supabase application.
+ * Token format:
  *
- * The Worker validates the token by calling:
+ *   <base64url(payload)>.<base64url(HMAC-SHA256 signature)>
  *
- *   Supabase Auth /user
+ * Payload:
  *
- * with:
+ *   {
+ *     email: "...",
+ *     exp: 1234567890
+ *   }
  *
- *   Authorization: Bearer <access token>
- *   apikey: <Supabase publishable key>
+ * The Media Worker verifies the exact same token format using
+ * AUTH_SECRET and ADMIN_EMAIL.
  *
- * The existing MEDIA_API_KEY is retained as a temporary fallback
- * so the infrastructure can still be tested with the existing
- * PowerShell method while we complete the frontend transition.
+ * No external authentication provider is used.
  */
+
+function base64UrlEncode(value) {
+  const bytes =
+    typeof value === "string"
+      ? new TextEncoder().encode(value)
+      : value;
+
+  let binary = "";
+
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+
+  return btoa(binary)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
+function base64UrlDecode(value) {
+  const padded =
+    value
+      .replace(/-/g, "+")
+      .replace(/_/g, "/") +
+    "=".repeat(
+      (4 - (value.length % 4)) % 4
+    );
+
+  const binary = atob(padded);
+
+  const bytes =
+    Uint8Array.from(
+      binary,
+      (char) =>
+        char.charCodeAt(0)
+    );
+
+  return new TextDecoder().decode(bytes);
+}
 
 async function isAuthorized(
   request,
@@ -631,172 +641,109 @@ async function isAuthorized(
       "Authorization"
     );
 
-  if (!authorization) {
-    return false;
-  }
-
-  const prefix =
-    "Bearer ";
-
   if (
+    !authorization ||
     !authorization.startsWith(
-      prefix
+      "Bearer "
     )
   ) {
     return false;
   }
 
-  const suppliedToken =
-    authorization
-      .slice(
-        prefix.length
-      )
-      .trim();
-
-  if (!suppliedToken) {
-    return false;
-  }
-
-
-  /*
-   * ------------------------------------------------------------
-   * TEMPORARY LEGACY MEDIA_API_KEY SUPPORT
-   * ------------------------------------------------------------
-   *
-   * This keeps the existing PowerShell infrastructure test working.
-   *
-   * It can be removed after the frontend has been successfully
-   * tested with Supabase authentication.
-   */
-
-  if (
-    env.MEDIA_API_KEY
-  ) {
-    const expectedKey =
-      String(
-        env.MEDIA_API_KEY
-      ).trim();
-
-    if (
-      expectedKey &&
-      timingSafeEqual(
-        suppliedToken,
-        expectedKey
-      )
-    ) {
-      return true;
-    }
-  }
-
-
-  /*
-   * ------------------------------------------------------------
-   * SUPABASE AUTHENTICATION
-   * ------------------------------------------------------------
-   */
-
-  if (
-    !env.SUPABASE_URL ||
-    !env.SUPABASE_PUBLISHABLE_KEY
-  ) {
-    console.error(
-      "SUPABASE_URL or SUPABASE_PUBLISHABLE_KEY Worker variable is not configured."
+  const token =
+    authorization.substring(
+      "Bearer ".length
     );
 
+  const parts =
+    token.split(".");
+
+  if (parts.length !== 2) {
     return false;
   }
 
+  const [
+    encodedPayload,
+    encodedSignature,
+  ] = parts;
+
   try {
-    const response =
-      await fetch(
-        `${String(
-          env.SUPABASE_URL
-        ).replace(
-          /\/+$/,
-          ""
-        )}/auth/v1/user`,
-        {
-          method:
-            "GET",
-
-          headers: {
-            Authorization:
-              `Bearer ${suppliedToken}`,
-
-            apikey:
-              String(
-                env.SUPABASE_PUBLISHABLE_KEY
-              ),
-          },
-        }
+    const payload =
+      JSON.parse(
+        base64UrlDecode(
+          encodedPayload
+        )
       );
 
     if (
-      !response.ok
+      !payload.email ||
+      !payload.exp ||
+      payload.exp <
+        Math.floor(
+          Date.now() / 1000
+        )
     ) {
       return false;
     }
 
-    const user =
-      await response.json();
+    if (
+      payload.email !==
+      env.ADMIN_EMAIL
+    ) {
+      return false;
+    }
 
-    /*
-     * A valid Supabase access token must resolve to a user.
-     */
+    const key =
+      await crypto.subtle.importKey(
+        "raw",
+        new TextEncoder().encode(
+          env.AUTH_SECRET
+        ),
+        {
+          name: "HMAC",
+          hash: "SHA-256",
+        },
+        false,
+        ["verify"]
+      );
 
-    return Boolean(
-      user?.id
-    );
-  } catch (error) {
-    console.error(
-      "Supabase token validation failed:",
-      error
-    );
+    const paddedSignature =
+      encodedSignature
+        .replace(/-/g, "+")
+        .replace(/_/g, "/") +
+      "=".repeat(
+        (4 -
+          (encodedSignature.length %
+            4)) %
+          4
+      );
 
+    const binarySignature =
+      atob(
+        paddedSignature
+      );
+
+    const signature =
+      Uint8Array.from(
+        binarySignature,
+        (char) =>
+          char.charCodeAt(0)
+      );
+
+    const valid =
+      await crypto.subtle.verify(
+        "HMAC",
+        key,
+        signature,
+        new TextEncoder().encode(
+          encodedPayload
+        )
+      );
+
+    return valid;
+  } catch {
     return false;
   }
-}
-
-
-/**
- * ================================================================
- * CONSTANT-TIME STRING COMPARISON
- * ================================================================
- */
-
-function timingSafeEqual(
-  a,
-  b
-) {
-  const encoder =
-    new TextEncoder();
-
-  const aBytes =
-    encoder.encode(a);
-
-  const bBytes =
-    encoder.encode(b);
-
-  if (
-    aBytes.length !==
-    bBytes.length
-  ) {
-    return false;
-  }
-
-  let result = 0;
-
-  for (
-    let i = 0;
-    i < aBytes.length;
-    i++
-  ) {
-    result |=
-      aBytes[i] ^
-      bBytes[i];
-  }
-
-  return result === 0;
 }
 
 
@@ -855,11 +802,11 @@ function buildObjectHeaders(
       object.httpMetadata
         .cacheControl;
   } else {
-  headers[
-    "Cache-Control"
-  ] =
-    "public, max-age=31536000, immutable";
-}
+    headers[
+      "Cache-Control"
+    ] =
+      "public, max-age=31536000, immutable";
+  }
 
   if (
     object.httpMetadata

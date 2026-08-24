@@ -9,7 +9,7 @@ import {
 
 import {
   getCardImageUrl,
-} from "../../utils/supabaseImageUrl";
+} from "../../utils/r2ImageUrl";
 
 import familyMembers from "../../data/familyMembers";
 

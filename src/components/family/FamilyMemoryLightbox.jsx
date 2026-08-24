@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { getDetailImageUrl } from "../../utils/supabaseImageUrl";
+import { getDetailImageUrl } from "../../utils/r2ImageUrl";
 
 /**
  * FamilyMemoryLightbox

@@ -8,8 +8,10 @@
 | Images are now stored in Cloudflare R2 and delivered through the
 | Cloudflare Media Worker.
 |
-| These helpers intentionally DO NOT perform any Supabase Storage
-| transformation.
+|| These helpers return and prepare URLs for Cloudflare R2 media
+| delivery without external storage transformation.
+- No Supabase Storage URL is generated.
+- No external storage URL is generated.
 |
 | The stored database URL is already the final media URL:
 |
@@ -21,7 +23,7 @@
 |
 | IMPORTANT:
 |
-| - Existing helper names are preserved for compatibility.
+|  Existing image helper interfaces are preserved where required.
 | - Existing component imports do not need to change.
 | - No image layout is changed.
 | - No image dimensions are changed here.
@@ -36,12 +38,13 @@
 |--------------------------------------------------------------------------
 | CORE IMAGE DELIVERY
 |--------------------------------------------------------------------------
+|| R2 does not require an external image transformation endpoint.
 |
-| R2 does not use the old Supabase:
+| Images migrated to R2 are already stored as optimized WebP files.
 |
-|     /storage/v1/render/image/public/
+| Therefore the correct behavior is simply:
 |
-| transformation endpoint.
+|     source URL → return unchanged
 |
 | Images migrated to R2 are already stored as optimized WebP files.
 |
@@ -55,7 +58,7 @@
 |--------------------------------------------------------------------------
 */
 
-export function getSupabaseImageUrl(
+export function getR2ImageUrl(
   source,
   {
     width,
@@ -221,7 +224,7 @@ export function getGalleryImageUrl(
 export function getCardImageUrl(
   source
 ) {
-  return getSupabaseImageUrl(
+  return getR2ImageUrl(
     source,
     {
       width: 600,
@@ -251,7 +254,7 @@ export function getCardImageUrl(
 export function getSmallImageUrl(
   source
 ) {
-  return getSupabaseImageUrl(
+  return getR2ImageUrl(
     source,
     {
       width: 400,
@@ -270,8 +273,8 @@ export function getSmallImageUrl(
 |
 | Existing Galaxy behavior remains visually controlled by the component.
 |
-| The helper no longer performs Supabase Image Transformation because
-| R2 does not use that endpoint.
+| | The helper returns the R2 media URL directly because image
+| optimization is handled before or during media delivery.
 |
 |--------------------------------------------------------------------------
 */
@@ -279,7 +282,7 @@ export function getSmallImageUrl(
 export function getGalaxyImageUrl(
   source
 ) {
-  return getSupabaseImageUrl(
+  return getR2ImageUrl(
     source,
     {
       width: 240,
@@ -310,7 +313,7 @@ export function getGalaxyImageUrl(
 export function getDetailImageUrl(
   source
 ) {
-  return getSupabaseImageUrl(
+  return getR2ImageUrl(
     source,
     {
       width: 1800,
@@ -342,7 +345,7 @@ export function getThumbnailImageUrl(
     resize = "contain",
   } = {}
 ) {
-  return getSupabaseImageUrl(
+  return getR2ImageUrl(
     source,
     {
       width,

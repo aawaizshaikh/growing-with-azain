@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import {
   getCardImageUrl,
-} from "../../utils/supabaseImageUrl";
+} from "../../utils/r2ImageUrl";
 
 export default function MemoryCard({
   memory,

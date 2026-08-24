@@ -23,7 +23,7 @@ import { isVideoMedia } from "../utils/mediaHelpers";
 import {
   getCardImageUrl,
   getDetailImageUrl,
-} from "../utils/supabaseImageUrl";
+} from "../utils/r2ImageUrl";
 
 
 /*

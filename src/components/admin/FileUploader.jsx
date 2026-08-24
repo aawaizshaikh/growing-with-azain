@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { isVideoMedia } from "../../utils/mediaHelpers";
-import { getCardImageUrl } from "../../utils/supabaseImageUrl";
+import { getCardImageUrl } from "../../utils/r2ImageUrl";
 
 export default function FileUploader({
   label = "Upload",

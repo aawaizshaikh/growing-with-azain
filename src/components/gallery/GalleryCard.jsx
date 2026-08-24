@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 import {
   getGalleryThumbnailUrl,
-} from "../../utils/supabaseImageUrl";
+} from "../../utils/r2ImageUrl";
 
 export default function GalleryCard({
   item,
@@ -77,7 +77,7 @@ export default function GalleryCard({
 
 import {
   getGalleryThumbnailUrl,
-} from "../../utils/supabaseImageUrl";
+} from "../../utils/r2ImageUrl";
 
 export default function GalleryCard({
   item,

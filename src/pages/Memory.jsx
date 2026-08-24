@@ -12,7 +12,7 @@ import { isVideoMedia } from "../utils/mediaHelpers";
 
 import {
   getCardImageUrl,
-} from "../utils/supabaseImageUrl";
+} from "../utils/r2ImageUrl";
 
 export default function Memory() {
   const navigate = useNavigate();

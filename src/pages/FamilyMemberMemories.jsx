@@ -29,7 +29,7 @@ import {
 import FamilyMemoryLightbox from "../components/family/FamilyMemoryLightbox";
 import {
   getGalaxyImageUrl,
-} from "../utils/supabaseImageUrl";
+} from "../utils/r2ImageUrl";
 
 /*
 ===============================================================================

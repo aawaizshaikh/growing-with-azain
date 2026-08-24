@@ -14,7 +14,7 @@ import {
 
 import {
   getDetailImageUrl,
-} from "../../utils/supabaseImageUrl";
+} from "../../utils/r2ImageUrl";
 
 export default function Lightbox({
   /*

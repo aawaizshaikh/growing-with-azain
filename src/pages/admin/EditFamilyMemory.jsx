@@ -21,7 +21,7 @@ import {
 
 import {
   getCardImageUrl,
-} from "../../utils/supabaseImageUrl";
+} from "../../utils/r2ImageUrl";
 
 /*
 ===============================================================================

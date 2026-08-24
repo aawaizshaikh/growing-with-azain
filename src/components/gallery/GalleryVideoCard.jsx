@@ -3,7 +3,7 @@ import { FaPlay } from "react-icons/fa";
 
 import {
   getGalleryThumbnailUrl,
-} from "../../utils/supabaseImageUrl";
+} from "../../utils/r2ImageUrl";
 
 export default function GalleryVideoCard({
   item,

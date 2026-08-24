@@ -17,7 +17,7 @@ import { isVideoMedia } from "../utils/mediaHelpers";
 import {
   getCardImageUrl,
   getDetailImageUrl,
-} from "../utils/supabaseImageUrl";
+} from "../utils/r2ImageUrl";
 
 import background from "../assets/illustrations/favsongs/favorite-song-memory-background.webp";
 
