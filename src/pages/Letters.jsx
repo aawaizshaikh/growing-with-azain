@@ -143,7 +143,7 @@ function PageHeading() {
         pointer-events-none
         left-1/2
         -translate-x-1/2
-        top-[10.5%]
+        top-[16.5%]
         w-[62%]
         text-center
       "
@@ -1285,6 +1285,34 @@ export default function Letters() {
             pointer-events-none
           "
         />
+                {/* ==================================================================
+            NAME ON HANGING WOODEN SIGN
+            ================================================================== */}
+
+        <div
+          className="
+            absolute
+            z-40
+            pointer-events-none
+            text-center
+            font-semibold
+            text-[#66503F]
+            drop-shadow-[0_1px_2px_rgba(255,250,235,0.75)]
+          "
+          style={{
+            left: "1.5%",
+            top: "32.8%",
+            width: "35%",
+            fontFamily:
+              "Tangerine, cursive",
+            fontSize:
+              "clamp(25px, 2.65vw, 38px)",
+            letterSpacing:
+              "0.01em",
+          }}
+        >
+          Azain
+        </div>
 
         {/* ==================================================================
             SUBTLE CENTRAL LIGHT
