@@ -102,6 +102,31 @@ export default function Gallery() {
     setCurrentIndex(index);
     setLightboxOpen(true);
   }
+  function surpriseMe() {
+  if (!items.length) {
+    return;
+  }
+
+  if (items.length === 1) {
+    setCurrentIndex(0);
+    setLightboxOpen(true);
+    return;
+  }
+
+  let randomIndex;
+
+  do {
+    randomIndex =
+      Math.floor(
+        Math.random() * items.length
+      );
+  } while (
+    randomIndex === currentIndex
+  );
+
+  setCurrentIndex(randomIndex);
+  setLightboxOpen(true);
+}
 
   /*
   ===================================================
@@ -434,12 +459,13 @@ export default function Gallery() {
         */}
 
         <MemoryGalaxy
-          items={items}
-          loading={loading}
-          sceneWidth={SCENE_WIDTH}
-          sceneHeight={SCENE_HEIGHT}
-          onOpen={openMedia}
-        />
+  items={items}
+  loading={loading}
+  sceneWidth={SCENE_WIDTH}
+  sceneHeight={SCENE_HEIGHT}
+  onOpen={openMedia}
+  onSurprise={surpriseMe}
+/>
 
       </div>
 

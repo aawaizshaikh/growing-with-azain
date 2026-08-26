@@ -430,6 +430,124 @@ img {
   color:
     rgba(255, 248, 231, 0.92);
 }
+/* ======================================================
+   SURPRISE ME
+====================================================== */
+
+.memory-galaxy-surprise {
+  position: absolute;
+
+  left: 50%;
+  top: 82%;
+
+  width: 13%;
+  height: auto;
+
+  padding: 0;
+  margin: 0;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  transform:
+    translateX(-50%);
+
+  z-index: 30;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  pointer-events: auto;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.memory-galaxy-surprise-image {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  margin: 0;
+  padding: 0;
+
+  user-select: none;
+  -webkit-user-drag: none;
+
+  transform-origin: center center;
+
+  animation:
+    galaxySurpriseBounce
+    0.72s
+    ease-in-out
+    infinite;
+
+  filter:
+    drop-shadow(
+      0 8px 14px
+      rgba(0, 0, 0, 0.30)
+    );
+
+  transition:
+    filter 0.2s ease;
+}
+
+.memory-galaxy-surprise:hover
+.memory-galaxy-surprise-image {
+  filter:
+    drop-shadow(
+      0 10px 18px
+      rgba(0, 0, 0, 0.38)
+    );
+}
+
+.memory-galaxy-surprise:focus-visible {
+  outline:
+    3px solid
+    rgba(255, 244, 214, 0.95);
+
+  outline-offset: 6px;
+
+  border-radius: 20px;
+}
+
+.memory-galaxy-surprise:disabled {
+  opacity: 0.45;
+
+  cursor: default;
+}
+
+.memory-galaxy-surprise:disabled
+.memory-galaxy-surprise-image {
+  animation: none;
+}
+
+
+/* ======================================================
+   SURPRISE ME BOUNCE
+====================================================== */
+
+@keyframes galaxySurpriseBounce {
+
+  0%,
+  100% {
+    transform:
+      translateY(0)
+      rotate(-4deg);
+  }
+
+  50% {
+    transform:
+      translateY(-18px)
+      rotate(4deg);
+  }
+}
 
 
 /* ======================================================
@@ -759,6 +877,9 @@ img {
   .memory-galaxy-illustration-image,
 
   .memory-galaxy-astronaut {
+      .memory-galaxy-surprise-image {
+    animation: none;
+  }
 
     animation: none;
 

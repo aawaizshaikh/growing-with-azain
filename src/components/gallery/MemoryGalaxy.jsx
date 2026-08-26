@@ -7,6 +7,7 @@ import saturnImage from "../../assets/illustrations/space/planet-saturn.webp";
 import moonImage from "../../assets/illustrations/space/moon.webp";
 import astronautImage from "../../assets/illustrations/space/astronaut.webp";
 import rocketImage from "../../assets/illustrations/space/rocket.webp";
+import surpriseMeImage from "../../assets/illustrations/space/surprise-me.png";
 
 
 /* ======================================================
@@ -659,6 +660,7 @@ function MemoryOrbitItem({
 export default function MemoryGalaxy({
   items = [],
   onOpen,
+  onSurprise,
 }) {
   /*
    * Only usable image/video memories are included.
@@ -947,6 +949,26 @@ export default function MemoryGalaxy({
           thousand little moments.
         </div>
       </div>
+      {/* =================================================
+    SURPRISE ME
+
+    Opens a random memory from the complete
+    Gallery media collection.
+================================================= */}
+      <button
+  type="button"
+  className="memory-galaxy-surprise"
+  onClick={onSurprise}
+  disabled={!mediaItems.length}
+  aria-label="Surprise Me - open a random memory"
+>
+  <img
+    src={surpriseMeImage}
+    alt="Surprise Me"
+    className="memory-galaxy-surprise-image"
+    draggable="false"
+  />
+</button>
 
 
       {/* =================================================
