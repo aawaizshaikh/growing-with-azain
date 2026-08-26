@@ -7,7 +7,7 @@ import saturnImage from "../../assets/illustrations/space/planet-saturn.webp";
 import moonImage from "../../assets/illustrations/space/moon.webp";
 import astronautImage from "../../assets/illustrations/space/astronaut.webp";
 import rocketImage from "../../assets/illustrations/space/rocket.webp";
-import surpriseMeImage from "../../assets/illustrations/space/surprise-me.png";
+import surpriseMeImage from "../../assets/illustrations/space/surprise-me.webp";
 
 
 /* ======================================================

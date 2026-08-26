@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-import closedDiary from "../assets/illustrations/diary/closed-diary.png";
-import midOpenDiary from "../assets/illustrations/diary/mid-open-diary.png";
-import openDiary from "../assets/illustrations/diary/open-diary.png";
-import homepagePreview from "../assets/illustrations/diary/homepage-preview.png";
+import closedDiary from "../assets/illustrations/diary/closed-diary.webp";
+import midOpenDiary from "../assets/illustrations/diary/mid-open-diary.webp";
+import openDiary from "../assets/illustrations/diary/open-diary.webp";
+import homepagePreview from "../assets/illustrations/diary/homepage-preview.webp";
 
 /*
 |--------------------------------------------------------------------------
