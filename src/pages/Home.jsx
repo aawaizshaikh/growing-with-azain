@@ -4,28 +4,10 @@ import FeatureCards from "../components/FeatureCards";
 import Footer from "../components/Footer";
 
 import StoryTrain from "../components/common/StoryTrain";
-import DiaryIntro from "../components/DiaryIntro";
-
-
 
 export default function Home() {
-
   return (
-
     <>
-
-      {!sessionStorage.getItem("azainDiaryIntroShown") && (
-  <DiaryIntro
-    onComplete={() => {
-      sessionStorage.setItem(
-        "azainDiaryIntroShown",
-        "true"
-      );
-    }}
-  />
-)}
-
-
       {/* =========================================================
           EXISTING HOMEPAGE
           ========================================================= */}
@@ -36,7 +18,6 @@ export default function Home() {
         p-4
         lg:p-6
       ">
-
 
         <div
           className="
@@ -50,25 +31,15 @@ export default function Home() {
           "
         >
 
-
           {/* Navigation */}
-
           <Navbar />
 
-
-
           {/* Hero */}
-
           <div className="pt-10 lg:pt-16">
-
             <Hero />
-
           </div>
 
-
-
           {/* Story Train */}
-
           <div
             className="
               relative
@@ -77,31 +48,18 @@ export default function Home() {
               z-20
             "
           >
-
             <StoryTrain />
-
           </div>
 
-
-
           {/* Cards */}
-
           <FeatureCards />
 
-
-
           {/* Footer */}
-
           <Footer />
-
 
         </div>
 
-
       </main>
-
     </>
-
   );
-
 }
