@@ -301,7 +301,7 @@ const ANIMALS = [
   {
     id: "parrot",
     src: parrot,
-    left: "74.652778%",
+    left: "76.652778%",
     top: "61.111111%",
     width: "10.069444%",
     zIndex: 25,
@@ -310,8 +310,8 @@ const ANIMALS = [
   {
   id: "parrotblue",
   src: parrotBlue1,
-  left: "70.486111%",
-  top: "75.555556%",
+  left: "72.486111%",
+  top: "72.555556%",
   width: "7.986111%",
   zIndex: 26,
   rotate: 4,
@@ -320,7 +320,7 @@ const ANIMALS = [
   id: "red-bird",
   src: redBirddown,
   left: "21.527778%",
-  top: "54.444444%",
+  top: "50.444444%",
   width: "6.250000%",
   zIndex: 26,
   rotate: 0,
@@ -355,8 +355,8 @@ const ANIMALS = [
 {
   id: "red-butterfly2",
   src: redButterfly,
-  left: "74.652778%",
-  top: "72.222222%",
+  left: "80.652778%",
+  top: "40.222222%",
   width: "4.305556%",
   zIndex: 21,
   rotate: -8,
@@ -438,10 +438,10 @@ const ANIMALS = [
   {
     id: "lion",
     src: lion1,
-    left: "36.805556%",
+    left: "40.805556%",
     top: "54.444444%",
     width: "13.888889%",
-    zIndex: 50,
+    zIndex: 25,
     rotate: -2,
     flip: true,
   },
@@ -467,8 +467,8 @@ const ANIMALS = [
   {
     id: "rabbit",
     src: rabbit,
-    left: "49.652778%",
-    top: "64.444444%",
+    left: "52.652778%",
+    top: "65.444444%",
     width: "5.208333%",
     zIndex: 50,
     rotate: 2,
@@ -476,8 +476,8 @@ const ANIMALS = [
   {
     id: "squirrel",
     src: squirrel,
-    left: "81.250000%",
-    top: "45.555556%",
+    left: "83.250000%",
+    top: "43.555556%",
     width: "8.194444%",
     zIndex: 50,
     rotate: -4,
@@ -520,16 +520,16 @@ const ANIMALS = [
   The actual memory/title comes from Admin.
 */
 const SIGNPOST_ANCHORS = [
-  { left: "7.638889%", top: "94.444444%", rotation: -2, scale: 1.0 },
-  { left: "35.763889%", top: "95.000000%", rotation: 2, scale: 0.98 },
-  { left: "21.875000%", top: "83.555556%", rotation: -2, scale: 0.96 },
+  { left: "5.638889%", top: "90.444444%", rotation: -2, scale: 1.0 },
+  { left: "35.763889%", top: "92.000000%", rotation: 2, scale: 0.98 },
+  { left: "21.875000%", top: "80.555556%", rotation: -2, scale: 0.96 },
   { left: "59.027778%", top: "76.666667%", rotation: 2, scale: 0.84 },
   { left: "41.666667%", top: "69.444444%", rotation: -1, scale: 0.82 },
   { left: "76.388889%", top: "61.111111%", rotation: 2, scale: 0.75 },
   { left: "57.986111%", top: "53.333333%", rotation: -2, scale: 0.68 },
   { left: "67.708333%", top: "47.222222%", rotation: 2, scale: 0.58 },
   { left: "79.513889%", top: "45.555556%", rotation: -1, scale: 0.64 },
-  { left: "69.791667%", top: "35.555556%", rotation: 2, scale: 0.58 },
+  { left: "71.791667%", top: "38.555556%", rotation: 2, scale: 0.58 },
 ];
 
 function AnimalLayer({

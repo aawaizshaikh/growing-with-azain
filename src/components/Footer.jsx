@@ -52,7 +52,7 @@ export default function Footer() {
 
         >
 
-          Made with love by Mommy & Daddy
+          Made with love by Mom & Dad
 
 
           <motion.span

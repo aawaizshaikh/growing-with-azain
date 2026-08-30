@@ -274,9 +274,9 @@ const BOOKS = {
   draggable={false}
   style={{
     position: "absolute",
-    right: 75,
+    right: 50,
     bottom: 150,
-    width: 200,
+    width: 250,
     zIndex: 20,
     pointerEvents: "none",
     userSelect: "none",
